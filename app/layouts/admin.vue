@@ -1,0 +1,87 @@
+<script setup lang="ts">
+const authStore = useAuthStore()
+const route = useRoute()
+const isCollapse = ref(false)
+
+const menuItems = [
+  { path: '/admin', icon: 'ep:odometer', title: '仪表盘' },
+  { path: '/admin/articles', icon: 'ep:document', title: '文章管理' },
+  { path: '/admin/categories', icon: 'ep:folder', title: '分类管理' },
+  { path: '/admin/tags', icon: 'ep:price-tag', title: '标签管理' },
+  { path: '/admin/comments', icon: 'ep:chat-dot-round', title: '评论管理' },
+  { path: '/admin/files', icon: 'ep:files', title: '文件管理' },
+  { path: '/admin/users', icon: 'ep:user', title: '用户管理' },
+]
+
+onMounted(() => {
+  if (!authStore.isLoggedIn) {
+    navigateTo('/login')
+  }
+})
+</script>
+
+<template>
+  <div class="min-h-screen flex">
+    <!-- 侧边栏 -->
+    <aside class="bg-gray-900 text-white" :class="isCollapse ? 'w-16' : 'w-60'">
+      <!-- Logo -->
+      <div class="h-16 flex items-center justify-center border-b border-gray-700">
+        <span v-if="!isCollapse" class="text-lg font-bold">AI Blog 管理</span>
+        <span v-else class="text-lg font-bold">AB</span>
+      </div>
+
+      <!-- 菜单 -->
+      <el-menu
+        :default-active="route.path"
+        :collapse="isCollapse"
+        background-color="#111827"
+        text-color="#9ca3af"
+        active-text-color="#409eff"
+        router
+      >
+        <el-menu-item
+          v-for="item in menuItems"
+          :key="item.path"
+          :index="item.path"
+        >
+          <el-icon><Icon :name="item.icon" /></el-icon>
+          <template #title>{{ item.title }}</template>
+        </el-menu-item>
+      </el-menu>
+    </aside>
+
+    <!-- 右侧内容区 -->
+    <div class="flex-1 flex flex-col">
+      <!-- 顶部栏 -->
+      <header class="bg-white h-16 flex items-center justify-between px-4 shadow-sm">
+        <el-button text @click="isCollapse = !isCollapse">
+          <el-icon :size="20">
+            <Icon :name="isCollapse ? 'ep:expand' : 'ep:fold'" />
+          </el-icon>
+        </el-button>
+
+        <div class="flex items-center gap-4">
+          <NuxtLink to="/" class="text-gray-500 hover:text-blue-500 text-sm">
+            访问前台
+          </NuxtLink>
+          <el-dropdown>
+            <span class="flex items-center gap-2 cursor-pointer">
+              <el-avatar :size="28">{{ authStore.user?.displayName?.charAt(0) }}</el-avatar>
+              <span class="text-sm">{{ authStore.user?.displayName }}</span>
+            </span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="authStore.logout()">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+        </div>
+      </header>
+
+      <!-- 内容 -->
+      <main class="flex-1 p-6 bg-gray-50">
+        <slot />
+      </main>
+    </div>
+  </div>
+</template>
