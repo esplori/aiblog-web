@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Comment } from '~/types'
+import type { CommentResponse } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -7,14 +7,13 @@ definePageMeta({
 
 const { get, put, del } = useApi()
 
-const comments = ref<Comment[]>([])
+const comments = ref<CommentResponse[]>([])
 const loading = ref(true)
 
 const loadComments = async () => {
   loading.value = true
   try {
-    // 获取待审核评论（这里简化处理，实际可能需要专门的审核接口）
-    const res = await get<Comment[]>('/api/comments/article/1')
+    const res = await get<CommentResponse[]>('/api/admin/comments')
     comments.value = res.data
   } catch (e) {
     console.error(e)
@@ -59,7 +58,12 @@ onMounted(loadComments)
         <el-table-column prop="content" label="内容" min-width="300" show-overflow-tooltip />
         <el-table-column label="用户" width="120">
           <template #default="{ row }">
-            {{ row.userInfo?.displayName || row.nickname || '匿名' }}
+            {{ row.userInfo?.username || '匿名' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="文章" width="200">
+          <template #default="{ row }">
+            文章 ID: {{ row.articleId }}
           </template>
         </el-table-column>
         <el-table-column prop="status" label="状态" width="100">

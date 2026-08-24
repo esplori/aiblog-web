@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from '~/types'
+import type { UserResponse } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -7,13 +7,13 @@ definePageMeta({
 
 const { get } = useApi()
 
-const users = ref<User[]>([])
+const users = ref<UserResponse[]>([])
 const loading = ref(true)
 
 const loadUsers = async () => {
   loading.value = true
   try {
-    const res = await get<User[]>('/api/users')
+    const res = await get<UserResponse[]>('/api/admin/users')
     users.value = res.data
   } catch (e) {
     console.error(e)
@@ -50,6 +50,11 @@ onMounted(loadUsers)
             <el-tag :type="row.role === 'admin' ? 'danger' : 'info'" size="small">
               {{ row.role }}
             </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="最后登录" width="180">
+          <template #default="{ row }">
+            {{ row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleString() : '未登录' }}
           </template>
         </el-table-column>
       </el-table>
