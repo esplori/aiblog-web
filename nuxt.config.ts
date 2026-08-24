@@ -3,6 +3,19 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
 
+  // 指定源码目录（Docker 构建时 WORKDIR /app/app）
+  srcDir: 'app',
+
+  vite: {
+    vue: {
+      script: {
+        // 禁用宏变换以避免 TypeScript 配置文件缺失问题
+        defineModel: false,
+        propsDestructure: false,
+      },
+    },
+  },
+
   modules: [
     '@nuxtjs/tailwindcss',
     '@element-plus/nuxt',
