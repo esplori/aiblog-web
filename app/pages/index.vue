@@ -3,30 +3,30 @@ import type { ArticleItem, Category, Tag } from '~/types'
 
 const { get } = useApi()
 
-const articles = ref<ArticleItem[]>([])
-const categories = ref<Category[]>([])
-const tags = ref<Tag[]>([])
-const loading = ref(true)
+// 使用 useAsyncData 进行服务端数据获取，支持 SSR
+const { data: articlesData, pending: articlesPending, error: articlesError } = useAsyncData(
+  'articles-home',
+  () => get<ArticleItem[]>('/api/articles', { page: 1, size: 6, status: 'published' }),
+  { default: () => [] }
+)
 
-const loadData = async () => {
-  loading.value = true
-  try {
-    const [articleRes, categoryRes, tagRes] = await Promise.all([
-      get<{ records: ArticleItem[] }>('/api/articles', { page: 1, size: 6, status: 'published' }),
-      get<Category[]>('/api/categories'),
-      get<Tag[]>('/api/tags'),
-    ])
-    articles.value = articleRes.data.records
-    categories.value = categoryRes.data
-    tags.value = tagRes.data
-  } catch (e) {
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
+const { data: categoriesData, pending: categoriesPending } = useAsyncData(
+  'categories-home',
+  () => get<Category[]>('/api/categories'),
+  { default: () => [] }
+)
 
-onMounted(loadData)
+const { data: tagsData, pending: tagsPending } = useAsyncData(
+  'tags-home',
+  () => get<Tag[]>('/api/tags'),
+  { default: () => [] }
+)
+
+const loading = computed(() => articlesPending.value || categoriesPending.value || tagsPending.value)
+
+const articles = computed(() => articlesData.value?.data || [])
+const categories = computed(() => categoriesData.value?.data || [])
+const tags = computed(() => tagsData.value?.data || [])
 </script>
 
 <template>
