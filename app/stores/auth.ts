@@ -1,9 +1,17 @@
 import { defineStore } from 'pinia'
 import type { User, LoginData } from '~/types'
 
+// Cookie 选项：HTTP 环境下 secure 必须为 false
+// sameSite 使用浏览器默认值（lax），避免跨端口问题
+const cookieOptions = {
+  maxAge: 60 * 60 * 24 * 7, // 7天
+  secure: false,
+  path: '/',
+}
+
 export const useAuthStore = defineStore('auth', () => {
-  const token = useCookie('token')
-  const refreshToken = useCookie('refreshToken')
+  const token = useCookie('token', cookieOptions)
+  const refreshToken = useCookie('refreshToken', cookieOptions)
   const user = ref<User | null>(null)
   const isLoggedIn = computed(() => !!token.value)
 

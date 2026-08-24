@@ -1,8 +1,14 @@
 import type { ApiResponse } from '~/types'
 
+const cookieOptions = {
+  maxAge: 60 * 60 * 24 * 7,
+  secure: false,
+  path: '/',
+}
+
 export const useApi = () => {
   const config = useRuntimeConfig()
-  const token = useCookie('token')
+  const token = useCookie('token', cookieOptions)
 
   const request = async <T>(
     url: string,
