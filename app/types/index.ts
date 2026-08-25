@@ -47,7 +47,6 @@ export interface Article {
   title: string
   content: string
   excerpt?: string
-  slug: string
   coverImage?: string
   status: string
   isTop: boolean
@@ -70,7 +69,6 @@ export interface ArticleItem {
   uuid: string
   title: string
   excerpt?: string
-  slug: string
   coverImage?: string
   status: string
   isTop: boolean
@@ -133,7 +131,6 @@ export interface ArticleRequest {
   title: string
   content: string
   excerpt?: string
-  slug: string
   coverImage?: string
   status?: string
   isTop?: boolean

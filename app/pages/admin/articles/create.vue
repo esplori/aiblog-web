@@ -19,7 +19,6 @@ const form = reactive<ArticleRequest>({
   title: '',
   content: '',
   excerpt: '',
-  slug: '',
   coverImage: '',
   status: 'draft',
   isTop: false,
@@ -70,7 +69,6 @@ const loadArticle = async () => {
     form.title = article.title
     form.content = article.content
     form.excerpt = article.excerpt || ''
-    form.slug = article.slug
     form.status = article.status
     form.isTop = article.isTop
     form.isOriginal = article.isOriginal
@@ -87,7 +85,7 @@ const loadArticle = async () => {
 }
 
 const handleSubmit = async () => {
-  if (!form.title || !form.content || !form.slug) {
+  if (!form.title || !form.content) {
     ElMessage.warning('请填写必填字段')
     return
   }
@@ -132,10 +130,6 @@ onMounted(() => {
       <el-form :model="form" label-width="100px">
         <el-form-item label="标题" required>
           <el-input v-model="form.title" placeholder="文章标题" />
-        </el-form-item>
-
-        <el-form-item label="URL别名" required>
-          <el-input v-model="form.slug" placeholder="url-slug" />
         </el-form-item>
 
         <el-form-item label="摘要">
