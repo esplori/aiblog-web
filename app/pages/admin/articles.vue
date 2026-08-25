@@ -1,30 +1,31 @@
 <script setup lang="ts">
-import type { ArticleListResponse } from '~/types'
+import type { ArticleItem } from '~/types'
 
 definePageMeta({
   layout: 'admin',
 })
 
+const route = useRouter()
 const { get, del } = useApi()
 
-const articles = ref<ArticleListResponse[]>([])
-const loading = ref(true)
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const loadArticles = async () => {
-  loading.value = true
-  try {
-    const res = await get<ArticleListResponse[]>(`/api/admin/articles?page=${page.value}&size=${pageSize.value}`)
-    articles.value = res.data
-    // 这里简化处理，实际应该从响应头或分页对象获取总数
-    total.value = articles.value.length
-  } catch (e) {
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
+const { data: articles, refresh: loadArticles, pending: loading } = await useAsyncData('articles', async () => {
+  const res = await get<ArticleItem[]>(`/api/admin/articles?page=${page.value}&size=${pageSize.value}`)
+  total.value = res.data.length
+  return res.data
+}, {
+  default: () => [],
+})
+
+const handleEdit = (id: number) => {
+  navigateTo(`/admin/articles/edit/${id}`)
+}
+
+const handleCreate = () => {
+  navigateTo('/admin/articles/create')
 }
 
 const handleDelete = async (id: number) => {
@@ -32,7 +33,7 @@ const handleDelete = async (id: number) => {
     await ElMessageBox.confirm('确定删除这篇文章吗？', '确认')
     await del(`/api/articles/${id}`)
     ElMessage.success('删除成功')
-    loadArticles()
+    await loadArticles()
   } catch (e: any) {
     if (e !== 'cancel') {
       ElMessage.error('删除失败')
@@ -40,14 +41,16 @@ const handleDelete = async (id: number) => {
   }
 }
 
-onMounted(loadArticles)
+onMounted(() => {
+  loadArticles()
+})
 </script>
 
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">文章管理</h1>
-      <el-button type="primary">新建文章</el-button>
+      <el-button type="primary" @click="handleCreate">新建文章</el-button>
     </div>
 
     <div class="card">
@@ -70,7 +73,7 @@ onMounted(loadArticles)
         </el-table-column>
         <el-table-column label="操作" width="200" fixed="right">
           <template #default="{ row }">
-            <el-button size="small" text type="primary">编辑</el-button>
+            <el-button size="small" text type="primary" @click="handleEdit(row.id)">编辑</el-button>
             <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
           </template>
         </el-table-column>

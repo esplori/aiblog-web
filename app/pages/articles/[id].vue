@@ -1,36 +1,33 @@
 <script setup lang="ts">
 import type { Article, Comment } from '~/types'
+import { renderMarkdown } from '~/utils/markdown'
 
 const route = useRoute()
 const { get, post } = useApi()
 
-const article = ref<Article | null>(null)
-const comments = ref<Comment[]>([])
-const loading = ref(true)
-const commentContent = ref('')
-
 const articleId = computed(() => Number(route.params.id))
 
-const loadArticle = async () => {
-  loading.value = true
-  try {
-    const res = await get<Article>(`/api/articles/${articleId.value}`)
-    article.value = res.data
-  } catch (e) {
-    console.error(e)
-  } finally {
-    loading.value = false
-  }
-}
+// 使用 useAsyncData 支持 SSR
+const { data: articleData, pending: articlePending, error: articleError, refresh: refreshArticle } = useAsyncData(
+  'article-detail',
+  () => get<Article>(`/api/articles/${articleId.value}`),
+  { default: () => null, watch: [articleId] }
+)
 
-const loadComments = async () => {
-  try {
-    const res = await get<Comment[]>(`/api/comments/article/${articleId.value}`)
-    comments.value = res.data
-  } catch (e) {
-    console.error(e)
-  }
-}
+const { data: commentsData, pending: commentsPending, refresh: refreshComments } = useAsyncData(
+  'article-comments',
+  () => get<Comment[]>(`/api/comments/article/${articleId.value}`),
+  { default: () => [], watch: [articleId] }
+)
+
+const article = computed(() => articleData.value?.data || null)
+const comments = computed(() => commentsData.value?.data || [])
+const loading = computed(() => articlePending.value || commentsPending.value)
+
+// 将 Markdown 内容转换为 HTML
+const articleContentHtml = computed(() => article.value ? renderMarkdown(article.value.content) : '')
+
+const commentContent = ref('')
 
 const submitComment = async () => {
   if (!commentContent.value.trim()) {
@@ -45,16 +42,11 @@ const submitComment = async () => {
     })
     ElMessage.success('评论已提交，等待审核')
     commentContent.value = ''
-    loadComments()
+    await refreshComments()
   } catch (e: any) {
     ElMessage.error(e?.data?.message || '评论失败')
   }
 }
-
-onMounted(() => {
-  loadArticle()
-  loadComments()
-})
 </script>
 
 <template>
@@ -81,7 +73,7 @@ onMounted(() => {
         </div>
 
         <!-- 文章内容 -->
-        <article class="card prose max-w-none mb-8" v-html="article.content" />
+        <article class="card prose max-w-none mb-8" v-html="articleContentHtml" />
 
         <!-- 点赞 -->
         <div class="flex justify-center mb-12">

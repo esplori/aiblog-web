@@ -14,6 +14,15 @@ export default defineNuxtConfig({
         propsDestructure: false,
       },
     },
+    // 开发环境代理配置
+    server: {
+      proxy: {
+        '/api': {
+          target: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080',
+          changeOrigin: true,
+        },
+      },
+    },
   },
 
   modules: [
@@ -32,6 +41,8 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080',
     },
   },
+
+  
 
   // Element Plus 配置
   elementPlus: {
