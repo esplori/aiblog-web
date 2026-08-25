@@ -33,9 +33,17 @@ export interface LoginData {
   userInfo: User
 }
 
+// 标签信息（文章详情中的标签）
+export interface TagInfo {
+  id: number
+  name: string
+  slug: string
+}
+
 // 文章
 export interface Article {
   id: number
+  uuid: string
   title: string
   content: string
   excerpt?: string
@@ -49,7 +57,7 @@ export interface Article {
   commentCount: number
   authorId: number
   categoryId?: number
-  tags?: string[]
+  tags?: TagInfo[]
   author?: User
   category?: Category
   createdAt: string
@@ -59,6 +67,7 @@ export interface Article {
 // 文章列表项
 export interface ArticleItem {
   id: number
+  uuid: string
   title: string
   excerpt?: string
   slug: string

@@ -37,6 +37,8 @@ export default defineNuxtConfig({
 
   // 运行时配置
   runtimeConfig: {
+    // 服务器端（SSR）访问后端的内部地址，浏览器不可见
+    apiBaseInternal: process.env.NUXT_API_BASE_INTERNAL || 'http://localhost:8080',
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8080',
     },

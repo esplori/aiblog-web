@@ -5,22 +5,29 @@ import { renderMarkdown } from '~/utils/markdown'
 const route = useRoute()
 const { get, post } = useApi()
 
-const articleId = computed(() => Number(route.params.id))
+// 文章 UUID（对外路由标识）
+const articleUuid = computed(() => String(route.params.uuid))
 
 // 使用 useAsyncData 支持 SSR
 const { data: articleData, pending: articlePending, error: articleError, refresh: refreshArticle } = useAsyncData(
   'article-detail',
-  () => get<Article>(`/api/articles/${articleId.value}`),
-  { default: () => null, watch: [articleId] }
-)
-
-const { data: commentsData, pending: commentsPending, refresh: refreshComments } = useAsyncData(
-  'article-comments',
-  () => get<Comment[]>(`/api/comments/article/${articleId.value}`),
-  { default: () => [], watch: [articleId] }
+  () => get<Article>(`/api/articles/uuid/${articleUuid.value}`),
+  { default: () => null, watch: [articleUuid] }
 )
 
 const article = computed(() => articleData.value?.data || null)
+
+// 评论请求依赖文章内部 id，需等文章加载完成后再请求
+const { data: commentsData, pending: commentsPending, refresh: refreshComments } = useAsyncData(
+  'article-comments',
+  () => {
+    const id = article.value?.id
+    if (!id) return Promise.resolve({ data: [] } as any)
+    return get<Comment[]>(`/api/comments/article/${id}`)
+  },
+  { default: () => [], watch: [() => article.value?.id] }
+)
+
 const comments = computed(() => commentsData.value?.data || [])
 const loading = computed(() => articlePending.value || commentsPending.value)
 
@@ -34,10 +41,14 @@ const submitComment = async () => {
     ElMessage.warning('请输入评论内容')
     return
   }
+  if (!article.value) {
+    ElMessage.error('文章不存在')
+    return
+  }
 
   try {
     await post('/api/comments', {
-      articleId: articleId.value,
+      articleId: article.value.id,
       content: commentContent.value,
     })
     ElMessage.success('评论已提交，等待审核')
@@ -68,7 +79,11 @@ const submitComment = async () => {
             <span>{{ article.viewCount }} 阅读</span>
           </div>
           <div v-if="article.tags?.length" class="flex gap-2 mt-3">
-            <el-tag v-for="tag in article.tags" :key="tag" size="small">{{ tag }}</el-tag>
+            <NuxtLink v-for="tag in article.tags" :key="tag.id" :to="`/articles?tag=${tag.slug}`">
+              <el-tag size="small" class="cursor-pointer hover:!bg-blue-50 hover:!text-blue-500 transition-colors">
+                {{ tag.name }}
+              </el-tag>
+            </NuxtLink>
           </div>
         </div>
 

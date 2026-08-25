@@ -14,6 +14,10 @@ const currentPage = ref(1)
 const category = computed(() => route.query.category as string)
 const tag = computed(() => route.query.tag as string)
 
+// 用名称展示当前过滤条件（slug → name）
+const categoryName = computed(() => categories.value.find(c => c.slug === category.value)?.name || category.value)
+const tagName = computed(() => tags.value.find(t => t.slug === tag.value)?.name || tag.value)
+
 const loadArticles = async () => {
   loading.value = true
   try {
@@ -22,8 +26,8 @@ const loadArticles = async () => {
       size: 10,
       status: 'published',
     }
-    if (category.value) params.category = category.value
-    if (tag.value) params.tag = tag.value
+    if (category.value) params.categorySlug = category.value
+    if (tag.value) params.tagSlug = tag.value
 
     const res = await get<{ records: ArticleItem[]; total: number } | ArticleItem[]>('/api/articles', params)
     // 兼容两种返回格式：分页对象 { records, total } 或直接数组
@@ -79,7 +83,7 @@ watch([category, tag], () => {
       <!-- 文章列表 -->
       <div class="lg:col-span-3">
         <h1 class="text-2xl font-bold mb-6">
-          {{ category ? `分类: ${category}` : tag ? `标签: ${tag}` : '全部文章' }}
+          {{ categoryName ? `分类: ${categoryName}` : tagName ? `标签: ${tagName}` : '全部文章' }}
         </h1>
 
         <el-skeleton v-if="loading" :rows="5" animated />
@@ -91,7 +95,7 @@ watch([category, tag], () => {
             <NuxtLink
               v-for="article in articles"
               :key="article.id"
-              :to="`/articles/${article.id}`"
+              :to="`/post/${article.uuid}`"
               class="card hover:shadow-md transition-shadow block"
             >
               <div class="flex gap-4">

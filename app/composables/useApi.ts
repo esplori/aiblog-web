@@ -39,8 +39,11 @@ export const useApi = () => {
     }
 
     try {
-      // 使用相对路径，通过 Nitro/Vite 代理转发到后端
-      const response = await $fetch<ApiResponse<T>>(url, {
+      // SSR 时直接请求容器内后端地址，避免 Nitro 自身无 /api 代理导致 404；
+      // 浏览器端使用相对路径，由 nginx 将 /api 代理到后端
+      const config = useRuntimeConfig()
+      const fullUrl = import.meta.server ? `${config.apiBaseInternal}${url}` : url
+      const response = await $fetch<ApiResponse<T>>(fullUrl, {
         method: (options.method || 'GET') as any,
         headers,
         body: options.body,

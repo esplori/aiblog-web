@@ -51,7 +51,7 @@ const tags = computed(() => tagsData.value?.data || [])
           <NuxtLink
             v-for="article in articles"
             :key="article.id"
-            :to="`/articles/${article.id}`"
+            :to="`/post/${article.uuid}`"
             class="card hover:shadow-md transition-shadow"
           >
             <h3 class="text-lg font-semibold mb-2 text-gray-800">{{ article.title }}</h3>
