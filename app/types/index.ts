@@ -49,8 +49,6 @@ export interface Article {
   excerpt?: string
   coverImage?: string
   status: string
-  isTop: boolean
-  isOriginal: boolean
   viewCount: number
   likeCount: number
   commentCount: number
@@ -71,7 +69,6 @@ export interface ArticleItem {
   excerpt?: string
   coverImage?: string
   status: string
-  isTop: boolean
   viewCount: number
   likeCount: number
   commentCount: number
@@ -133,8 +130,6 @@ export interface ArticleRequest {
   excerpt?: string
   coverImage?: string
   status?: string
-  isTop?: boolean
-  isOriginal?: boolean
   sourceUrl?: string
   categoryId: number
   tagIds?: number[]

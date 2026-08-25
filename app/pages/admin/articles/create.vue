@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { Article, ArticleRequest, Category, Tag, FileInfo } from '~/types'
+import { MdEditor } from 'md-editor-v3'
+import 'md-editor-v3/lib/style.css'
 
 definePageMeta({
   layout: 'admin',
@@ -21,8 +23,6 @@ const form = reactive<ArticleRequest>({
   excerpt: '',
   coverImage: '',
   status: 'draft',
-  isTop: false,
-  isOriginal: true,
   categoryId: 0,
   tagIds: [],
 })
@@ -70,8 +70,6 @@ const loadArticle = async () => {
     form.content = article.content
     form.excerpt = article.excerpt || ''
     form.status = article.status
-    form.isTop = article.isTop
-    form.isOriginal = article.isOriginal
     form.categoryId = article.categoryId || 0
     form.tagIds = (article.tags || []).map((t: any) => t.id) || []
     selectedTagIds.value = (article.tags || []).map((t: any) => t.id) || []
@@ -188,18 +186,13 @@ onMounted(() => {
           </el-select>
         </el-form-item>
 
-        <el-form-item label="原创/置顶">
-          <el-checkbox v-model="form.isOriginal">原创</el-checkbox>
-          <el-checkbox v-model="form.isTop">置顶</el-checkbox>
-        </el-form-item>
-
         <el-form-item label="内容" required>
-          <el-input
-            v-model="form.content"
-            type="textarea"
-            :rows="15"
-            placeholder="Markdown 格式内容"
-          />
+          <ClientOnly>
+            <MdEditor v-model="form.content" style="height: 520px" :toolbars-exclude="['github']" />
+            <template #fallback>
+              <el-input v-model="form.content" type="textarea" :rows="15" placeholder="加载 Markdown 编辑器中..." />
+            </template>
+          </ClientOnly>
         </el-form-item>
 
         <el-form-item>
