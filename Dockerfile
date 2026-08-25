@@ -24,15 +24,12 @@ RUN pnpm build
 # 运行阶段
 FROM node:22-alpine
 
-# 安装必要工具
-RUN apk add --no-cache curl tzdata
+# 安装必要工具 + nginx
+RUN apk add --no-cache curl tzdata nginx
 
 # 设置时区
 ENV TZ=Asia/Shanghai
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-# 创建非root用户
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # 设置工作目录
 WORKDIR /app
@@ -41,8 +38,18 @@ WORKDIR /app
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/package.json ./
 
-# 切换用户
-USER appuser
+# 复制 nginx 配置
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# 创建 nginx 运行目录
+RUN mkdir -p /var/lib/nginx/tmp/client_body \
+    /var/lib/nginx/tmp/proxy \
+    /var/lib/nginx/tmp/fastcgi \
+    /var/lib/nginx/tmp/uwsgi \
+    /var/lib/nginx/tmp/scgi \
+    /var/log/nginx \
+    /var/run/nginx && \
+    chown -R nobody:nogroup /var/lib/nginx /var/log/nginx /var/run/nginx
 
 # 暴露端口
 EXPOSE 3000
@@ -51,5 +58,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# 启动命令
-CMD ["node", ".output/server/index.mjs"]
+# 启动命令：先启动 Nuxt 服务器（内部端口 3001），再启动 nginx（前台端口 3000）
+CMD ["sh", "-c", "PORT=3001 node .output/server/index.mjs & nginx -g 'daemon off;'"]

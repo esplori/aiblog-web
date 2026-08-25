@@ -7,7 +7,6 @@ const cookieOptions = {
 }
 
 export const useApi = () => {
-  const config = useRuntimeConfig()
   const token = useCookie('token', cookieOptions)
 
   const request = async <T>(
@@ -40,9 +39,8 @@ export const useApi = () => {
     }
 
     try {
-      // 直接调用后端 API（后端已配置 CORS 允许跨域）
+      // 使用相对路径，通过 Nitro/Vite 代理转发到后端
       const response = await $fetch<ApiResponse<T>>(url, {
-        baseURL: config.public.apiBase as string,
         method: (options.method || 'GET') as any,
         headers,
         body: options.body,

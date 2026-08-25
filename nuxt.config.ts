@@ -42,8 +42,6 @@ export default defineNuxtConfig({
     },
   },
 
-  
-
   // Element Plus 配置
   elementPlus: {
     importStyle: 'css',

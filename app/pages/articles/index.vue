@@ -25,11 +25,20 @@ const loadArticles = async () => {
     if (category.value) params.category = category.value
     if (tag.value) params.tag = tag.value
 
-    const res = await get<{ records: ArticleItem[]; total: number }>('/api/articles', params)
-    articles.value = res.data.records
-    total.value = res.data.total
+    const res = await get<{ records: ArticleItem[]; total: number } | ArticleItem[]>('/api/articles', params)
+    // 兼容两种返回格式：分页对象 { records, total } 或直接数组
+    const data = res.data
+    if (Array.isArray(data)) {
+      articles.value = data
+      total.value = data.length
+    } else {
+      articles.value = data.records || []
+      total.value = data.total || 0
+    }
   } catch (e) {
     console.error(e)
+    articles.value = []
+    total.value = 0
   } finally {
     loading.value = false
   }

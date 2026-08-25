@@ -5,14 +5,21 @@ definePageMeta({
   layout: 'admin',
 })
 
-const route = useRouter()
+const route = useRoute()
 const { get, del } = useApi()
+
+// 判断是否为子路由（新建/编辑），是则由 NuxtPage 渲染子页面，否则渲染文章列表
+const isSubRoute = computed(() => {
+  const path = route.path
+  return path.startsWith('/admin/articles/create') || path.startsWith('/admin/articles/edit')
+})
 
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
 const { data: articles, refresh: loadArticles, pending: loading } = await useAsyncData('articles', async () => {
+  if (isSubRoute.value) return []
   const res = await get<ArticleItem[]>(`/api/admin/articles?page=${page.value}&size=${pageSize.value}`)
   total.value = res.data.length
   return res.data
@@ -47,7 +54,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
+  <NuxtPage v-if="isSubRoute" />
+  <div v-else>
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-2xl font-bold">文章管理</h1>
       <el-button type="primary" @click="handleCreate">新建文章</el-button>
