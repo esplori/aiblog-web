@@ -17,7 +17,6 @@ const editingId = ref<number | null>(null)
 const submitting = ref(false)
 const form = reactive({
   name: '',
-  slug: '',
   color: '#409eff',
 })
 
@@ -38,7 +37,6 @@ const loadTags = async () => {
 
 const resetForm = () => {
   form.name = ''
-  form.slug = ''
   form.color = '#409eff'
   editingId.value = null
 }
@@ -53,14 +51,13 @@ const handleEdit = (row: Tag) => {
   isEdit.value = true
   editingId.value = row.id
   form.name = row.name
-  form.slug = row.slug
   form.color = row.color || '#409eff'
   dialogVisible.value = true
 }
 
 const handleSubmit = async () => {
-  if (!form.name || !form.slug) {
-    ElMessage.warning('请填写名称和 Slug')
+  if (!form.name) {
+    ElMessage.warning('请填写名称')
     return
   }
 
@@ -109,7 +106,6 @@ onMounted(loadTags)
       <el-skeleton v-if="loading" :rows="5" animated />
       <el-table v-else :data="tags">
         <el-table-column prop="name" label="名称" width="150" />
-        <el-table-column prop="slug" label="Slug" width="150" />
         <el-table-column label="颜色" width="100">
           <template #default="{ row }">
             <span
@@ -138,9 +134,6 @@ onMounted(loadTags)
       <el-form :model="form" label-width="80px">
         <el-form-item label="名称" required>
           <el-input v-model="form.name" placeholder="标签名称" />
-        </el-form-item>
-        <el-form-item label="Slug" required>
-          <el-input v-model="form.slug" placeholder="url-slug" />
         </el-form-item>
         <el-form-item label="颜色">
           <div class="flex items-center gap-2 flex-wrap">

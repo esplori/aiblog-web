@@ -14,9 +14,9 @@ const currentPage = ref(1)
 const category = computed(() => route.query.category as string)
 const tag = computed(() => route.query.tag as string)
 
-// 用名称展示当前过滤条件（slug → name）
-const categoryName = computed(() => categories.value.find(c => c.slug === category.value)?.name || category.value)
-const tagName = computed(() => tags.value.find(t => t.slug === tag.value)?.name || tag.value)
+// 用名称展示当前过滤条件（id → name）
+const categoryName = computed(() => categories.value.find(c => String(c.id) === category.value)?.name || category.value)
+const tagName = computed(() => tags.value.find(t => String(t.id) === tag.value)?.name || tag.value)
 
 const loadArticles = async () => {
   loading.value = true
@@ -26,8 +26,8 @@ const loadArticles = async () => {
       size: 10,
       status: 'published',
     }
-    if (category.value) params.categorySlug = category.value
-    if (tag.value) params.tagSlug = tag.value
+    if (category.value) params.categoryId = category.value
+    if (tag.value) params.tagId = tag.value
 
     const res = await get<{ records: ArticleItem[]; total: number } | ArticleItem[]>('/api/articles', params)
     // 兼容两种返回格式：分页对象 { records, total } 或直接数组
@@ -137,7 +137,7 @@ watch([category, tag], () => {
             <NuxtLink
               v-for="cat in categories"
               :key="cat.id"
-              :to="`/articles?category=${cat.slug}`"
+              :to="`/articles?category=${cat.id}`"
               class="flex justify-between items-center text-sm text-gray-600 hover:text-blue-500"
             >
               <span>{{ cat.name }}</span>
@@ -153,7 +153,7 @@ watch([category, tag], () => {
             <NuxtLink
               v-for="t in tags"
               :key="t.id"
-              :to="`/articles?tag=${t.slug}`"
+              :to="`/articles?tag=${t.id}`"
               class="px-2 py-1 border rounded text-xs hover:bg-blue-50 hover:text-blue-500"
             >
               {{ t.name }}

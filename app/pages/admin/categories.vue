@@ -17,7 +17,6 @@ const editingId = ref<number | null>(null)
 const submitting = ref(false)
 const form = reactive({
   name: '',
-  slug: '',
   description: '',
 })
 
@@ -35,7 +34,6 @@ const loadCategories = async () => {
 
 const resetForm = () => {
   form.name = ''
-  form.slug = ''
   form.description = ''
   editingId.value = null
 }
@@ -50,14 +48,13 @@ const handleEdit = (row: Category) => {
   isEdit.value = true
   editingId.value = row.id
   form.name = row.name
-  form.slug = row.slug
   form.description = row.description || ''
   dialogVisible.value = true
 }
 
 const handleSubmit = async () => {
-  if (!form.name || !form.slug) {
-    ElMessage.warning('请填写名称和 Slug')
+  if (!form.name) {
+    ElMessage.warning('请填写名称')
     return
   }
 
@@ -106,7 +103,6 @@ onMounted(loadCategories)
       <el-skeleton v-if="loading" :rows="5" animated />
       <el-table v-else :data="categories">
         <el-table-column prop="name" label="名称" width="150" />
-        <el-table-column prop="slug" label="Slug" width="150" />
         <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
         <el-table-column prop="articleCount" label="文章数" width="100" />
         <el-table-column label="操作" width="150">
@@ -128,9 +124,6 @@ onMounted(loadCategories)
       <el-form :model="form" label-width="80px">
         <el-form-item label="名称" required>
           <el-input v-model="form.name" placeholder="分类名称" />
-        </el-form-item>
-        <el-form-item label="Slug" required>
-          <el-input v-model="form.slug" placeholder="url-slug" />
         </el-form-item>
         <el-form-item label="描述">
           <el-input v-model="form.description" type="textarea" :rows="3" placeholder="分类描述" />

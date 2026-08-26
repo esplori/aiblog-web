@@ -72,14 +72,14 @@ const submitComment = async () => {
             <span v-if="article.author">{{ article.author.displayName }}</span>
             <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
             <span v-if="article.category">
-              <NuxtLink :to="`/articles?category=${article.category.slug}`" class="hover:text-blue-500">
+              <NuxtLink :to="`/articles?category=${article.category.id}`" class="hover:text-blue-500">
                 {{ article.category.name }}
               </NuxtLink>
             </span>
             <span>{{ article.viewCount }} 阅读</span>
           </div>
           <div v-if="article.tags?.length" class="flex gap-2 mt-3">
-            <NuxtLink v-for="tag in article.tags" :key="tag.id" :to="`/articles?tag=${tag.slug}`">
+            <NuxtLink v-for="tag in article.tags" :key="tag.id" :to="`/articles?tag=${tag.id}`">
               <el-tag size="small" class="cursor-pointer hover:!bg-blue-50 hover:!text-blue-500 transition-colors">
                 {{ tag.name }}
               </el-tag>

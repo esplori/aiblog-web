@@ -37,7 +37,6 @@ export interface LoginData {
 export interface TagInfo {
   id: number
   name: string
-  slug: string
 }
 
 // 文章
@@ -84,7 +83,6 @@ export interface ArticleItem {
 export interface Category {
   id: number
   name: string
-  slug: string
   description?: string
   articleCount: number
 }
@@ -93,7 +91,6 @@ export interface Category {
 export interface Tag {
   id: number
   name: string
-  slug: string
   color?: string
   articleCount: number
 }

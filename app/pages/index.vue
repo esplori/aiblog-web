@@ -80,7 +80,7 @@ const tags = computed(() => tagsData.value?.data || [])
             <NuxtLink
               v-for="cat in categories"
               :key="cat.id"
-              :to="`/articles?category=${cat.slug}`"
+              :to="`/articles?category=${cat.id}`"
               class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-500"
             >
               {{ cat.name }} ({{ cat.articleCount }})
@@ -95,7 +95,7 @@ const tags = computed(() => tagsData.value?.data || [])
             <NuxtLink
               v-for="tag in tags"
               :key="tag.id"
-              :to="`/articles?tag=${tag.slug}`"
+              :to="`/articles?tag=${tag.id}`"
               class="px-3 py-1 border rounded-full text-sm hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300"
               :style="{ borderColor: tag.color || '#d1d5db', color: tag.color || '#6b7280' }"
             >
