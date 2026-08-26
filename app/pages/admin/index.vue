@@ -10,6 +10,7 @@ const stats = ref({
   commentCount: 0,
   categoryCount: 0,
   tagCount: 0,
+  totalViewCount: 0,
 })
 
 const loading = ref(true)
@@ -33,7 +34,7 @@ onMounted(loadStats)
   <div>
     <h1 class="text-2xl font-bold mb-6">仪表盘</h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
       <div class="card text-center">
         <div class="text-3xl font-bold text-blue-500" v-text="stats.articleCount" />
         <div class="text-gray-500 text-sm mt-1">文章总数</div>
@@ -41,6 +42,10 @@ onMounted(loadStats)
       <div class="card text-center">
         <div class="text-3xl font-bold text-green-500" v-text="stats.commentCount" />
         <div class="text-gray-500 text-sm mt-1">评论总数</div>
+      </div>
+      <div class="card text-center">
+        <div class="text-3xl font-bold text-red-500" v-text="stats.totalViewCount" />
+        <div class="text-gray-500 text-sm mt-1">总访问量</div>
       </div>
       <div class="card text-center">
         <div class="text-3xl font-bold text-orange-500" v-text="stats.categoryCount" />

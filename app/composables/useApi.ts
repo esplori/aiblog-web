@@ -17,8 +17,10 @@ export const useApi = () => {
       params?: Record<string, any>
     } = {}
   ): Promise<ApiResponse<T>> => {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+    const headers: Record<string, string> = {}
+    // FormData 让浏览器自动设置 Content-Type（含 boundary）
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json'
     }
 
     // SSR 时从请求头获取 cookie，客户端时使用 useCookie

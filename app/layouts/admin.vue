@@ -13,9 +13,14 @@ const menuItems = [
   { path: '/admin/users', icon: 'ep:user', title: '用户管理' },
 ]
 
-onMounted(() => {
+onMounted(async () => {
   if (!authStore.isLoggedIn) {
     navigateTo('/login')
+    return
+  }
+  // 页面刷新后 token 恢复了但 user 数据为 null，需要重新加载
+  if (!authStore.user) {
+    await authStore.fetchUser()
   }
 })
 </script>

@@ -58,6 +58,7 @@ export default defineNuxtConfig({
   app: {
     head: {
       title: 'AI Blog',
+      titleTemplate: '%s | AI Blog',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },

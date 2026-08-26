@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ArticleItem } from '~/types'
+import type { ArticleItem, PageResult } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -14,18 +14,41 @@ const isSubRoute = computed(() => {
   return path.startsWith('/admin/articles/create') || path.startsWith('/admin/articles/edit')
 })
 
+const articles = ref<ArticleItem[]>([])
+const loading = ref(true)
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-const { data: articles, refresh: loadArticles, pending: loading } = await useAsyncData('articles', async () => {
-  if (isSubRoute.value) return []
-  const res = await get<ArticleItem[]>(`/api/admin/articles?page=${page.value}&size=${pageSize.value}`)
-  total.value = res.data.length
-  return res.data
-}, {
-  default: () => [],
-})
+const loadArticles = async () => {
+  if (isSubRoute.value) {
+    articles.value = []
+    return
+  }
+  loading.value = true
+  try {
+    const res = await get<PageResult<ArticleItem>>(`/api/admin/articles`, {
+      params: { page: page.value, size: pageSize.value },
+    })
+    articles.value = res.data.records
+    total.value = res.data.total
+  } catch (e) {
+    console.error(e)
+  } finally {
+    loading.value = false
+  }
+}
+
+const handlePageChange = (p: number) => {
+  page.value = p
+  loadArticles()
+}
+
+const handleSizeChange = (s: number) => {
+  pageSize.value = s
+  page.value = 1
+  loadArticles()
+}
 
 const handleEdit = (id: number) => {
   navigateTo(`/admin/articles/edit/${id}`)
@@ -63,38 +86,48 @@ onMounted(() => {
 
     <div class="card">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="articles">
-        <el-table-column prop="title" label="标题" min-width="250" show-overflow-tooltip />
-        <el-table-column label="状态" width="100">
-          <template #default="{ row }">
-            <el-tag :type="row.status === 'published' ? 'success' : 'warning'" size="small">
-              {{ row.status === 'published' ? '已发布' : '草稿' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="viewCount" label="阅读" width="80" />
-        <el-table-column prop="commentCount" label="评论" width="80" />
-        <el-table-column label="创建时间" width="180">
-          <template #default="{ row }">
-            {{ new Date(row.createdAt).toLocaleString() }}
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" text type="primary" @click="handleEdit(row.id)">编辑</el-button>
-            <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
-      <el-pagination
-        v-if="!loading"
-        class="mt-4"
-        :page-size="pageSize"
-        :current-page="page"
-        :total="total"
-        layout="prev, pager, next"
-        @current-change="page => { page.value = page; loadArticles() }"
-      />
+      <template v-else>
+        <el-table :data="articles">
+          <el-table-column prop="title" label="标题" min-width="250" show-overflow-tooltip />
+          <el-table-column label="分类" width="120">
+            <template #default="{ row }">
+              <el-tag v-if="row.category" size="small">{{ row.category.name }}</el-tag>
+              <span v-else class="text-gray-400 text-sm">-</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="状态" width="100">
+            <template #default="{ row }">
+              <el-tag :type="row.status === 'published' ? 'success' : 'warning'" size="small">
+                {{ row.status === 'published' ? '已发布' : '草稿' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="viewCount" label="阅读" width="80" />
+          <el-table-column prop="commentCount" label="评论" width="80" />
+          <el-table-column label="创建时间" width="180">
+            <template #default="{ row }">
+              {{ new Date(row.createdAt).toLocaleString() }}
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200" fixed="right">
+            <template #default="{ row }">
+              <el-button size="small" text type="primary" @click="handleEdit(row.id)">编辑</el-button>
+              <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="flex justify-center mt-4" v-if="total > pageSize">
+          <el-pagination
+            v-model:current-page="page"
+            :page-size="pageSize"
+            :total="total"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next"
+            @current-change="handlePageChange"
+            @size-change="handleSizeChange"
+          />
+        </div>
+      </template>
     </div>
   </div>
 </template>

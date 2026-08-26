@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Category } from '~/types'
+import type { Category, PageResult } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -9,6 +9,11 @@ const { get, post, put, del } = useApi()
 
 const categories = ref<Category[]>([])
 const loading = ref(true)
+
+// 分页
+const page = ref(1)
+const pageSize = ref(20)
+const total = ref(0)
 
 // 弹窗表单
 const dialogVisible = ref(false)
@@ -23,13 +28,27 @@ const form = reactive({
 const loadCategories = async () => {
   loading.value = true
   try {
-    const res = await get<Category[]>('/api/categories')
-    categories.value = res.data
+    const res = await get<PageResult<Category>>('/api/admin/categories/page', {
+      params: { page: page.value, size: pageSize.value },
+    })
+    categories.value = res.data.records
+    total.value = res.data.total
   } catch (e) {
     console.error(e)
   } finally {
     loading.value = false
   }
+}
+
+const handlePageChange = (p: number) => {
+  page.value = p
+  loadCategories()
+}
+
+const handleSizeChange = (s: number) => {
+  pageSize.value = s
+  page.value = 1
+  loadCategories()
 }
 
 const resetForm = () => {
@@ -101,17 +120,30 @@ onMounted(loadCategories)
 
     <div class="card">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="categories">
-        <el-table-column prop="name" label="名称" width="150" />
-        <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="articleCount" label="文章数" width="100" />
-        <el-table-column label="操作" width="150">
-          <template #default="{ row }">
-            <el-button size="small" text type="primary" @click="handleEdit(row)">编辑</el-button>
-            <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <template v-else>
+        <el-table :data="categories">
+          <el-table-column prop="name" label="名称" width="150" />
+          <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
+          <el-table-column prop="articleCount" label="文章数" width="100" />
+          <el-table-column label="操作" width="150">
+            <template #default="{ row }">
+              <el-button size="small" text type="primary" @click="handleEdit(row)">编辑</el-button>
+              <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="flex justify-center mt-4" v-if="total > pageSize">
+          <el-pagination
+            v-model:current-page="page"
+            :page-size="pageSize"
+            :total="total"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next"
+            @current-change="handlePageChange"
+            @size-change="handleSizeChange"
+          />
+        </div>
+      </template>
     </div>
 
     <!-- 新建/编辑弹窗 -->

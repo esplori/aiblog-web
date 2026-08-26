@@ -4,6 +4,19 @@ import type { ArticleItem, Category, Tag } from '~/types'
 const route = useRoute()
 const { get } = useApi()
 
+// 文章列表页 SEO
+const pageTitle = computed(() => {
+  const c = route.query.category as string
+  const t = route.query.tag as string
+  if (c) return `分类: ${c}`
+  if (t) return `标签: ${t}`
+  return '全部文章'
+})
+useSeoMeta({
+  title: pageTitle,
+  description: '浏览所有文章，按分类和标签筛选',
+})
+
 const articles = ref<ArticleItem[]>([])
 const categories = ref<Category[]>([])
 const tags = ref<Tag[]>([])

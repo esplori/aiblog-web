@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tag } from '~/types'
+import type { Tag, PageResult } from '~/types'
 
 definePageMeta({
   layout: 'admin',
@@ -9,6 +9,11 @@ const { get, post, put, del } = useApi()
 
 const tags = ref<Tag[]>([])
 const loading = ref(true)
+
+// 分页
+const page = ref(1)
+const pageSize = ref(20)
+const total = ref(0)
 
 // 弹窗表单
 const dialogVisible = ref(false)
@@ -26,13 +31,27 @@ const colorOptions = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#9
 const loadTags = async () => {
   loading.value = true
   try {
-    const res = await get<Tag[]>('/api/tags')
-    tags.value = res.data
+    const res = await get<PageResult<Tag>>('/api/admin/tags/page', {
+      params: { page: page.value, size: pageSize.value },
+    })
+    tags.value = res.data.records
+    total.value = res.data.total
   } catch (e) {
     console.error(e)
   } finally {
     loading.value = false
   }
+}
+
+const handlePageChange = (p: number) => {
+  page.value = p
+  loadTags()
+}
+
+const handleSizeChange = (s: number) => {
+  pageSize.value = s
+  page.value = 1
+  loadTags()
 }
 
 const resetForm = () => {
@@ -104,24 +123,37 @@ onMounted(loadTags)
 
     <div class="card">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="tags">
-        <el-table-column prop="name" label="名称" width="150" />
-        <el-table-column label="颜色" width="100">
-          <template #default="{ row }">
-            <span
-              class="inline-block w-4 h-4 rounded-full"
-              :style="{ backgroundColor: row.color || '#409eff' }"
-            />
-          </template>
-        </el-table-column>
-        <el-table-column prop="articleCount" label="文章数" width="100" />
-        <el-table-column label="操作" width="150">
-          <template #default="{ row }">
-            <el-button size="small" text type="primary" @click="handleEdit(row)">编辑</el-button>
-            <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <template v-else>
+        <el-table :data="tags">
+          <el-table-column prop="name" label="名称" width="150" />
+          <el-table-column label="颜色" width="100">
+            <template #default="{ row }">
+              <span
+                class="inline-block w-4 h-4 rounded-full"
+                :style="{ backgroundColor: row.color || '#409eff' }"
+              />
+            </template>
+          </el-table-column>
+          <el-table-column prop="articleCount" label="文章数" width="100" />
+          <el-table-column label="操作" width="150">
+            <template #default="{ row }">
+              <el-button size="small" text type="primary" @click="handleEdit(row)">编辑</el-button>
+              <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <div class="flex justify-center mt-4" v-if="total > pageSize">
+          <el-pagination
+            v-model:current-page="page"
+            :page-size="pageSize"
+            :total="total"
+            :page-sizes="[10, 20, 50, 100]"
+            layout="total, sizes, prev, pager, next"
+            @current-change="handlePageChange"
+            @size-change="handleSizeChange"
+          />
+        </div>
+      </template>
     </div>
 
     <!-- 新建/编辑弹窗 -->

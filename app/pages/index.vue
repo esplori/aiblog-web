@@ -1,10 +1,16 @@
 <script setup lang="ts">
 import type { ArticleItem, Category, Tag } from '~/types'
 
+// 首页 SEO
+useSeoMeta({
+  title: 'AI Blog',
+  description: 'AI 驱动的现代化博客系统 — 分享技术、生活与思考',
+})
+
 const { get } = useApi()
 
 // 使用 useAsyncData 进行服务端数据获取，支持 SSR
-const { data: articlesData, pending: articlesPending, error: articlesError } = useAsyncData(
+const { data: articlesData, pending: articlesPending } = useAsyncData(
   'articles-home',
   () => get<ArticleItem[]>('/api/articles', { page: 1, size: 6, status: 'published' }),
   { default: () => [] }
@@ -27,79 +33,201 @@ const loading = computed(() => articlesPending.value || categoriesPending.value 
 const articles = computed(() => articlesData.value?.data || [])
 const categories = computed(() => categoriesData.value?.data || [])
 const tags = computed(() => tagsData.value?.data || [])
+
+// 第一篇作为 Hero，其余作为精选文章
+const heroArticle = computed(() => articles.value[0] || null)
+const featuredArticles = computed(() => articles.value.slice(1, 5))
+
+// 按文章数排序，取前 6 个标签
+const topTags = computed(() =>
+  [...tags.value]
+    .sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0))
+    .slice(0, 6)
+)
+
+// 封面图占位色（根据文章标题生成稳定颜色）
+const coverColors = [
+  'from-blue-100 to-blue-50',
+  'from-indigo-100 to-indigo-50',
+  'from-purple-100 to-purple-50',
+  'from-teal-100 to-teal-50',
+  'from-amber-100 to-amber-50',
+  'from-rose-100 to-rose-50',
+  'from-emerald-100 to-emerald-50',
+  'from-cyan-100 to-cyan-50',
+]
+
+function getCoverColor(id: number): string {
+  return coverColors[id % coverColors.length]
+}
 </script>
 
 <template>
   <div>
-    <!-- Banner -->
-    <section class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20">
-      <div class="container text-center">
-        <h1 class="text-4xl font-bold mb-4">AI Blog</h1>
-        <p class="text-xl opacity-90 mb-8">AI 驱动的现代化博客系统</p>
-        <NuxtLink to="/articles">
-          <el-button size="large" type="primary" plain>浏览文章</el-button>
+    <!-- ========== Hero：最新文章大卡片 ========== -->
+    <section class="pt-12 pb-16">
+      <div class="container">
+        <el-skeleton v-if="loading" :rows="6" animated />
+        <NuxtLink
+          v-else-if="heroArticle"
+          :to="`/post/${heroArticle.uuid}`"
+          class="block group"
+        >
+          <div class="overflow-hidden rounded-2xl">
+            <!-- 封面图区域 -->
+            <div
+              v-if="heroArticle.coverImage"
+              class="aspect-[16/9] bg-cover bg-center"
+              :style="{ backgroundImage: `url(${heroArticle.coverImage})` }"
+            />
+            <div
+              v-else
+              class="aspect-[16/9] bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center"
+            >
+              <span class="text-6xl font-bold text-blue-200/50">{{ heroArticle.title.charAt(0) }}</span>
+            </div>
+          </div>
+
+          <div class="mt-6 max-w-3xl">
+            <!-- 分类标签 -->
+            <div class="flex items-center gap-3 mb-3">
+              <span
+                v-if="heroArticle.category"
+                class="inline-block px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-full"
+              >
+                {{ heroArticle.category.name }}
+              </span>
+              <span class="text-sm text-gray-500">{{ new Date(heroArticle.createdAt).toLocaleDateString() }}</span>
+              <span class="text-sm text-gray-400">·</span>
+              <span class="text-sm text-gray-500">{{ heroArticle.viewCount }} 阅读</span>
+            </div>
+
+            <!-- 标题 -->
+            <h1 class="text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+              {{ heroArticle.title }}
+            </h1>
+
+            <!-- 摘要 -->
+            <p class="mt-3 text-base text-gray-500 leading-relaxed line-clamp-2">
+              {{ heroArticle.excerpt }}
+            </p>
+          </div>
         </NuxtLink>
       </div>
     </section>
 
-    <!-- 最新文章 -->
-    <section class="py-12">
+    <!-- ========== 精选文章 ========== -->
+    <section class="pb-16">
       <div class="container">
-        <h2 class="text-2xl font-bold mb-6">最新文章</h2>
-        <el-skeleton v-if="loading" :rows="3" animated />
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-2xl font-bold text-gray-900">精选文章</h2>
           <NuxtLink
-            v-for="article in articles"
-            :key="article.id"
-            :to="`/post/${article.uuid}`"
-            class="card hover:shadow-md transition-shadow"
+            to="/articles"
+            class="text-sm text-blue-600 hover:text-blue-700 font-medium"
           >
-            <h3 class="text-lg font-semibold mb-2 text-gray-800">{{ article.title }}</h3>
-            <p class="text-gray-500 text-sm mb-4 line-clamp-2">{{ article.excerpt }}</p>
-            <div class="flex items-center justify-between text-xs text-gray-400">
-              <span>{{ article.author?.displayName }}</span>
-              <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
-            </div>
+            查看全部 →
           </NuxtLink>
         </div>
-        <div v-if="!loading && articles.length > 0" class="text-center mt-8">
-          <NuxtLink to="/articles">
-            <el-button>查看更多文章</el-button>
+
+        <el-skeleton v-if="loading" :rows="4" animated />
+        <div
+          v-else-if="featuredArticles.length > 0"
+          class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-10"
+        >
+          <NuxtLink
+            v-for="article in featuredArticles"
+            :key="article.id"
+            :to="`/post/${article.uuid}`"
+            class="group"
+          >
+            <!-- 封面图 -->
+            <div
+              v-if="article.coverImage"
+              class="aspect-[16/9] rounded-xl bg-cover bg-center mb-4"
+              :style="{ backgroundImage: `url(${article.coverImage})` }"
+            />
+            <div
+              v-else
+              class="aspect-[16/9] rounded-xl mb-4 bg-gradient-to-br flex items-center justify-center"
+              :class="getCoverColor(article.id)"
+            >
+              <span class="text-4xl font-bold text-gray-300/60">{{ article.title.charAt(0) }}</span>
+            </div>
+
+            <!-- 元信息 -->
+            <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+              <span
+                v-if="article.category"
+                class="text-blue-600 font-medium"
+              >
+                {{ article.category.name }}
+              </span>
+              <span v-if="article.category" class="text-gray-300">·</span>
+              <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
+            </div>
+
+            <!-- 标题 -->
+            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+              {{ article.title }}
+            </h3>
+
+            <!-- 摘要 -->
+            <p class="mt-2 text-sm text-gray-500 leading-relaxed line-clamp-2">
+              {{ article.excerpt }}
+            </p>
           </NuxtLink>
         </div>
       </div>
     </section>
 
-    <!-- 分类与标签 -->
-    <section class="py-12 bg-white">
-      <div class="container grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- 分类 -->
-        <div>
-          <h2 class="text-2xl font-bold mb-4">文章分类</h2>
-          <div class="flex flex-wrap gap-3">
-            <NuxtLink
-              v-for="cat in categories"
-              :key="cat.id"
-              :to="`/articles?category=${cat.id}`"
-              class="px-4 py-2 bg-gray-100 rounded-full text-sm text-gray-600 hover:bg-blue-50 hover:text-blue-500"
-            >
-              {{ cat.name }} ({{ cat.articleCount }})
-            </NuxtLink>
+    <!-- ========== 底部三栏：分类 + 热门标签 + 关于 ========== -->
+    <section class="border-t border-gray-100 py-16">
+      <div class="container">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <!-- 分类 -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">分类</h3>
+            <div class="flex flex-col gap-3">
+              <NuxtLink
+                v-for="cat in categories"
+                :key="cat.id"
+                :to="`/articles?category=${cat.id}`"
+                class="flex items-center justify-between group"
+              >
+                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">{{ cat.name }}</span>
+                <span class="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">{{ cat.articleCount }}</span>
+              </NuxtLink>
+              <div v-if="categories.length === 0" class="text-sm text-gray-400">暂无分类</div>
+            </div>
           </div>
-        </div>
 
-        <!-- 标签 -->
-        <div>
-          <h2 class="text-2xl font-bold mb-4">热门标签</h2>
-          <div class="flex flex-wrap gap-2">
+          <!-- 热门标签 -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">热门标签</h3>
+            <div class="flex flex-wrap gap-2">
+              <NuxtLink
+                v-for="tag in topTags"
+                :key="tag.id"
+                :to="`/articles?tag=${tag.id}`"
+                class="inline-block px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              >
+                {{ tag.name }}
+              </NuxtLink>
+              <div v-if="topTags.length === 0" class="text-sm text-gray-400">暂无标签</div>
+            </div>
+          </div>
+
+          <!-- 关于 -->
+          <div>
+            <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">关于</h3>
+            <p class="text-sm text-gray-500 leading-relaxed mb-4">
+              AI Blog 是一个 AI 驱动的现代化博客平台，分享技术、生活与思考。探索 AI 前沿技术，记录成长点滴。
+            </p>
             <NuxtLink
-              v-for="tag in tags"
-              :key="tag.id"
-              :to="`/articles?tag=${tag.id}`"
-              class="px-3 py-1 border rounded-full text-sm hover:bg-blue-50 hover:text-blue-500 hover:border-blue-300"
-              :style="{ borderColor: tag.color || '#d1d5db', color: tag.color || '#6b7280' }"
+              to="/articles"
+              class="text-sm text-blue-600 hover:text-blue-700 font-medium"
             >
-              {{ tag.name }}
+              浏览全部文章 →
             </NuxtLink>
           </div>
         </div>
