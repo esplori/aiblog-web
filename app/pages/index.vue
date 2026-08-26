@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ArticleItem, Category, Tag } from '~/types'
+import type { ArticleItem, Category, Tag, PageResult } from '~/types'
 
 // 首页 SEO
 useSeoMeta({
@@ -12,8 +12,8 @@ const { get } = useApi()
 // 使用 useAsyncData 进行服务端数据获取，支持 SSR
 const { data: articlesData, pending: articlesPending } = useAsyncData(
   'articles-home',
-  () => get<ArticleItem[]>('/api/articles', { page: 1, size: 6, status: 'published' }),
-  { default: () => [] }
+  () => get<PageResult<ArticleItem>>('/api/articles', { page: 1, size: 6, status: 'published' }),
+  { default: () => ({ records: [] }) }
 )
 
 const { data: categoriesData, pending: categoriesPending } = useAsyncData(
@@ -30,7 +30,7 @@ const { data: tagsData, pending: tagsPending } = useAsyncData(
 
 const loading = computed(() => articlesPending.value || categoriesPending.value || tagsPending.value)
 
-const articles = computed(() => articlesData.value?.data || [])
+const articles = computed(() => (articlesData.value?.data as any)?.records || [])
 const categories = computed(() => categoriesData.value?.data || [])
 const tags = computed(() => tagsData.value?.data || [])
 
