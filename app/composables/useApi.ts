@@ -74,5 +74,5 @@ export const useApi = () => {
   const del = <T>(url: string) =>
     request<T>(url, { method: 'DELETE' })
 
-  return { get, post, put, del }
+  return { get, post, put, del, request }
 }

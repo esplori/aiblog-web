@@ -20,9 +20,11 @@ export interface User {
   username: string
   email: string
   displayName: string
-  avatarUrl?: string
+  avatar?: string
   bio?: string
   role: string
+  lastLoginAt?: string
+  createdAt?: string
 }
 
 // 登录响应

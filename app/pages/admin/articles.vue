@@ -28,7 +28,8 @@ const loadArticles = async () => {
   loading.value = true
   try {
     const res = await get<PageResult<ArticleItem>>(`/api/admin/articles`, {
-      params: { page: page.value, size: pageSize.value },
+      page: page.value,
+      size: pageSize.value,
     })
     articles.value = res.data.records
     total.value = res.data.total
@@ -80,7 +81,7 @@ onMounted(() => {
   <NuxtPage v-if="isSubRoute" />
   <div v-else>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">文章管理</h1>
+      <h1 class="text-2xl font-bold text-gray-900">文章管理</h1>
       <el-button type="primary" @click="handleCreate">新建文章</el-button>
     </div>
 

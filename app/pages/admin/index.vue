@@ -32,7 +32,7 @@ onMounted(loadStats)
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">仪表盘</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">仪表盘</h1>
 
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
       <div class="card text-center">

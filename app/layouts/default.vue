@@ -33,7 +33,7 @@ onMounted(() => {
             </NuxtLink>
             <el-dropdown>
               <span class="flex items-center gap-2 cursor-pointer">
-                <el-avatar :size="32" :src="authStore.user?.avatarUrl">
+                <el-avatar :size="32" :src="authStore.user?.avatar">
                   {{ authStore.user?.displayName?.charAt(0) }}
                 </el-avatar>
                 <span class="text-sm">{{ authStore.user?.displayName }}</span>
@@ -42,6 +42,9 @@ onMounted(() => {
                 <el-dropdown-menu>
                   <el-dropdown-item @click="navigateTo('/admin')">
                     后台管理
+                  </el-dropdown-item>
+                  <el-dropdown-item @click="navigateTo('/admin/settings')">
+                    个人设置
                   </el-dropdown-item>
                   <el-dropdown-item divided @click="authStore.logout()">
                     退出登录

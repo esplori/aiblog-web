@@ -76,7 +76,7 @@ onMounted(loadFiles)
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">文件管理</h1>
+      <h1 class="text-2xl font-bold text-gray-900">文件管理</h1>
       <el-upload :http-request="handleUpload" :show-file-list="false">
         <el-button type="primary" :loading="uploading">{{ uploading ? '上传中...' : '上传文件' }}</el-button>
       </el-upload>

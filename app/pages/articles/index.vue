@@ -19,7 +19,7 @@ useSeoMeta({
 
 const articles = ref<ArticleItem[]>([])
 const categories = ref<Category[]>([])
-const tags = ref<Tag[]>([])
+const topTags = ref<Tag[]>([])
 const loading = ref(true)
 const total = ref(0)
 const page = ref(1)
@@ -30,7 +30,7 @@ const tag = computed(() => route.query.tag as string)
 
 // 用名称展示当前过滤条件（id → name）
 const categoryName = computed(() => categories.value.find(c => String(c.id) === category.value)?.name || category.value)
-const tagName = computed(() => tags.value.find(t => String(t.id) === tag.value)?.name || tag.value)
+const tagName = computed(() => topTags.value.find(t => String(t.id) === tag.value)?.name || tag.value)
 
 const loadArticles = async () => {
   loading.value = true
@@ -59,10 +59,10 @@ const loadFilters = async () => {
   try {
     const [catRes, tagRes] = await Promise.all([
       get<Category[]>('/api/categories'),
-      get<Tag[]>('/api/tags'),
+      get<Tag[]>('/api/tags/hot', { size: 20 }),
     ])
     categories.value = catRes.data
-    tags.value = tagRes.data
+    topTags.value = tagRes.data
   } catch (e) {
     console.error(e)
   }
@@ -174,7 +174,7 @@ watch([category, tag], () => {
             <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-4">热门标签</h3>
             <div class="flex flex-wrap gap-2">
               <NuxtLink
-                v-for="t in tags"
+                v-for="t in topTags"
                 :key="t.id"
                 :to="`/articles?tag=${t.id}`"
                 class="px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"

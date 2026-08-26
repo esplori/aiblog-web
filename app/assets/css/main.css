@@ -38,3 +38,15 @@ a {
 a:hover {
   color: #1557b0;
 }
+
+/* 后管侧边栏菜单（浅色风格，与前管一致） */
+.el-menu {
+  --el-menu-active-color: #2563eb;
+  --el-menu-hover-bg-color: #eff6ff;
+}
+
+.admin-sidebar .el-menu-item.is-active {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-weight: 500;
+}

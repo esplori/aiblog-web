@@ -50,7 +50,7 @@ onMounted(loadComments)
 
 <template>
   <div>
-    <h1 class="text-2xl font-bold mb-6">评论管理</h1>
+    <h1 class="text-2xl font-bold text-gray-900 mb-6">评论管理</h1>
 
     <div class="card">
       <el-skeleton v-if="loading" :rows="5" animated />

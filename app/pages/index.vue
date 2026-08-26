@@ -24,7 +24,7 @@ const { data: categoriesData, pending: categoriesPending } = useAsyncData(
 
 const { data: tagsData, pending: tagsPending } = useAsyncData(
   'tags-home',
-  () => get<Tag[]>('/api/tags'),
+  () => get<Tag[]>('/api/tags/hot', { size: 6 }),
   { default: () => [] }
 )
 
@@ -32,18 +32,11 @@ const loading = computed(() => articlesPending.value || categoriesPending.value 
 
 const articles = computed(() => (articlesData.value?.data as any)?.records || [])
 const categories = computed(() => categoriesData.value?.data || [])
-const tags = computed(() => tagsData.value?.data || [])
+const topTags = computed(() => tagsData.value?.data || [])
 
 // 第一篇作为 Hero，其余作为精选文章
 const heroArticle = computed(() => articles.value[0] || null)
 const featuredArticles = computed(() => articles.value.slice(1, 5))
-
-// 按文章数排序，取前 6 个标签
-const topTags = computed(() =>
-  [...tags.value]
-    .sort((a, b) => (b.articleCount || 0) - (a.articleCount || 0))
-    .slice(0, 6)
-)
 
 // 封面图占位色（根据文章标题生成稳定颜色）
 const coverColors = [

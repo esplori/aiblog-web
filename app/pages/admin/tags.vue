@@ -117,7 +117,7 @@ onMounted(loadTags)
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">标签管理</h1>
+      <h1 class="text-2xl font-bold text-gray-900">标签管理</h1>
       <el-button type="primary" @click="handleCreate">新建标签</el-button>
     </div>
 

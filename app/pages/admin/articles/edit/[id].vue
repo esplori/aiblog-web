@@ -111,7 +111,7 @@ onMounted(() => {
 <template>
   <div>
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">编辑文章</h1>
+      <h1 class="text-2xl font-bold text-gray-900">编辑文章</h1>
       <NuxtLink to="/admin/articles">
         <el-button>返回</el-button>
       </NuxtLink>
