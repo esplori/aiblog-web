@@ -38,7 +38,7 @@ const handleLogin = async () => {
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
     <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
       <div class="text-center mb-8">
-        <h1 class="text-2xl font-bold text-gray-800">AI Blog</h1>
+        <h1 class="text-2xl font-bold text-gray-800">Pylox</h1>
         <p class="text-gray-500 mt-2">登录到你的账户</p>
       </div>
 

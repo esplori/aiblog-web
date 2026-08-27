@@ -31,8 +31,8 @@ onMounted(async () => {
     <aside class="admin-sidebar bg-white border-r border-gray-100" :class="isCollapse ? 'w-16' : 'w-60'">
       <!-- Logo -->
       <div class="h-16 flex items-center justify-center border-b border-gray-100">
-        <span v-if="!isCollapse" class="text-lg font-bold text-gray-900">AI Blog 管理</span>
-        <span v-else class="text-lg font-bold text-gray-900">AB</span>
+        <span v-if="!isCollapse" class="text-lg font-bold text-gray-900">Pylox 管理</span>
+        <span v-else class="text-lg font-bold text-gray-900">PX</span>
       </div>
 
       <!-- 菜单 -->

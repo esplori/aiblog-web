@@ -15,7 +15,7 @@ onMounted(() => {
       <div class="container flex items-center justify-between h-16">
         <!-- Logo -->
         <NuxtLink to="/" class="text-xl font-bold text-gray-800">
-          AI Blog
+          Pylox
         </NuxtLink>
 
         <!-- 导航菜单 -->
@@ -71,7 +71,7 @@ onMounted(() => {
     <!-- 底部 -->
     <footer class="bg-gray-800 text-gray-400 py-8">
       <div class="container text-center text-sm">
-        <p>© {{ new Date().getFullYear() }} AI Blog. All rights reserved.</p>
+        <p>© {{ new Date().getFullYear() }} Pylox. All rights reserved.</p>
       </div>
     </footer>
   </div>

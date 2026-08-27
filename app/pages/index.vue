@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { ArticleItem, Category, Tag, PageResult } from '~/types'
 
-// 首页 SEO
+// 首页 SEO（title 由 nuxt.config 的 titleTemplate 统一生成，避免 "Pylox | Pylox" 重复）
 useSeoMeta({
-  title: 'AI Blog',
-  description: 'AI 驱动的现代化博客系统 — 分享技术、生活与思考',
+  description: 'Pylox — AI 驱动的现代化博客系统，分享技术、生活与思考',
 })
 
 const { get } = useApi()
@@ -214,7 +213,7 @@ function getCoverColor(id: number): string {
           <div>
             <h3 class="text-sm font-semibold text-gray-900 uppercase tracking-wider mb-5">关于</h3>
             <p class="text-sm text-gray-500 leading-relaxed mb-4">
-              AI Blog 是一个 AI 驱动的现代化博客平台，分享技术、生活与思考。探索 AI 前沿技术，记录成长点滴。
+              Pylox 是一个 AI 驱动的现代化博客平台，分享技术、生活与思考。探索 AI 前沿技术，记录成长点滴。
             </p>
             <NuxtLink
               to="/articles"

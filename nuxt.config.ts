@@ -57,12 +57,13 @@ export default defineNuxtConfig({
   // 应用配置
   app: {
     head: {
-      title: 'AI Blog',
-      titleTemplate: '%s | AI Blog',
+      title: 'Pylox',
+      // 兜底模板；实际规则由 app.vue 的 useHead titleTemplate 覆盖（避免首页 "Pylox | Pylox" 重复）
+      titleTemplate: '%s | Pylox',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: 'AI 驱动的现代化博客系统' },
+        { name: 'description', content: 'Pylox — AI 驱动的现代化博客系统' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
