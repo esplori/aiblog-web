@@ -55,6 +55,10 @@ const handleEdit = (id: number) => {
   navigateTo(`/admin/articles/edit/${id}`)
 }
 
+const handleView = (uuid: string) => {
+  window.open(`/post/${uuid}`, '_blank')
+}
+
 const handleCreate = () => {
   navigateTo('/admin/articles/create')
 }
@@ -110,8 +114,9 @@ onMounted(() => {
               {{ new Date(row.createdAt).toLocaleString() }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="200" fixed="right">
+          <el-table-column label="操作" width="260" fixed="right">
             <template #default="{ row }">
+              <el-button size="small" text type="primary" @click="handleView(row.uuid)">查看</el-button>
               <el-button size="small" text type="primary" @click="handleEdit(row.id)">编辑</el-button>
               <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>
             </template>
