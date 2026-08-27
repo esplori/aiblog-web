@@ -214,10 +214,11 @@ const submitComment = async () => {
   color: #1f1f1f;
 }
 
-.article-content h1,
-.article-content h2,
-.article-content h3,
-.article-content h4 {
+/* 注意：内容由 v-html 动态插入，子元素不带 scoped 属性，必须用 :deep() 穿透 */
+.article-content :deep(h1),
+.article-content :deep(h2),
+.article-content :deep(h3),
+.article-content :deep(h4) {
   color: #111;
   font-weight: 700;
   line-height: 1.3;
@@ -225,35 +226,35 @@ const submitComment = async () => {
   margin-bottom: 0.8em;
 }
 
-.article-content h2 {
+.article-content :deep(h2) {
   font-size: 1.5rem;
   letter-spacing: -0.01em;
 }
 
-.article-content h3 {
+.article-content :deep(h3) {
   font-size: 1.25rem;
 }
 
-.article-content p {
+.article-content :deep(p) {
   margin-bottom: 1.5em;
 }
 
-.article-content a {
+.article-content :deep(a) {
   color: #1a73e8;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.article-content a:hover {
+.article-content :deep(a:hover) {
   color: #1557b0;
 }
 
-.article-content strong {
+.article-content :deep(strong) {
   font-weight: 600;
   color: #111;
 }
 
-.article-content blockquote {
+.article-content :deep(blockquote) {
   margin: 1.5em 0;
   padding: 0.5em 1em 0.5em 1.5em;
   border-left: 3px solid #1a73e8;
@@ -262,21 +263,21 @@ const submitComment = async () => {
   color: #5f6368;
 }
 
-.article-content blockquote p {
+.article-content :deep(blockquote p) {
   margin-bottom: 0;
 }
 
-.article-content ul,
-.article-content ol {
+.article-content :deep(ul),
+.article-content :deep(ol) {
   margin: 1em 0;
   padding-left: 1.5em;
 }
 
-.article-content li {
+.article-content :deep(li) {
   margin-bottom: 0.4em;
 }
 
-.article-content code {
+.article-content :deep(code) {
   font-size: 0.875em;
   background: #f1f3f4;
   padding: 0.15em 0.4em;
@@ -285,7 +286,7 @@ const submitComment = async () => {
   font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
 }
 
-.article-content pre {
+.article-content :deep(pre) {
   margin: 1.5em 0;
   padding: 1.25em;
   background: #1f1f1f;
@@ -295,14 +296,14 @@ const submitComment = async () => {
   line-height: 1.6;
 }
 
-.article-content pre code {
+.article-content :deep(pre code) {
   background: none;
   padding: 0;
   color: #e8eaed;
   font-size: inherit;
 }
 
-.article-content img {
+.article-content :deep(img) {
   max-width: 100%;
   height: auto;
   border-radius: 12px;
@@ -310,27 +311,27 @@ const submitComment = async () => {
   display: block;
 }
 
-.article-content hr {
+.article-content :deep(hr) {
   margin: 2.5em 0;
   border: none;
   border-top: 1px solid #e8eaed;
 }
 
-.article-content table {
+.article-content :deep(table) {
   width: 100%;
   border-collapse: collapse;
   margin: 1.5em 0;
   font-size: 0.9375rem;
 }
 
-.article-content th,
-.article-content td {
+.article-content :deep(th),
+.article-content :deep(td) {
   padding: 0.75em 1em;
   border: 1px solid #e8eaed;
   text-align: left;
 }
 
-.article-content th {
+.article-content :deep(th) {
   background: #f8f9fa;
   font-weight: 600;
   color: #1f1f1f;
