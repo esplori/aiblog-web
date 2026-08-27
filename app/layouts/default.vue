@@ -1,9 +1,6 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
 
-// 仅管理员显示"管理"入口
-const isAdmin = computed(() => authStore.user?.role === 'admin')
-
 onMounted(() => {
   if (authStore.token) {
     authStore.fetchUser()
@@ -31,7 +28,7 @@ onMounted(() => {
           </NuxtLink>
 
           <template v-if="authStore.isLoggedIn">
-            <NuxtLink v-if="isAdmin" to="/admin" class="text-gray-600 hover:text-blue-500">
+            <NuxtLink to="/admin" class="text-gray-600 hover:text-blue-500">
               管理
             </NuxtLink>
             <el-dropdown>
@@ -43,7 +40,7 @@ onMounted(() => {
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item v-if="isAdmin" @click="navigateTo('/admin')">
+                  <el-dropdown-item @click="navigateTo('/admin')">
                     后台管理
                   </el-dropdown-item>
                   <el-dropdown-item @click="navigateTo('/admin/settings')">

@@ -36,7 +36,7 @@ const handleLogin = async () => {
     const res = await post<LoginData>('/api/auth/login', form)
     authStore.setAuth(res.data)
     ElMessage.success('登录成功')
-    navigateTo('/')
+    navigateTo(res.data.userInfo?.role === 'admin' ? '/admin' : '/')
   } catch (e: any) {
     ElMessage.error(e?.data?.message || '登录失败')
   } finally {
@@ -65,7 +65,7 @@ const handleRegister = async () => {
       password: registerForm.password,
     })
     authStore.setAuth(res.data)
-    navigateTo('/')
+    navigateTo(res.data.userInfo?.role === 'admin' ? '/admin' : '/')
   } catch (e: any) {
     ElMessage.error(e?.data?.message || '注册失败')
   } finally {

@@ -1,17 +1,34 @@
 <script setup lang="ts">
+interface MenuItem {
+  id: number
+  name: string
+  path: string
+  icon: string
+  sortOrder: number
+  enabled: boolean
+  roles?: string[]
+}
+
 const authStore = useAuthStore()
 const route = useRoute()
+const { get } = useApi()
 const isCollapse = ref(false)
 
-const menuItems = [
-  { path: '/admin', icon: 'ep:odometer', title: '仪表盘' },
-  { path: '/admin/articles', icon: 'ep:document', title: '文章管理' },
-  { path: '/admin/categories', icon: 'ep:folder', title: '分类管理' },
-  { path: '/admin/tags', icon: 'ep:price-tag', title: '标签管理' },
-  { path: '/admin/comments', icon: 'ep:chat-dot-round', title: '评论管理' },
-  { path: '/admin/files', icon: 'ep:files', title: '文件管理' },
-  { path: '/admin/users', icon: 'ep:user', title: '用户管理' },
-]
+const menuItems = ref<MenuItem[]>([])
+const menuLoaded = ref(false)
+
+// 当前路由是否在当前用户可见范围内
+const isAllowed = computed(() => {
+  if (authStore.user?.role === 'admin') return true
+  if (route.path === '/admin/settings') return true // 个人设置所有登录用户可用
+  const path = route.path
+  return menuItems.value.some(m => {
+    if (path === m.path) return true
+    // 仪表盘 /admin 只匹配自身，不匹配其下所有子路径
+    if (m.path === '/admin') return false
+    return path.startsWith(m.path + '/')
+  })
+})
 
 onMounted(async () => {
   if (!authStore.isLoggedIn) {
@@ -22,10 +39,22 @@ onMounted(async () => {
   if (!authStore.user) {
     await authStore.fetchUser()
   }
-  // 非管理员无权访问管理后台（后端接口亦有 hasRole("admin") 拦截）
-  if (authStore.user?.role !== 'admin') {
-    ElMessage.warning('无权限访问管理后台')
-    navigateTo('/')
+  // 按当前用户角色加载可见菜单（后端 role_menus 配置）
+  try {
+    const res = await get<MenuItem[]>('/api/menus')
+    menuItems.value = res.data || []
+  } catch (e) {
+    console.error('加载菜单失败', e)
+    menuItems.value = []
+  }
+  menuLoaded.value = true
+})
+
+// 菜单加载完成后校验页面权限，无权限跳转 403
+watch(menuLoaded, (v) => {
+  if (v && !isAllowed.value) {
+    ElMessage.error('无权限访问该页面')
+    navigateTo('/403')
   }
 })
 </script>
@@ -40,7 +69,7 @@ onMounted(async () => {
         <span v-else class="text-lg font-bold text-gray-900">PX</span>
       </div>
 
-      <!-- 菜单 -->
+      <!-- 菜单（按角色动态加载） -->
       <el-menu
         :default-active="route.path"
         :collapse="isCollapse"
@@ -49,13 +78,16 @@ onMounted(async () => {
       >
         <el-menu-item
           v-for="item in menuItems"
-          :key="item.path"
+          :key="item.id"
           :index="item.path"
           class="!h-12 !my-1 !mx-2 !rounded-lg hover:!bg-blue-50"
         >
           <el-icon><Icon :name="item.icon" /></el-icon>
-          <template #title>{{ item.title }}</template>
+          <template #title>{{ item.name }}</template>
         </el-menu-item>
+        <div v-if="menuItems.length === 0" class="text-center text-gray-400 text-sm py-8">
+          暂无可用菜单
+        </div>
       </el-menu>
     </aside>
 
@@ -94,7 +126,10 @@ onMounted(async () => {
 
       <!-- 内容 -->
       <main class="flex-1 p-6 bg-gray-50">
-        <slot />
+        <div v-if="!menuLoaded" class="h-full flex items-center justify-center text-gray-400 text-sm py-20">
+          加载中...
+        </div>
+        <slot v-else-if="isAllowed" />
       </main>
     </div>
   </div>
