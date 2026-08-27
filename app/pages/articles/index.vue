@@ -6,15 +6,13 @@ const { get } = useApi()
 
 // 文章列表页 SEO
 const pageTitle = computed(() => {
+  const k = keyword.value.trim()
+  if (k) return `搜索: ${k}`
   const c = route.query.category as string
   const t = route.query.tag as string
   if (c) return `分类: ${c}`
   if (t) return `标签: ${t}`
   return '全部文章'
-})
-useSeoMeta({
-  title: pageTitle,
-  description: '浏览所有文章，按分类和标签筛选',
 })
 
 const articles = ref<ArticleItem[]>([])
@@ -24,6 +22,7 @@ const loading = ref(true)
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(10)
+const keyword = ref('')
 
 const category = computed(() => route.query.category as string)
 const tag = computed(() => route.query.tag as string)
@@ -31,6 +30,13 @@ const tag = computed(() => route.query.tag as string)
 // 用名称展示当前过滤条件（id → name）
 const categoryName = computed(() => categories.value.find(c => String(c.id) === category.value)?.name || category.value)
 const tagName = computed(() => topTags.value.find(t => String(t.id) === tag.value)?.name || tag.value)
+
+const listTitle = computed(() => {
+  if (keyword.value.trim()) return `搜索: ${keyword.value.trim()}`
+  if (categoryName.value) return `分类: ${categoryName.value}`
+  if (tagName.value) return `标签: ${tagName.value}`
+  return '全部文章'
+})
 
 const loadArticles = async () => {
   loading.value = true
@@ -42,6 +48,7 @@ const loadArticles = async () => {
     }
     if (category.value) params.categoryId = category.value
     if (tag.value) params.tagId = tag.value
+    if (keyword.value.trim()) params.keyword = keyword.value.trim()
 
     const res = await get<PageResult<ArticleItem>>('/api/articles', params)
     articles.value = res.data.records || []
@@ -79,6 +86,22 @@ const handleSizeChange = (s: number) => {
   loadArticles()
 }
 
+const handleSearch = () => {
+  page.value = 1
+  loadArticles()
+}
+
+const handleClearSearch = () => {
+  keyword.value = ''
+  page.value = 1
+  loadArticles()
+}
+
+useSeoMeta({
+  title: pageTitle,
+  description: '浏览所有文章，按分类和标签筛选',
+})
+
 onMounted(() => {
   loadArticles()
   loadFilters()
@@ -96,9 +119,28 @@ watch([category, tag], () => {
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
         <!-- 文章列表 -->
         <div class="lg:col-span-3">
-          <h1 class="text-2xl font-bold text-gray-900 mb-8">
-            {{ categoryName ? `分类: ${categoryName}` : tagName ? `标签: ${tagName}` : '全部文章' }}
-          </h1>
+          <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">
+              {{ listTitle }}
+            </h1>
+          </div>
+
+          <!-- 搜索框 -->
+          <div class="mb-6">
+            <el-input
+              v-model="keyword"
+              placeholder="搜索文章标题 / 内容"
+              clearable
+              style="max-width: 360px"
+              @keyup.enter="handleSearch"
+              @clear="handleClearSearch"
+            >
+              <template #prefix>
+                <el-icon><Icon name="ep:search" /></el-icon>
+              </template>
+            </el-input>
+            <el-button type="primary" class="ml-2" @click="handleSearch">搜索</el-button>
+          </div>
 
           <el-skeleton v-if="loading" :rows="5" animated />
           <template v-else>

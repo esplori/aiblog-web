@@ -19,6 +19,7 @@ const loading = ref(true)
 const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
+const keyword = ref('')
 
 const loadArticles = async () => {
   if (isSubRoute.value) {
@@ -27,10 +28,12 @@ const loadArticles = async () => {
   }
   loading.value = true
   try {
-    const res = await get<PageResult<ArticleItem>>(`/api/admin/articles`, {
+    const params: Record<string, any> = {
       page: page.value,
       size: pageSize.value,
-    })
+    }
+    if (keyword.value.trim()) params.keyword = keyword.value.trim()
+    const res = await get<PageResult<ArticleItem>>(`/api/admin/articles`, params)
     articles.value = res.data.records
     total.value = res.data.total
   } catch (e) {
@@ -38,6 +41,17 @@ const loadArticles = async () => {
   } finally {
     loading.value = false
   }
+}
+
+const handleSearch = () => {
+  page.value = 1
+  loadArticles()
+}
+
+const handleClearSearch = () => {
+  keyword.value = ''
+  page.value = 1
+  loadArticles()
 }
 
 const handlePageChange = (p: number) => {
@@ -84,9 +98,24 @@ onMounted(() => {
 <template>
   <NuxtPage v-if="isSubRoute" />
   <div v-else>
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-6 gap-4">
       <h1 class="text-2xl font-bold text-gray-900">文章管理</h1>
-      <el-button type="primary" @click="handleCreate">新建文章</el-button>
+      <div class="flex items-center gap-3">
+        <el-input
+          v-model="keyword"
+          placeholder="搜索标题 / 内容关键词"
+          clearable
+          style="width: 260px"
+          @keyup.enter="handleSearch"
+          @clear="handleClearSearch"
+        >
+          <template #prefix>
+            <el-icon><Icon name="ep:search" /></el-icon>
+          </template>
+        </el-input>
+        <el-button type="primary" @click="handleSearch">搜索</el-button>
+        <el-button type="primary" @click="handleCreate">新建文章</el-button>
+      </div>
     </div>
 
     <div class="card">
