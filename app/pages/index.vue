@@ -156,6 +156,8 @@ function getCoverColor(id: number): string {
               </span>
               <span v-if="article.category" class="text-gray-300">·</span>
               <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
+              <span v-if="article.author" class="text-gray-300">·</span>
+              <span v-if="article.author" class="text-gray-500">{{ article.author.displayName }}</span>
             </div>
 
             <!-- 标题 -->
