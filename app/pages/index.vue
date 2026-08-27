@@ -36,22 +36,6 @@ const topTags = computed(() => tagsData.value?.data || [])
 // 第一篇作为 Hero，其余作为精选文章
 const heroArticle = computed(() => articles.value[0] || null)
 const featuredArticles = computed(() => articles.value.slice(1, 5))
-
-// 封面图占位色（根据文章标题生成稳定颜色）
-const coverColors = [
-  'from-blue-100 to-blue-50',
-  'from-indigo-100 to-indigo-50',
-  'from-purple-100 to-purple-50',
-  'from-teal-100 to-teal-50',
-  'from-amber-100 to-amber-50',
-  'from-rose-100 to-rose-50',
-  'from-emerald-100 to-emerald-50',
-  'from-cyan-100 to-cyan-50',
-]
-
-function getCoverColor(id: number): string {
-  return coverColors[id % coverColors.length]
-}
 </script>
 
 <template>
@@ -65,22 +49,9 @@ function getCoverColor(id: number): string {
           :to="`/post/${heroArticle.uuid}`"
           class="block group"
         >
-          <div class="overflow-hidden rounded-2xl">
-            <!-- 封面图区域 -->
-            <div
-              v-if="heroArticle.coverImage"
-              class="aspect-[16/9] bg-cover bg-center"
-              :style="{ backgroundImage: `url(${heroArticle.coverImage})` }"
-            />
-            <div
-              v-else
-              class="aspect-[16/9] bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center"
-            >
-              <span class="text-6xl font-bold text-blue-200/50">{{ heroArticle.title.charAt(0) }}</span>
-            </div>
-          </div>
+          <ArticleCover :article="heroArticle" variant="hero" />
 
-          <div class="mt-6 max-w-3xl">
+          <div v-if="heroArticle.coverImage" class="mt-6 max-w-3xl">
             <!-- 分类标签 -->
             <div class="flex items-center gap-3 mb-3">
               <span
@@ -133,42 +104,35 @@ function getCoverColor(id: number): string {
             class="group"
           >
             <!-- 封面图 -->
-            <div
-              v-if="article.coverImage"
-              class="aspect-[16/9] rounded-xl bg-cover bg-center mb-4"
-              :style="{ backgroundImage: `url(${article.coverImage})` }"
-            />
-            <div
-              v-else
-              class="aspect-[16/9] rounded-xl mb-4 bg-gradient-to-br flex items-center justify-center"
-              :class="getCoverColor(article.id)"
-            >
-              <span class="text-4xl font-bold text-gray-300/60">{{ article.title.charAt(0) }}</span>
+            <div class="mb-4">
+              <ArticleCover :article="article" variant="card" />
             </div>
 
-            <!-- 元信息 -->
-            <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
-              <span
-                v-if="article.category"
-                class="text-blue-600 font-medium"
-              >
-                {{ article.category.name }}
-              </span>
-              <span v-if="article.category" class="text-gray-300">·</span>
-              <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
-              <span v-if="article.author" class="text-gray-300">·</span>
-              <span v-if="article.author" class="text-gray-500">{{ article.author.displayName }}</span>
-            </div>
+            <template v-if="article.coverImage">
+              <!-- 元信息 -->
+              <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
+                <span
+                  v-if="article.category"
+                  class="text-blue-600 font-medium"
+                >
+                  {{ article.category.name }}
+                </span>
+                <span v-if="article.category" class="text-gray-300">·</span>
+                <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
+                <span v-if="article.author" class="text-gray-300">·</span>
+                <span v-if="article.author" class="text-gray-500">{{ article.author.displayName }}</span>
+              </div>
 
-            <!-- 标题 -->
-            <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
-              {{ article.title }}
-            </h3>
+              <!-- 标题 -->
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+                {{ article.title }}
+              </h3>
 
-            <!-- 摘要 -->
-            <p class="mt-2 text-sm text-gray-500 leading-relaxed line-clamp-2">
-              {{ article.excerpt }}
-            </p>
+              <!-- 摘要 -->
+              <p class="mt-2 text-sm text-gray-500 leading-relaxed line-clamp-2">
+                {{ article.excerpt }}
+              </p>
+            </template>
           </NuxtLink>
         </div>
       </div>
