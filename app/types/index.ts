@@ -23,7 +23,20 @@ export interface User {
   avatar?: string
   bio?: string
   role: string
+  roleName?: string
   lastLoginAt?: string
+  createdAt?: string
+}
+
+// 角色
+export interface Role {
+  id: number
+  code: string
+  name: string
+  description?: string
+  enabled: boolean
+  userCount: number
+  menuIds: number[]
   createdAt?: string
 }
 

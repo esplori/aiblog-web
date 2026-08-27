@@ -5,10 +5,13 @@ definePageMeta({
   layout: 'admin',
 })
 
-const { get } = useApi()
+const { get, put } = useApi()
+const authStore = useAuthStore()
 
 const users = ref<UserResponse[]>([])
+const roles = ref<{ code: string; name: string; enabled: boolean }[]>([])
 const loading = ref(true)
+const saving = ref(false)
 
 const loadUsers = async () => {
   loading.value = true
@@ -22,7 +25,48 @@ const loadUsers = async () => {
   }
 }
 
-onMounted(loadUsers)
+const loadRoles = async () => {
+  try {
+    const res = await get<{ code: string; name: string; enabled: boolean }[]>('/api/admin/roles')
+    roles.value = res.data || []
+  } catch (e) {
+    console.error(e)
+    roles.value = []
+  }
+}
+
+const isSelf = (row: UserResponse) => authStore.user?.id === row.id
+
+const handleRoleChange = async (row: UserResponse, newRole: string) => {
+  if (newRole === row.role) return
+  try {
+    await ElMessageBox.confirm(
+      `确定将用户「${row.displayName || row.username}」的角色修改为「${roles.value.find(r => r.code === newRole)?.name || newRole}」吗？`,
+      '修改角色',
+      { type: 'warning' },
+    )
+  } catch {
+    // 取消则恢复原值
+    row.role = row.role
+    return
+  }
+  saving.value = true
+  try {
+    await put(`/api/admin/users/${row.id}/role`, { role: newRole })
+    ElMessage.success('角色已更新')
+    loadUsers()
+  } catch (e: any) {
+    ElMessage.error(e?.data?.message || '修改失败')
+    loadUsers()
+  } finally {
+    saving.value = false
+  }
+}
+
+onMounted(() => {
+  loadUsers()
+  loadRoles()
+})
 </script>
 
 <template>
@@ -45,11 +89,22 @@ onMounted(loadUsers)
           </template>
         </el-table-column>
         <el-table-column prop="email" label="邮箱" min-width="200" />
-        <el-table-column prop="role" label="角色" width="100">
+        <el-table-column label="角色" width="160">
           <template #default="{ row }">
-            <el-tag :type="row.role === 'admin' ? 'danger' : 'info'" size="small">
-              {{ row.role }}
-            </el-tag>
+            <el-select
+              :model-value="row.role"
+              :disabled="isSelf(row) || saving"
+              size="small"
+              @change="(v: string) => handleRoleChange(row, v)"
+            >
+              <el-option
+                v-for="r in roles"
+                :key="r.code"
+                :value="r.code"
+                :label="`${r.name} (${r.code})`"
+                :disabled="!r.enabled"
+              />
+            </el-select>
           </template>
         </el-table-column>
         <el-table-column label="最后登录" width="180">
@@ -58,6 +113,7 @@ onMounted(loadUsers)
           </template>
         </el-table-column>
       </el-table>
+      <p class="text-gray-400 text-sm mt-3">提示：不能修改自己的角色。角色可在「角色管理」中维护。</p>
     </div>
   </div>
 </template>

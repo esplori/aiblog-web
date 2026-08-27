@@ -18,7 +18,17 @@ const { get, put } = useApi()
 const menus = ref<MenuItem[]>([])
 const loading = ref(true)
 const saving = ref(false)
-const roleOptions = ['admin', 'user']
+const roleOptions = ref<{ code: string; name: string }[]>([])
+
+const loadRoles = async () => {
+  try {
+    const res = await get<{ code: string; name: string }[]>('/api/admin/roles')
+    roleOptions.value = res.data || []
+  } catch (e) {
+    console.error(e)
+    roleOptions.value = []
+  }
+}
 
 const loadMenus = async () => {
   loading.value = true
@@ -44,7 +54,10 @@ const handleSave = async (row: MenuItem) => {
   }
 }
 
-onMounted(loadMenus)
+onMounted(() => {
+  loadMenus()
+  loadRoles()
+})
 </script>
 
 <template>
@@ -69,7 +82,7 @@ onMounted(loadMenus)
           <el-table-column label="可见角色" min-width="240">
             <template #default="{ row }">
               <el-checkbox-group v-model="row.roles">
-                <el-checkbox v-for="r in roleOptions" :key="r" :value="r" :label="r">{{ r }}</el-checkbox>
+                <el-checkbox v-for="r in roleOptions" :key="r.code" :value="r.code" :label="r.code">{{ r.name }}</el-checkbox>
               </el-checkbox-group>
             </template>
           </el-table-column>
@@ -80,7 +93,7 @@ onMounted(loadMenus)
           </el-table-column>
         </el-table>
         <p class="text-gray-400 text-sm mt-3">
-          提示：勾选角色后点击「保存」，该菜单将只对勾选的角色显示。角色可选：admin / user。
+          提示：勾选角色后点击「保存」，该菜单将只对勾选的角色显示。角色列表来自「角色管理」。
         </p>
       </template>
     </div>
