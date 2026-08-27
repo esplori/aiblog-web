@@ -22,6 +22,11 @@ onMounted(async () => {
   if (!authStore.user) {
     await authStore.fetchUser()
   }
+  // 非管理员无权访问管理后台（后端接口亦有 hasRole("admin") 拦截）
+  if (authStore.user?.role !== 'admin') {
+    ElMessage.warning('无权限访问管理后台')
+    navigateTo('/')
+  }
 })
 </script>
 
