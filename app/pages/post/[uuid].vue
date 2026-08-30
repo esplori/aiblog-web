@@ -9,8 +9,10 @@ const { get, post } = useApi()
 const articleUuid = computed(() => String(route.params.uuid))
 
 // 使用 useAsyncData 支持 SSR
+// 注意：key 必须用函数形式跟随 articleUuid，否则 SPA 路由切换文章（组件复用、仅 params 变化）时，
+// Nuxt 3.21 的 useAsyncData watch 不会触发重新请求，导致标题/内容停留在上一篇文章。
 const { data: articleData, pending: articlePending, error: articleError, refresh: refreshArticle } = useAsyncData(
-  'article-detail',
+  () => `article-detail-${articleUuid.value}`,
   () => get<Article>(`/api/articles/uuid/${articleUuid.value}`),
   { default: () => null, watch: [articleUuid] }
 )
@@ -18,14 +20,14 @@ const { data: articleData, pending: articlePending, error: articleError, refresh
 const article = computed(() => articleData.value?.data || null)
 
 // 动态设置 SEO 元信息（SSR 时生效，爬虫可见）
-useServerSeoMeta({
+useSeoMeta({
   title: () => article.value?.title || '文章详情',
   description: () => article.value?.excerpt || article.value?.content?.slice(0, 200)?.replace(/<[^>]*>/g, ''),
 })
 
 // 评论请求依赖文章内部 id，需等文章加载完成后再请求
 const { data: commentsData, pending: commentsPending, refresh: refreshComments } = useAsyncData(
-  'article-comments',
+  () => `article-comments-${article.value?.id ?? 'none'}`,
   () => {
     const id = article.value?.id
     if (!id) return Promise.resolve({ data: [] } as any)
