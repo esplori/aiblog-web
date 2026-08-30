@@ -32,7 +32,8 @@ const loadTags = async () => {
   loading.value = true
   try {
     const res = await get<PageResult<Tag>>('/api/admin/tags/page', {
-      params: { page: page.value, size: pageSize.value },
+      page: page.value,
+      size: pageSize.value,
     })
     tags.value = res.data.records
     total.value = res.data.total
@@ -125,7 +126,7 @@ onMounted(loadTags)
       <el-skeleton v-if="loading" :rows="5" animated />
       <template v-else>
         <el-table :data="tags">
-          <el-table-column prop="name" label="名称" width="150" />
+          <el-table-column prop="name" label="名称" min-width="150" show-overflow-tooltip />
           <el-table-column label="颜色" width="100">
             <template #default="{ row }">
               <span

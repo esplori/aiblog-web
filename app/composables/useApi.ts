@@ -17,6 +17,21 @@ export const useApi = () => {
       params?: Record<string, any>
     } = {}
   ): Promise<ApiResponse<T>> => {
+    // 兼容调用方误传 { params: {...} } 的写法（如后台分页参数），
+    // useApi.get(url, params) 的第二个参数本就是 params 对象，若再包一层 { params } 会导致
+    // ofetch 把整个对象序列化成单个名为 params 的查询参数，后端无法解析分页字段。
+    let { params } = options
+    if (
+      params &&
+      typeof params === 'object' &&
+      !Array.isArray(params) &&
+      (params as any).params &&
+      typeof (params as any).params === 'object' &&
+      !Array.isArray((params as any).params)
+    ) {
+      params = (params as any).params
+    }
+
     const headers: Record<string, string> = {}
     // FormData 让浏览器自动设置 Content-Type（含 boundary）
     if (!(options.body instanceof FormData)) {
@@ -49,7 +64,7 @@ export const useApi = () => {
         method: (options.method || 'GET') as any,
         headers,
         body: options.body,
-        params: options.params,
+        params,
       })
 
       return response

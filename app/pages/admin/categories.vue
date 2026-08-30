@@ -29,7 +29,8 @@ const loadCategories = async () => {
   loading.value = true
   try {
     const res = await get<PageResult<Category>>('/api/admin/categories/page', {
-      params: { page: page.value, size: pageSize.value },
+      page: page.value,
+      size: pageSize.value,
     })
     categories.value = res.data.records
     total.value = res.data.total
