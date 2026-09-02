@@ -122,12 +122,12 @@ onMounted(loadTags)
       <el-button type="primary" @click="handleCreate">新建标签</el-button>
     </div>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
       <template v-else>
-        <el-table :data="tags">
-          <el-table-column prop="name" label="名称" min-width="150" show-overflow-tooltip />
-          <el-table-column label="颜色" width="100">
+        <el-table :data="tags" class="min-w-[400px]">
+          <el-table-column prop="name" label="名称" min-width="120" show-overflow-tooltip />
+          <el-table-column label="颜色" width="80" class="hidden sm:table-cell">
             <template #default="{ row }">
               <span
                 class="inline-block w-4 h-4 rounded-full"
@@ -135,8 +135,8 @@ onMounted(loadTags)
               />
             </template>
           </el-table-column>
-          <el-table-column prop="articleCount" label="文章数" width="100" />
-          <el-table-column label="操作" width="150">
+          <el-table-column prop="articleCount" label="文章数" width="80" class="hidden sm:table-cell" />
+          <el-table-column label="操作" width="140" fixed="right">
             <template #default="{ row }">
               <el-button size="small" text type="primary" @click="handleEdit(row)">编辑</el-button>
               <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>

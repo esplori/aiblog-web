@@ -119,14 +119,14 @@ onMounted(loadCategories)
       <el-button type="primary" @click="handleCreate">新建分类</el-button>
     </div>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
       <template v-else>
-        <el-table :data="categories">
-          <el-table-column prop="name" label="名称" width="150" />
-          <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="articleCount" label="文章数" width="100" />
-          <el-table-column label="操作" width="150">
+        <el-table :data="categories" class="min-w-[480px]">
+          <el-table-column prop="name" label="名称" min-width="120" />
+          <el-table-column prop="description" label="描述" min-width="180" show-overflow-tooltip class="hidden md:table-cell" />
+          <el-table-column prop="articleCount" label="文章数" width="80" class="hidden sm:table-cell" />
+          <el-table-column label="操作" width="140" fixed="right">
             <template #default="{ row }">
               <el-button size="small" text type="primary" @click="handleEdit(row)">编辑</el-button>
               <el-button size="small" text type="danger" @click="handleDelete(row.id)">删除</el-button>

@@ -64,13 +64,13 @@ onMounted(() => {
   <div>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">菜单管理</h1>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="6" animated />
       <template v-else>
-        <el-table :data="menus">
-          <el-table-column prop="name" label="菜单名称" width="160" />
-          <el-table-column prop="path" label="路由路径" min-width="180" />
-          <el-table-column prop="icon" label="图标" width="160">
+        <el-table :data="menus" class="min-w-[640px]">
+          <el-table-column prop="name" label="菜单名称" min-width="120" />
+          <el-table-column prop="path" label="路由路径" min-width="160" class="hidden md:table-cell" />
+          <el-table-column label="图标" width="100" class="hidden sm:table-cell">
             <template #default="{ row }">
               <span class="inline-flex items-center gap-2">
                 <el-icon><Icon :name="row.icon" /></el-icon>
@@ -78,15 +78,15 @@ onMounted(() => {
               </span>
             </template>
           </el-table-column>
-          <el-table-column prop="sortOrder" label="排序" width="80" />
-          <el-table-column label="可见角色" min-width="240">
+          <el-table-column prop="sortOrder" label="排序" width="70" class="hidden sm:table-cell" />
+          <el-table-column label="可见角色" min-width="200">
             <template #default="{ row }">
               <el-checkbox-group v-model="row.roles">
-                <el-checkbox v-for="r in roleOptions" :key="r.code" :value="r.code" :label="r.code">{{ r.name }}</el-checkbox>
+                <el-checkbox v-for="r in roleOptions" :key="r.code" :value="r.code" :label="r.code" class="!mr-0 !mb-1">{{ r.name }}</el-checkbox>
               </el-checkbox-group>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="120" fixed="right">
+          <el-table-column label="操作" width="100" fixed="right">
             <template #default="{ row }">
               <el-button size="small" type="primary" text :loading="saving" @click="handleSave(row)">保存</el-button>
             </template>

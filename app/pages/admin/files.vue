@@ -82,23 +82,19 @@ onMounted(loadFiles)
       </el-upload>
     </div>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="files">
-        <el-table-column prop="originalFilename" label="文件名" min-width="200" show-overflow-tooltip />
-        <el-table-column prop="fileType" label="类型" width="100" />
-        <el-table-column label="大小" width="100">
-          <template #default="{ row }">
-            {{ formatSize(row.fileSize) }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="mimeType" label="MIME" width="150" />
-        <el-table-column label="上传时间" width="160">
+      <el-table v-else :data="files" class="min-w-[640px]">
+        <el-table-column prop="originalFilename" label="文件名" min-width="180" show-overflow-tooltip />
+        <el-table-column prop="fileType" label="类型" width="90" class="hidden sm:table-cell" />
+        <el-table-column label="大小" width="90" />
+        <el-table-column prop="mimeType" label="MIME" width="140" class="hidden md:table-cell" />
+        <el-table-column label="上传时间" width="140" class="hidden lg:table-cell">
           <template #default="{ row }">
             {{ new Date(row.createdAt).toLocaleString() }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="150">
+        <el-table-column label="操作" width="140" fixed="right">
           <template #default="{ row }">
             <a :href="row.fileUrl" target="_blank">
               <el-button size="small" text type="primary">查看</el-button>

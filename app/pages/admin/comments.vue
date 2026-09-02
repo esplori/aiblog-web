@@ -52,33 +52,24 @@ onMounted(loadComments)
   <div>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">评论管理</h1>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="comments">
-        <el-table-column prop="content" label="内容" min-width="300" show-overflow-tooltip />
-        <el-table-column label="用户" width="120">
-          <template #default="{ row }">
-            {{ row.userInfo?.username || '匿名' }}
-          </template>
-        </el-table-column>
-        <el-table-column label="文章" width="200">
-          <template #default="{ row }">
-            文章 ID: {{ row.articleId }}
-          </template>
-        </el-table-column>
-        <el-table-column prop="status" label="状态" width="100">
+      <el-table v-else :data="comments" class="min-w-[600px]">
+        <el-table-column prop="content" label="内容" min-width="240" show-overflow-tooltip class="hidden md:table-cell" />
+        <el-table-column label="用户" width="100" />
+        <el-table-column label="状态" width="90" class="hidden sm:table-cell">
           <template #default="{ row }">
             <el-tag :type="row.status === 'approved' ? 'success' : 'warning'" size="small">
               {{ row.status === 'approved' ? '已审核' : '待审核' }}
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="创建时间" width="160">
+        <el-table-column label="创建时间" width="140" class="hidden lg:table-cell">
           <template #default="{ row }">
             {{ new Date(row.createdAt).toLocaleString() }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="200" fixed="right">
+        <el-table-column label="操作" width="160" fixed="right">
           <template #default="{ row }">
             <el-button
               v-if="row.status !== 'approved'"

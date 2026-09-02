@@ -156,44 +156,41 @@ onMounted(() => {
       <el-button type="primary" @click="openCreate">新增角色</el-button>
     </div>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="roles">
-        <el-table-column prop="id" label="ID" width="70" />
-        <el-table-column prop="name" label="角色名称" width="140">
-          <template #default="{ row }">
-            <span class="font-medium">{{ row.name }}</span>
-            <el-tag v-if="row.code === 'admin'" type="danger" size="small" class="ml-2">内置</el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column prop="code" label="编码" width="120">
-          <template #default="{ row }">
-            <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{{ row.code }}</code>
-          </template>
-        </el-table-column>
-        <el-table-column prop="description" label="描述" min-width="200">
-          <template #default="{ row }">
-            <span class="text-gray-500 text-sm">{{ row.description || '-' }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column prop="userCount" label="用户数" width="90" />
-        <el-table-column label="状态" width="90">
-          <template #default="{ row }">
-            <el-tag :type="row.enabled ? 'success' : 'info'" size="small">
-              {{ row.enabled ? '启用' : '禁用' }}
-            </el-tag>
-          </template>
-        </el-table-column>
-        <el-table-column label="操作" width="220" fixed="right">
-          <template #default="{ row }">
-            <el-button size="small" text type="primary" @click="openMenuAuth(row)">菜单授权</el-button>
-            <el-button size="small" text type="primary" @click="openEdit(row)">编辑</el-button>
-            <el-button size="small" text type="danger" :disabled="row.code === 'admin'" @click="handleDelete(row)">
-              删除
-            </el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+      <template v-else>
+        <el-table :data="roles" class="min-w-[640px]">
+          <el-table-column prop="id" label="ID" width="70" class="hidden sm:table-cell" />
+          <el-table-column prop="name" label="角色名称" min-width="120">
+            <template #default="{ row }">
+              <span class="font-medium">{{ row.name }}</span>
+              <el-tag v-if="row.code === 'admin'" type="danger" size="small" class="ml-2">内置</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="code" label="编码" width="110" class="hidden sm:table-cell">
+            <template #default="{ row }">
+              <code class="text-xs bg-gray-100 px-1.5 py-0.5 rounded">{{ row.code }}</code>
+            </template>
+          </el-table-column>
+          <el-table-column prop="description" label="描述" min-width="160" show-overflow-tooltip class="hidden md:table-cell" />
+          <el-table-column prop="userCount" label="用户数" width="80" class="hidden sm:table-cell" />
+          <el-table-column label="状态" width="80">
+            <template #default="{ row }">
+              <el-tag :type="row.enabled ? 'success' : 'info'" size="small">
+                {{ row.enabled ? '启用' : '禁用' }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="200" fixed="right">
+            <template #default="{ row }">
+              <el-button size="small" text type="primary" @click="openMenuAuth(row)">菜单授权</el-button>
+              <el-button size="small" text type="primary" @click="openEdit(row)">编辑</el-button>
+              <el-button size="small" text type="danger" :disabled="row.code === 'admin'" @click="handleDelete(row)">
+                删除
+              </el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       <p class="text-gray-400 text-sm mt-3">
         提示：内置「admin」角色不可删除/禁用；被用户使用的角色需先调整用户角色后才能删除。
       </p>

@@ -73,11 +73,11 @@ onMounted(() => {
   <div>
     <h1 class="text-2xl font-bold text-gray-900 mb-6">用户管理</h1>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
-      <el-table v-else :data="users">
-        <el-table-column prop="id" label="ID" width="80" />
-        <el-table-column label="用户" width="200">
+      <el-table v-else :data="users" class="min-w-[640px]">
+        <el-table-column prop="id" label="ID" width="70" class="hidden sm:table-cell" />
+        <el-table-column label="用户" min-width="160">
           <template #default="{ row }">
             <div class="flex items-center gap-2">
               <el-avatar :size="32">{{ row.displayName?.charAt(0) }}</el-avatar>
@@ -88,8 +88,8 @@ onMounted(() => {
             </div>
           </template>
         </el-table-column>
-        <el-table-column prop="email" label="邮箱" min-width="200" />
-        <el-table-column label="角色" width="160">
+        <el-table-column prop="email" label="邮箱" min-width="180" class="hidden md:table-cell" />
+        <el-table-column label="角色" width="140">
           <template #default="{ row }">
             <el-select
               :model-value="row.role"
@@ -107,7 +107,7 @@ onMounted(() => {
             </el-select>
           </template>
         </el-table-column>
-        <el-table-column label="最后登录" width="180">
+        <el-table-column label="最后登录" width="160" class="hidden lg:table-cell">
           <template #default="{ row }">
             {{ row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleString() : '未登录' }}
           </template>

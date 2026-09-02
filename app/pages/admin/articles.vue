@@ -118,32 +118,32 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="card">
+    <div class="card overflow-x-auto">
       <el-skeleton v-if="loading" :rows="5" animated />
       <template v-else>
-        <el-table :data="articles">
-          <el-table-column prop="title" label="标题" min-width="250" show-overflow-tooltip />
-          <el-table-column label="分类" width="120">
+        <el-table :data="articles" class="min-w-[640px]">
+          <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
+          <el-table-column label="分类" width="100" class="hidden md:table-cell">
             <template #default="{ row }">
               <el-tag v-if="row.category" size="small">{{ row.category.name }}</el-tag>
               <span v-else class="text-gray-400 text-sm">-</span>
             </template>
           </el-table-column>
-          <el-table-column label="状态" width="100">
+          <el-table-column label="状态" width="90" class="hidden md:table-cell">
             <template #default="{ row }">
               <el-tag :type="row.status === 'published' ? 'success' : 'warning'" size="small">
                 {{ row.status === 'published' ? '已发布' : '草稿' }}
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="viewCount" label="阅读" width="80" />
-          <el-table-column prop="commentCount" label="评论" width="80" />
-          <el-table-column label="创建时间" width="180">
+          <el-table-column prop="viewCount" label="阅读" width="70" class="hidden sm:table-cell" />
+          <el-table-column prop="commentCount" label="评论" width="70" class="hidden sm:table-cell" />
+          <el-table-column label="创建时间" width="160" class="hidden lg:table-cell">
             <template #default="{ row }">
               {{ new Date(row.createdAt).toLocaleString() }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="260" fixed="right">
+          <el-table-column label="操作" width="220" fixed="right">
             <template #default="{ row }">
               <el-button size="small" text type="primary" @click="handleView(row.uuid)">查看</el-button>
               <el-button size="small" text type="primary" @click="handleEdit(row.id)">编辑</el-button>

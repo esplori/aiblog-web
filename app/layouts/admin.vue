@@ -13,6 +13,24 @@ const authStore = useAuthStore()
 const route = useRoute()
 const { get } = useApi()
 const isCollapse = ref(false)
+const isMobile = ref(false)
+
+// 检测移动端屏幕宽度
+const checkMobile = () => {
+  isMobile.value = window.innerWidth < 768
+  if (isMobile.value) {
+    isCollapse.value = true
+  }
+}
+
+onMounted(() => {
+  checkMobile()
+  window.addEventListener('resize', checkMobile)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkMobile)
+})
 
 const menuItems = ref<MenuItem[]>([])
 const menuLoaded = ref(false)
@@ -61,8 +79,21 @@ watch(menuLoaded, (v) => {
 
 <template>
   <div class="min-h-screen flex">
-    <!-- 侧边栏（浅色风格，与前管一致） -->
-    <aside class="admin-sidebar bg-white border-r border-gray-100" :class="isCollapse ? 'w-16' : 'w-60'">
+    <!-- 移动端遮罩层 -->
+    <div
+      v-if="isMobile && !isCollapse"
+      class="fixed inset-0 bg-black/50 z-40"
+      @click="isCollapse = true"
+    />
+
+    <!-- 侧边栏（移动端抽屉式 / 桌面端固定） -->
+    <aside
+      class="admin-sidebar bg-white border-r border-gray-100 fixed md:relative z-50 h-screen transition-all duration-300"
+      :class="[
+        isCollapse ? '-translate-x-full md:w-16 md:translate-x-0' : 'translate-x-0 w-60',
+        isMobile ? 'shadow-xl' : ''
+      ]"
+    >
       <!-- Logo -->
       <div class="h-16 flex items-center justify-center border-b border-gray-100">
         <span v-if="!isCollapse" class="text-lg font-bold text-gray-900">Pylox 管理</span>
@@ -102,13 +133,13 @@ watch(menuLoaded, (v) => {
         </el-button>
 
         <div class="flex items-center gap-4">
-          <NuxtLink to="/" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">
+          <NuxtLink to="/" class="hidden sm:inline-block text-sm text-gray-500 hover:text-blue-600 transition-colors">
             访问前台
           </NuxtLink>
           <el-dropdown>
             <span class="flex items-center gap-2 cursor-pointer">
               <el-avatar :size="28">{{ authStore.user?.displayName?.charAt(0) }}</el-avatar>
-              <span class="text-sm">{{ authStore.user?.displayName }}</span>
+              <span class="text-sm hidden sm:inline">{{ authStore.user?.displayName }}</span>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -125,7 +156,7 @@ watch(menuLoaded, (v) => {
       </header>
 
       <!-- 内容 -->
-      <main class="flex-1 p-6 bg-gray-50 min-w-0 overflow-x-auto">
+      <main class="flex-1 p-4 md:p-6 bg-gray-50 min-w-0 overflow-x-auto">
         <div v-if="!menuLoaded" class="h-full flex items-center justify-center text-gray-400 text-sm py-20">
           加载中...
         </div>
