@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Article, Comment } from '~/types'
 import { renderMarkdown } from '~/utils/markdown'
+import { useAuthStore } from '~/stores/auth'
 
 const route = useRoute()
 const { get, post } = useApi()
+const authStore = useAuthStore()
 
 // 文章 UUID（对外路由标识）
 const articleUuid = computed(() => String(route.params.uuid))
@@ -42,6 +44,28 @@ const loading = computed(() => articlePending.value || commentsPending.value)
 // 将 Markdown 内容转换为 HTML
 const articleContentHtml = computed(() => article.value ? renderMarkdown(article.value.content) : '')
 
+// 点赞状态
+const isLiked = ref(false)
+const likeLoading = ref(false)
+
+const toggleLike = async () => {
+  if (!article.value) return
+  if (likeLoading.value) return
+
+  likeLoading.value = true
+  try {
+    await post(`/api/articles/${article.value.id}/like`)
+    // 切换点赞状态并更新计数
+    isLiked.value = !isLiked.value
+    article.value.likeCount += isLiked.value ? 1 : -1
+    ElMessage.success(isLiked.value ? '点赞成功' : '已取消点赞')
+  } catch (e: any) {
+    ElMessage.error(e?.data?.message || '操作失败')
+  } finally {
+    likeLoading.value = false
+  }
+}
+
 const commentContent = ref('')
 
 const submitComment = async () => {
@@ -51,6 +75,11 @@ const submitComment = async () => {
   }
   if (!article.value) {
     ElMessage.error('文章不存在')
+    return
+  }
+  if (!authStore.isLoggedIn) {
+    ElMessage.warning('请先登录后再评论')
+    navigateTo('/login')
     return
   }
 
@@ -143,9 +172,16 @@ const submitComment = async () => {
 
         <!-- 点赞 -->
         <div class="flex justify-center pt-16 pb-12">
-          <el-button round plain class="!px-8">
-            <el-icon class="mr-1.5"><Icon name="ep:star" /></el-icon>
-            点赞 ({{ article.likeCount }})
+          <el-button
+            round
+            plain
+            class="!px-8"
+            :type="isLiked ? 'primary' : ''"
+            :loading="likeLoading"
+            @click="toggleLike"
+          >
+            <el-icon class="mr-1.5"><Icon :name="isLiked ? 'ep:star-filled' : 'ep:star'" /></el-icon>
+            {{ isLiked ? '已点赞' : '点赞' }} ({{ article.likeCount }})
           </el-button>
         </div>
 
