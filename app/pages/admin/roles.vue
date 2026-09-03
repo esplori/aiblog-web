@@ -191,9 +191,10 @@ onMounted(() => {
             </template>
           </el-table-column>
         </el-table>
-      <p class="text-gray-400 text-sm mt-3">
-        提示：内置「admin」角色不可删除/禁用；被用户使用的角色需先调整用户角色后才能删除。
-      </p>
+        <p class="text-gray-400 text-sm mt-3">
+          提示：内置「admin」角色不可删除/禁用；被用户使用的角色需先调整用户角色后才能删除。
+        </p>
+      </template>
     </div>
 
     <!-- 新增/编辑角色 -->
