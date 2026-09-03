@@ -51,6 +51,11 @@ const likeLoading = ref(false)
 const toggleLike = async () => {
   if (!article.value) return
   if (likeLoading.value) return
+  if (!authStore.isLoggedIn) {
+    ElMessage.warning('请先登录后再点赞')
+    navigateTo('/login')
+    return
+  }
 
   likeLoading.value = true
   try {
