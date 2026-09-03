@@ -105,7 +105,7 @@ onMounted(() => {
           v-model="keyword"
           placeholder="搜索标题 / 内容关键词"
           clearable
-          style="width: 260px"
+          class="flex-1 min-w-0"
           @keyup.enter="handleSearch"
           @clear="handleClearSearch"
         >

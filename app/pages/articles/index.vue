@@ -131,7 +131,7 @@ watch([category, tag], () => {
               v-model="keyword"
               placeholder="搜索文章标题 / 内容"
               clearable
-              style="max-width: 360px"
+              class="flex-1 min-w-0"
               @keyup.enter="handleSearch"
               @clear="handleClearSearch"
             >
