@@ -126,7 +126,7 @@ watch([category, tag], () => {
           </div>
 
           <!-- 搜索框 -->
-          <div class="mb-6">
+          <div class="mb-6 flex items-center gap-3">
             <el-input
               v-model="keyword"
               placeholder="搜索文章标题 / 内容"
@@ -139,7 +139,7 @@ watch([category, tag], () => {
                 <el-icon><Icon name="ep:search" /></el-icon>
               </template>
             </el-input>
-            <el-button type="primary" class="ml-2" @click="handleSearch">搜索</el-button>
+            <el-button type="primary" class="shrink-0" @click="handleSearch">搜索</el-button>
           </div>
 
           <el-skeleton v-if="loading" :rows="5" animated />
