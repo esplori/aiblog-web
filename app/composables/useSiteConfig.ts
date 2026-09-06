@@ -22,13 +22,20 @@ export const useSiteConfig = () => {
 }
 
 /**
- * 设置品牌 CSS 变量。调用方在 <script setup> 的 onMounted 或组件顶层执行，
- * 让 --color-brand 等颜色变量生效，配合 tailwind 的 brand-* 工具类实现主题化。
+ * 将品牌色写入 <html> 标签的内联 style。
+ * 基于 useHead 的 htmlAttrs，在 SSR 阶段即输出，客户端 hydration 直接继承，
+ * 避免 onMounted 注入造成的首屏颜色闪烁（FOUC）。
+ * 需在 <script setup> 顶层调用（不能放 onMounted 内，否则丢失 SSR 时机）。
  */
-export const applyBrandTheme = (brandColor?: string) => {
-  if (import.meta.server) return
-  const color = brandColor || useSiteConfig().brandColor
+export const useBrandTheme = (brandColor?: string) => {
+  const { brandColor: fallback } = useSiteConfig()
+  const color = brandColor || fallback
   if (!color) return
-  const root = document.documentElement
-  root.style.setProperty('--color-brand', color)
+  useHead({
+    htmlAttrs: {
+      style: {
+        '--color-brand': color,
+      },
+    },
+  })
 }

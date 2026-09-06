@@ -12,7 +12,11 @@ interface MenuItem {
 const authStore = useAuthStore()
 const route = useRoute()
 const { get } = useApi()
-const { name } = useSiteConfig()
+const { name, brandColor } = useSiteConfig()
+
+// 后台布局也注入品牌色（SSR 阶段写入 html style）
+useBrandTheme(brandColor)
+
 const isCollapse = ref(false)
 const isMobile = ref(false)
 

@@ -7,6 +7,10 @@ definePageMeta({
 
 const authStore = useAuthStore()
 const { post } = useApi()
+const { name, brandColor } = useSiteConfig()
+
+// login 页面独立布局，需单独注入品牌 CSS 变量（SSR 阶段写入 html style）
+useBrandTheme(brandColor)
 
 const activeTab = ref<'login' | 'register'>('login')
 
@@ -78,7 +82,7 @@ const handleRegister = async () => {
   <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-600 to-brand-700">
     <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
       <div class="text-center mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Pylox</h1>
+        <h1 class="text-2xl font-bold text-gray-800">{{ name }}</h1>
         <p class="text-gray-500 mt-2">{{ activeTab === 'login' ? '登录到你的账户' : '创建你的账户' }}</p>
       </div>
 

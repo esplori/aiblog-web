@@ -63,15 +63,14 @@ export default defineNuxtConfig({
   },
 
   // 应用配置
+  // 注意：title / description 等品牌相关 head 不在此静态配置，统一由
+  // app.vue 的 useHead 在运行时读取 runtimeConfig 生成（避免构建期写死，
+  // 使 .output 启动时注入 env 即可换名，无需重新构建）。
   app: {
     head: {
-      title: process.env.NUXT_PUBLIC_SITE_NAME || 'Pylox',
-      // 兜底模板；实际规则由 app.vue 的 useHead titleTemplate 覆盖（避免首页 "Pylox | Pylox" 重复）
-      titleTemplate: `%s | ${process.env.NUXT_PUBLIC_SITE_NAME || 'Pylox'}`,
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: process.env.NUXT_PUBLIC_SITE_DESCRIPTION || 'Pylox — AI 驱动的现代化博客系统，分享技术、生活与思考' },
       ],
       link: [
         { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

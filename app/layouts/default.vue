@@ -2,8 +2,10 @@
 const authStore = useAuthStore()
 const { name, brandColor } = useSiteConfig()
 
+// SSR 阶段将品牌色写入 html style，避免客户端注入导致首屏闪烁
+useBrandTheme(brandColor)
+
 onMounted(() => {
-  applyBrandTheme(brandColor)
   if (authStore.token) {
     authStore.fetchUser()
   }
