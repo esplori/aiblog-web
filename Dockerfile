@@ -38,8 +38,9 @@ WORKDIR /app
 COPY --from=builder /app/.output ./.output
 COPY --from=builder /app/package.json ./
 
-# 复制 nginx 配置
-COPY nginx.conf /etc/nginx/nginx.conf
+# 复制 nginx 配置模板与启动脚本（启动时按 API_BACKEND_HOST 生成最终配置，支持多实例克隆）
+COPY nginx.conf.template /etc/nginx/nginx.conf.template
+COPY entrypoint.sh /app/entrypoint.sh
 
 # 创建 nginx 运行目录
 RUN mkdir -p /var/lib/nginx/tmp/client_body \
@@ -49,7 +50,8 @@ RUN mkdir -p /var/lib/nginx/tmp/client_body \
     /var/lib/nginx/tmp/scgi \
     /var/log/nginx \
     /var/run/nginx && \
-    chown -R nobody:nogroup /var/lib/nginx /var/log/nginx /var/run/nginx
+    chown -R nobody:nogroup /var/lib/nginx /var/log/nginx /var/run/nginx && \
+    chmod +x /app/entrypoint.sh
 
 # 暴露端口
 EXPOSE 3000
@@ -58,5 +60,5 @@ EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3000 || exit 1
 
-# 启动命令：先启动 Nuxt 服务器（内部端口 3001），再启动 nginx（前台端口 3000）
-CMD ["sh", "-c", "PORT=3001 node .output/server/index.mjs & nginx -g 'daemon off;'"]
+# 启动命令：入口脚本先按环境变量生成 nginx 配置，再启动 Nuxt SSR + nginx
+CMD ["sh", "/app/entrypoint.sh"]
