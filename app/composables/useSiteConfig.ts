@@ -1,24 +1,88 @@
 /**
  * 站点品牌配置（可换肤换名）。
- * 读取 nuxt.config runtimeConfig.public.site，若配了 brandColor 则注入
- * --color-brand 等 CSS 变量，实现"一套代码、改 .env 即换主题"。
+ *
+ * 数据来源优先级：后端 site_settings（后台可运行时切换，持久化到 DB） > .env(runtimeConfig) > 默认值。
+ * 统一通过 useAsyncData 预取后端配置（SSR 阻塞渲染、随 payload 传递、客户端不重复请求），
+ * 供 app.vue / 布局 / 页面同步读取生效值。后端不可达时回退 .env 兜底。
  */
-export const useSiteConfig = () => {
-  const config = useRuntimeConfig()
-  const site = config.public.site || {
-    name: 'Pylox',
-    tagline: 'AI 驱动的现代化博客系统',
-    description: 'Pylox — AI 驱动的现代化博客系统',
-    brandColor: '#2563eb',
-  }
 
+export interface SiteConfig {
+  name: string
+  tagline: string
+  description: string
+  brandColor: string
+  theme: string
+}
+
+interface SiteResponse {
+  code: number
+  message: string
+  data?: Partial<SiteConfig>
+}
+
+/** 读取 .env / 默认的站点配置（作为兜底） */
+const envSite = (): SiteConfig => {
+  const config = useRuntimeConfig()
+  const site = config.public.site || {}
   return {
-    site,
-    name: site.name,
-    tagline: site.tagline,
-    description: site.description,
-    brandColor: site.brandColor,
+    name: site.name || 'Pylox',
+    tagline: site.tagline || '',
+    description: site.description || '',
+    brandColor: site.brandColor || '#2563eb',
+    theme: site.theme || 'blue',
   }
+}
+
+const fetchDb = async (): Promise<Partial<SiteConfig> | null> => {
+  const runtime = useRuntimeConfig()
+  const url = import.meta.server
+    ? `${runtime.apiBaseInternal}/api/site-settings`
+    : '/api/site-settings'
+  try {
+    const res = await $fetch<SiteResponse>(url)
+    if (res?.code === 200 && res.data) {
+      return res.data
+    }
+    return null
+  } catch (e) {
+    // 后端暂不可达时回退 .env 默认
+    return null
+  }
+}
+
+/** 合并 .env 与后端配置（后端字段为空时不覆盖默认值） */
+const mergeSite = (env: SiteConfig, db: Partial<SiteConfig> | null): SiteConfig => {
+  if (!db) return env
+  const clean: Partial<SiteConfig> = {}
+  for (const [k, v] of Object.entries(db)) {
+    if (v != null && v !== '') (clean as any)[k] = v
+  }
+  return { ...env, ...clean }
+}
+
+/**
+ * 预取后端站点设置（同 key，任意调用点共享一份，SSR 后随 payload 下发）。
+ * app.vue 顶层 `await useSiteSettings()` 保证渲染前已就绪。
+ */
+export const useSiteSettings = () =>
+  useAsyncData<Partial<SiteConfig> | null>('site-settings', () => fetchDb(), {
+    default: () => null,
+  })
+
+/**
+ * 同步读取当前生效的站点配置（后端优先，其次 .env）。
+ * 需在 app.vue await useSiteSettings() 后调用，值已就绪可直接解构。
+ */
+export const useSiteConfig = (): SiteConfig => {
+  const { data } = useSiteSettings()
+  return mergeSite(envSite(), data.value)
+}
+
+/**
+ * 强制刷新站点配置（后台保存后调用，让新配置即时生效）。
+ */
+export const refreshSiteSettings = async (): Promise<void> => {
+  await useSiteSettings().refresh()
 }
 
 /**
