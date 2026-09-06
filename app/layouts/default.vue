@@ -1,7 +1,9 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
+const { name, brandColor } = useSiteConfig()
 
 onMounted(() => {
+  applyBrandTheme(brandColor)
   if (authStore.token) {
     authStore.fetchUser()
   }
@@ -15,20 +17,20 @@ onMounted(() => {
       <div class="container flex items-center justify-between h-16">
         <!-- Logo -->
         <NuxtLink to="/" class="text-xl font-bold text-gray-800">
-          Pylox
+          {{ name }}
         </NuxtLink>
 
         <!-- 导航菜单 -->
         <nav class="flex items-center gap-6">
-          <NuxtLink to="/" class="text-gray-600 hover:text-blue-500">
+          <NuxtLink to="/" class="text-gray-600 hover:text-brand-600">
             首页
           </NuxtLink>
-          <NuxtLink to="/articles" class="text-gray-600 hover:text-blue-500">
+          <NuxtLink to="/articles" class="text-gray-600 hover:text-brand-600">
             文章
           </NuxtLink>
 
           <template v-if="authStore.isLoggedIn">
-            <NuxtLink to="/admin" class="text-gray-600 hover:text-blue-500">
+            <NuxtLink to="/admin" class="text-gray-600 hover:text-brand-600">
               管理
             </NuxtLink>
             <el-dropdown>
@@ -71,7 +73,7 @@ onMounted(() => {
     <!-- 底部 -->
     <footer class="bg-gray-800 text-gray-400 py-8">
       <div class="container text-center text-sm">
-        <p>© {{ new Date().getFullYear() }} Pylox. All rights reserved.</p>
+        <p>© {{ new Date().getFullYear() }} {{ name }}. All rights reserved.</p>
       </div>
     </footer>
   </div>

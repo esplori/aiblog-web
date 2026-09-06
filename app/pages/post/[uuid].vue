@@ -117,7 +117,7 @@ const submitComment = async () => {
       <div class="max-w-[720px] mx-auto px-6 pb-20">
         <!-- 返回链接 -->
         <div class="pt-12 pb-2">
-          <NuxtLink to="/" class="text-sm text-gray-400 hover:text-blue-600 transition-colors">
+          <NuxtLink to="/" class="text-sm text-gray-400 hover:text-brand-600 transition-colors">
             ← 返回首页
           </NuxtLink>
         </div>
@@ -128,7 +128,7 @@ const submitComment = async () => {
           <div v-if="article.category" class="mb-4">
             <NuxtLink
               :to="`/articles?category=${article.category.id}`"
-              class="inline-block px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-full hover:bg-blue-100 transition-colors"
+              class="inline-block px-3 py-1 text-xs font-medium text-brand-600 bg-brand-50 rounded-full hover:bg-brand-100 transition-colors"
             >
               {{ article.category.name }}
             </NuxtLink>
@@ -142,7 +142,7 @@ const submitComment = async () => {
           <!-- 元信息 -->
           <div class="flex items-center gap-4 mt-6 text-sm text-gray-500">
             <div class="flex items-center gap-2">
-              <el-avatar :size="32" class="bg-blue-50">
+              <el-avatar :size="32" class="bg-brand-50">
                 {{ article.author?.displayName?.charAt(0) || '?' }}
               </el-avatar>
               <span class="font-medium text-gray-700">{{ article.author?.displayName || '匿名' }}</span>
@@ -159,7 +159,7 @@ const submitComment = async () => {
               v-for="tag in article.tags"
               :key="tag.id"
               :to="`/articles?tag=${tag.id}`"
-              class="inline-block px-3 py-1 text-xs text-gray-500 bg-gray-50 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+              class="inline-block px-3 py-1 text-xs text-gray-500 bg-gray-50 rounded-full hover:bg-brand-50 hover:text-brand-600 transition-colors"
             >
               {{ tag.name }}
             </NuxtLink>
@@ -244,7 +244,7 @@ const submitComment = async () => {
     <!-- 404 -->
     <div v-else-if="!articlePending" class="text-center py-32 text-gray-400">
       <p class="text-lg">文章不存在</p>
-      <NuxtLink to="/" class="text-blue-600 text-sm mt-2 inline-block">返回首页</NuxtLink>
+      <NuxtLink to="/" class="text-brand-600 text-sm mt-2 inline-block">返回首页</NuxtLink>
     </div>
   </div>
 </template>

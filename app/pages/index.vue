@@ -56,7 +56,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
             <div class="flex items-center gap-3 mb-3">
               <span
                 v-if="heroArticle.category"
-                class="inline-block px-3 py-1 text-xs font-medium text-blue-600 bg-blue-50 rounded-full"
+                class="inline-block px-3 py-1 text-xs font-medium text-brand-600 bg-brand-50 rounded-full"
               >
                 {{ heroArticle.category.name }}
               </span>
@@ -66,7 +66,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
             </div>
 
             <!-- 标题 -->
-            <h1 class="text-3xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors leading-tight">
+            <h1 class="text-3xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors leading-tight">
               {{ heroArticle.title }}
             </h1>
 
@@ -86,7 +86,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
           <h2 class="text-2xl font-bold text-gray-900">精选文章</h2>
           <NuxtLink
             to="/articles"
-            class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            class="text-sm text-brand-600 hover:text-brand-700 font-medium"
           >
             查看全部 →
           </NuxtLink>
@@ -113,7 +113,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
               <div class="flex items-center gap-2 text-sm text-gray-500 mb-2">
                 <span
                   v-if="article.category"
-                  class="text-blue-600 font-medium"
+                  class="text-brand-600 font-medium"
                 >
                   {{ article.category.name }}
                 </span>
@@ -124,7 +124,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
               </div>
 
               <!-- 标题 -->
-              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug">
+              <h3 class="text-lg font-semibold text-gray-900 group-hover:text-brand-600 transition-colors leading-snug">
                 {{ article.title }}
               </h3>
 
@@ -152,7 +152,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
                 :to="`/articles?category=${cat.id}`"
                 class="flex items-center justify-between group"
               >
-                <span class="text-sm text-gray-600 group-hover:text-blue-600 transition-colors">{{ cat.name }}</span>
+                <span class="text-sm text-gray-600 group-hover:text-brand-600 transition-colors">{{ cat.name }}</span>
                 <span class="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">{{ cat.articleCount }}</span>
               </NuxtLink>
               <div v-if="categories.length === 0" class="text-sm text-gray-400">暂无分类</div>
@@ -167,7 +167,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
                 v-for="tag in topTags"
                 :key="tag.id"
                 :to="`/articles?tag=${tag.id}`"
-                class="inline-block px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                class="inline-block px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-full hover:bg-brand-50 hover:text-brand-600 transition-colors"
               >
                 {{ tag.name }}
               </NuxtLink>
@@ -183,7 +183,7 @@ const featuredArticles = computed(() => articles.value.slice(1, 5))
             </p>
             <NuxtLink
               to="/articles"
-              class="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              class="text-sm text-brand-600 hover:text-brand-700 font-medium"
             >
               浏览全部文章 →
             </NuxtLink>

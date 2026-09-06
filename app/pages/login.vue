@@ -75,7 +75,7 @@ const handleRegister = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-600 to-brand-700">
     <div class="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
       <div class="text-center mb-6">
         <h1 class="text-2xl font-bold text-gray-800">Pylox</h1>

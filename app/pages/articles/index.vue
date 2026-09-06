@@ -162,11 +162,11 @@ watch([category, tag], () => {
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 text-xs text-gray-400 mb-1.5">
-                    <span v-if="article.category" class="text-blue-600 font-medium">{{ article.category.name }}</span>
+                    <span v-if="article.category" class="text-brand-600 font-medium">{{ article.category.name }}</span>
                     <span v-if="article.category" class="text-gray-300">·</span>
                     <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
                   </div>
-                  <h2 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors leading-snug mb-1.5">
+                  <h2 class="text-lg font-semibold text-gray-900 group-hover:text-brand-600 transition-colors leading-snug mb-1.5">
                     {{ article.title }}
                   </h2>
                   <p class="text-sm text-gray-500 leading-relaxed line-clamp-2">{{ article.excerpt }}</p>
@@ -202,8 +202,8 @@ watch([category, tag], () => {
                 v-for="cat in categories"
                 :key="cat.id"
                 :to="`/articles?category=${cat.id}`"
-                class="flex justify-between items-center text-sm text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50"
-                :class="{ 'text-blue-600 bg-blue-50 font-medium': category === String(cat.id) }"
+                class="flex justify-between items-center text-sm text-gray-600 hover:text-brand-600 transition-colors px-3 py-2 rounded-lg hover:bg-brand-50"
+                :class="{ 'text-brand-600 bg-brand-50 font-medium': category === String(cat.id) }"
               >
                 <span>{{ cat.name }}</span>
                 <span class="text-xs text-gray-400">{{ cat.articleCount }}</span>
@@ -219,8 +219,8 @@ watch([category, tag], () => {
                 v-for="t in topTags"
                 :key="t.id"
                 :to="`/articles?tag=${t.id}`"
-                class="px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-full hover:bg-blue-50 hover:text-blue-600 transition-colors"
-                :class="{ 'text-blue-600 bg-blue-50 font-medium': tag === String(t.id) }"
+                class="px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-full hover:bg-brand-50 hover:text-brand-600 transition-colors"
+                :class="{ 'text-brand-600 bg-brand-50 font-medium': tag === String(t.id) }"
               >
                 {{ t.name }}
               </NuxtLink>

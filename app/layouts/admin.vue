@@ -12,6 +12,7 @@ interface MenuItem {
 const authStore = useAuthStore()
 const route = useRoute()
 const { get } = useApi()
+const { name } = useSiteConfig()
 const isCollapse = ref(false)
 const isMobile = ref(false)
 
@@ -96,8 +97,8 @@ watch(menuLoaded, (v) => {
     >
       <!-- Logo -->
       <div class="h-16 flex items-center justify-center border-b border-gray-100">
-        <span v-if="!isCollapse" class="text-lg font-bold text-gray-900">Pylox 管理</span>
-        <span v-else class="text-lg font-bold text-gray-900">PX</span>
+        <span v-if="!isCollapse" class="text-lg font-bold text-gray-900">{{ name }} 管理</span>
+        <span v-else class="text-lg font-bold text-gray-900">{{ name.slice(0, 1) }}{{ name.slice(-1) }}</span>
       </div>
 
       <!-- 菜单（按角色动态加载） -->
@@ -111,7 +112,7 @@ watch(menuLoaded, (v) => {
           v-for="item in menuItems"
           :key="item.id"
           :index="item.path"
-          class="!h-12 !my-1 !mx-2 !rounded-lg hover:!bg-blue-50"
+          class="!h-12 !my-1 !mx-2 !rounded-lg hover:!bg-brand-50"
         >
           <el-icon><Icon :name="item.icon" /></el-icon>
           <template #title>{{ item.name }}</template>
@@ -133,7 +134,7 @@ watch(menuLoaded, (v) => {
         </el-button>
 
         <div class="flex items-center gap-4">
-          <NuxtLink to="/" class="hidden sm:inline-block text-sm text-gray-500 hover:text-blue-600 transition-colors">
+          <NuxtLink to="/" class="hidden sm:inline-block text-sm text-gray-500 hover:text-brand-600 transition-colors">
             访问前台
           </NuxtLink>
           <el-dropdown>

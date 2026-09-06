@@ -49,7 +49,7 @@ onMounted(async () => {
 
     <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
       <div class="card text-center">
-        <div class="text-3xl font-bold text-blue-500" v-text="stats.articleCount" />
+        <div class="text-3xl font-bold text-brand-600" v-text="stats.articleCount" />
         <div class="text-gray-500 text-sm mt-1">文章总数</div>
       </div>
       <div v-if="isAdmin" class="card text-center">

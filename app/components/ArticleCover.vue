@@ -14,6 +14,10 @@ const props = withDefaults(defineProps<{
   variant: 'card',
 })
 
+// 品牌标识：跟随站点配置，实现"换名"后封面自动更新
+const siteConfig = useSiteConfig()
+const siteLabel = computed(() => siteConfig.name.toUpperCase())
+
 const imageFailed = ref(false)
 const hasImage = computed(() => Boolean(props.article.coverImage) && !imageFailed.value)
 const theme = computed(() => getArticleCoverTheme(props.article.category?.name, props.article.id))
@@ -21,7 +25,7 @@ const articleNumber = computed(() => formatArticleNumber(props.article.id))
 const readingCount = computed(() => formatCompactCount(props.article.viewCount))
 const publishedDate = computed(() => {
   const date = new Date(props.article.createdAt)
-  if (Number.isNaN(date.getTime())) return 'PYLOX EDITION'
+  if (Number.isNaN(date.getTime())) return `${siteConfig.name.toUpperCase()} EDITION`
   return new Intl.DateTimeFormat('zh-CN', {
     year: 'numeric',
     month: '2-digit',
@@ -78,7 +82,7 @@ function handleImageError() {
 
       <div class="article-cover__body">
         <p v-if="variant === 'hero'" class="article-cover__eyebrow">
-          PYLOX EDITORIAL · {{ publishedDate }}
+          {{ siteLabel }} EDITORIAL · {{ publishedDate }}
         </p>
         <h2 class="article-cover__title">{{ article.title }}</h2>
         <p v-if="variant === 'hero' && article.excerpt" class="article-cover__excerpt">
@@ -88,11 +92,11 @@ function handleImageError() {
 
       <footer class="article-cover__footer">
         <div class="article-cover__meta">
-          <span>{{ article.author?.displayName || 'Pylox' }}</span>
+          <span>{{ article.author?.displayName || siteConfig.name }}</span>
           <span aria-hidden="true">·</span>
           <span>{{ readingCount }} READS</span>
         </div>
-        <strong>PYLOX</strong>
+        <strong>{{ siteLabel }}</strong>
       </footer>
     </div>
   </div>
