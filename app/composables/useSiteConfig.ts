@@ -12,6 +12,11 @@ export interface SiteConfig {
   description: string
   brandColor: string
   theme: string
+  logoUrl: string
+  faviconUrl: string
+  footerText: string
+  copyright: string
+  icp: string
 }
 
 interface SiteResponse {
@@ -30,6 +35,11 @@ const envSite = (): SiteConfig => {
     description: site.description || '',
     brandColor: site.brandColor || '#2563eb',
     theme: site.theme || 'blue',
+    logoUrl: site.logoUrl || '',
+    faviconUrl: site.faviconUrl || '',
+    footerText: site.footerText || '',
+    copyright: site.copyright || '',
+    icp: site.icp || '',
   }
 }
 

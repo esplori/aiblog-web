@@ -12,7 +12,7 @@ interface MenuItem {
 const authStore = useAuthStore()
 const route = useRoute()
 const { get } = useApi()
-const { name, brandColor } = useSiteConfig()
+const { name, brandColor, logoUrl } = useSiteConfig()
 
 // 后台布局也注入品牌色（SSR 阶段写入 html style）
 useBrandTheme(brandColor)
@@ -101,8 +101,11 @@ watch(menuLoaded, (v) => {
     >
       <!-- Logo -->
       <div class="h-16 flex items-center justify-center border-b border-gray-100">
-        <span v-if="!isCollapse" class="text-lg font-bold text-gray-900">{{ name }} 管理</span>
-        <span v-else class="text-lg font-bold text-gray-900">{{ name.slice(0, 1) }}{{ name.slice(-1) }}</span>
+        <NuxtLink to="/admin" v-if="!isCollapse" class="flex items-center justify-center gap-1 px-2 overflow-hidden">
+          <img v-if="logoUrl" :src="logoUrl" :alt="name" class="h-8 max-w-[120px] object-contain" />
+          <span v-else class="text-lg font-bold text-gray-900 truncate">{{ name }} 管理</span>
+        </NuxtLink>
+        <NuxtLink to="/admin" v-else class="text-lg font-bold text-gray-900">{{ name.slice(0, 1) }}{{ name.slice(-1) }}</NuxtLink>
       </div>
 
       <!-- 菜单（按角色动态加载） -->

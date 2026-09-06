@@ -18,6 +18,11 @@ interface SiteData {
   siteDescription: string
   theme: string
   brandColor: string
+  logoUrl: string
+  faviconUrl: string
+  footerText: string
+  copyright: string
+  icp: string
 }
 
 // 仅管理员可管理站点外观
@@ -34,6 +39,11 @@ const form = reactive<SiteData>({
   siteDescription: '',
   theme: 'blue',
   brandColor: envBrandColor,
+  logoUrl: '',
+  faviconUrl: '',
+  footerText: '',
+  copyright: '',
+  icp: '',
 })
 
 const formRef = ref()
@@ -62,6 +72,11 @@ const load = async () => {
     form.siteDescription = data.siteDescription || ''
     form.theme = data.theme || 'blue'
     form.brandColor = data.brandColor || envBrandColor
+    form.logoUrl = data.logoUrl || ''
+    form.faviconUrl = data.faviconUrl || ''
+    form.footerText = data.footerText || ''
+    form.copyright = data.copyright || ''
+    form.icp = data.icp || ''
     themes.value = (themesRes.data || []).filter(
       (t: ThemePreset) => t && t.key,
     )
@@ -83,6 +98,11 @@ const save = async () => {
       siteDescription: form.siteDescription,
       theme: form.theme,
       brandColor: form.brandColor,
+      logoUrl: form.logoUrl,
+      faviconUrl: form.faviconUrl,
+      footerText: form.footerText,
+      copyright: form.copyright,
+      icp: form.icp,
     })
     // 刷新全局配置覆盖层，让前台/后台即时生效
     await refreshSiteSettings()
@@ -178,6 +198,68 @@ onMounted(load)
           :rows="3"
           placeholder="用于 SEO 与页面描述"
           maxlength="300"
+          show-word-limit
+        />
+      </el-form-item>
+
+      <!-- ════ 白标外观（Logo/图标/页脚） ════ -->
+      <el-form-item label="站点 Logo">
+        <div class="flex items-center gap-3 w-full">
+          <img
+            v-if="form.logoUrl"
+            :src="form.logoUrl"
+            alt="logo-preview"
+            class="h-8 max-w-[120px] object-contain"
+          />
+          <el-input
+            v-model="form.logoUrl"
+            class="flex-1"
+            placeholder="Logo 图片 URL（留空则显示文字站名）"
+          />
+        </div>
+        <div class="text-xs text-gray-400 mt-1">图片建议高度 32px，支持透明 PNG</div>
+      </el-form-item>
+
+      <el-form-item label="站点图标">
+        <div class="flex items-center gap-3 w-full">
+          <img
+            v-if="form.faviconUrl"
+            :src="form.faviconUrl"
+            alt="favicon-preview"
+            class="w-4 h-4"
+          />
+          <el-input
+            v-model="form.faviconUrl"
+            class="flex-1"
+            placeholder="favicon URL（留空使用默认 /favicon.ico）"
+          />
+        </div>
+        <div class="text-xs text-gray-400 mt-1">浏览器标签页小图标，建议 .ico 或 32x32 PNG</div>
+      </el-form-item>
+
+      <el-form-item label="页脚文案">
+        <el-input
+          v-model="form.footerText"
+          placeholder="页脚附加一行文字，如：由某某建站 / 技术分享站"
+          maxlength="300"
+          show-word-limit
+        />
+      </el-form-item>
+
+      <el-form-item label="版权声明">
+        <el-input
+          v-model="form.copyright"
+          placeholder="如：© 2026 xxx 版权所有（留空默认 © 年份 站点名）"
+          maxlength="300"
+          show-word-limit
+        />
+      </el-form-item>
+
+      <el-form-item label="ICP 备案号">
+        <el-input
+          v-model="form.icp"
+          placeholder="如：粤ICP备xxxxxxxx号（留空不显示）"
+          maxlength="100"
           show-word-limit
         />
       </el-form-item>

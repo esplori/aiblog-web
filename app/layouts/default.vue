@@ -1,9 +1,11 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
-const { name, brandColor } = useSiteConfig()
+const { name, brandColor, logoUrl, copyright, footerText, icp } = useSiteConfig()
 
 // SSR 阶段将品牌色写入 html style，避免客户端注入导致首屏闪烁
 useBrandTheme(brandColor)
+
+const year = new Date().getFullYear()
 
 onMounted(() => {
   if (authStore.token) {
@@ -18,8 +20,16 @@ onMounted(() => {
     <header class="bg-white shadow-sm sticky top-0 z-50">
       <div class="container flex items-center justify-between h-16">
         <!-- Logo -->
-        <NuxtLink to="/" class="text-xl font-bold text-gray-800">
-          {{ name }}
+        <NuxtLink to="/" class="flex items-center shrink-0">
+          <img
+            v-if="logoUrl"
+            :src="logoUrl"
+            :alt="name"
+            class="h-8 max-w-[160px] object-contain"
+          />
+          <span v-else class="text-xl font-bold text-gray-800">
+            {{ name }}
+          </span>
         </NuxtLink>
 
         <!-- 导航菜单 -->
@@ -74,8 +84,16 @@ onMounted(() => {
 
     <!-- 底部 -->
     <footer class="bg-gray-800 text-gray-400 py-8">
-      <div class="container text-center text-sm">
-        <p>© {{ new Date().getFullYear() }} {{ name }}. All rights reserved.</p>
+      <div class="container text-center text-sm space-y-2">
+        <p>{{ copyright || `© ${year} ${name}` }}</p>
+        <p v-if="footerText">{{ footerText }}</p>
+        <a
+          v-if="icp"
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
+          rel="noopener"
+          class="hover:text-white transition-colors"
+        >{{ icp }}</a>
       </div>
     </footer>
   </div>

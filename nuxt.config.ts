@@ -48,6 +48,12 @@ export default defineNuxtConfig({
         description: process.env.NUXT_PUBLIC_SITE_DESCRIPTION || 'Pylox — AI 驱动的现代化博客系统，分享技术、生活与思考',
         // 品牌主色（十六进制），供 CSS 变量渲染，覆盖后整体换肤
         brandColor: process.env.NUXT_PUBLIC_SITE_BRAND_COLOR || '#2563eb',
+        // 白标外观（可选，.env 覆盖作部署级默认；运行时可在后台站点设置覆盖）
+        logoUrl: process.env.NUXT_PUBLIC_SITE_LOGO_URL || '',
+        faviconUrl: process.env.NUXT_PUBLIC_SITE_FAVICON_URL || '',
+        footerText: process.env.NUXT_PUBLIC_SITE_FOOTER_TEXT || '',
+        copyright: process.env.NUXT_PUBLIC_SITE_COPYRIGHT || '',
+        icp: process.env.NUXT_PUBLIC_SITE_ICP || '',
       },
     },
   },
@@ -72,9 +78,8 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       ],
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      ],
+      // favicon 不在此静态配置，统一由 app.vue 按生效配置（DB 优先 > .env）注入，
+      // 避免与运行时 favicon 重复导致浏览器取错。
     },
   },
 })
