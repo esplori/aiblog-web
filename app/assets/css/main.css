@@ -45,8 +45,9 @@ a:hover {
   color: color-mix(in srgb, var(--color-brand) 82%, black);
 }
 
-/* Element Plus 主色跟随品牌变量（按钮/选中态等） */
-:root {
+/* Element Plus 主色跟随品牌变量（按钮/选中态等）
+   用 :root:root 提升特异性，确保覆盖 Element 组件库 css 里同名的 :root 变量 */
+:root:root {
   --el-color-primary: var(--color-brand);
   --el-color-primary-light-3: color-mix(in srgb, var(--color-brand) 72%, white);
   --el-color-primary-light-5: color-mix(in srgb, var(--color-brand) 55%, white);
