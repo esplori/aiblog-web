@@ -68,3 +68,7 @@ a:hover {
   color: var(--color-brand);
   font-weight: 500;
 }
+
+/* 企业官网锚点平滑滚动 */
+html { scroll-behavior: smooth; }
+section[id] { scroll-margin-top: 84px; }

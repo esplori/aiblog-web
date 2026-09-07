@@ -23,6 +23,10 @@ interface SiteData {
   footerText: string
   copyright: string
   icp: string
+  template: string
+  contactPhone: string
+  contactEmail: string
+  contactAddress: string
 }
 
 // 仅管理员可管理站点外观
@@ -44,6 +48,10 @@ const form = reactive<SiteData>({
   footerText: '',
   copyright: '',
   icp: '',
+  template: 'blog',
+  contactPhone: '',
+  contactEmail: '',
+  contactAddress: '',
 })
 
 const formRef = ref()
@@ -77,6 +85,10 @@ const load = async () => {
     form.footerText = data.footerText || ''
     form.copyright = data.copyright || ''
     form.icp = data.icp || ''
+    form.template = data.template || 'blog'
+    form.contactPhone = data.contactPhone || ''
+    form.contactEmail = data.contactEmail || ''
+    form.contactAddress = data.contactAddress || ''
     themes.value = (themesRes.data || []).filter(
       (t: ThemePreset) => t && t.key,
     )
@@ -103,6 +115,10 @@ const save = async () => {
       footerText: form.footerText,
       copyright: form.copyright,
       icp: form.icp,
+      template: form.template,
+      contactPhone: form.contactPhone,
+      contactEmail: form.contactEmail,
+      contactAddress: form.contactAddress,
     })
     // 刷新全局配置覆盖层，让前台/后台即时生效
     await refreshSiteSettings()
@@ -133,6 +149,15 @@ onMounted(load)
       label-width="110px"
       class="card max-w-2xl p-6"
     >
+      <!-- 模板类型 -->
+      <el-form-item label="前台模板">
+        <el-radio-group v-model="form.template">
+          <el-radio-button value="blog">内容站 / 博客</el-radio-button>
+          <el-radio-button value="corporate">企业官网</el-radio-button>
+        </el-radio-group>
+        <div class="text-xs text-gray-400 mt-2">切换前台整体版式；企业官网首页内容由"核心服务/客户案例/新闻资讯"等分类文章驱动。</div>
+      </el-form-item>
+
       <!-- 主题切换 -->
       <el-form-item label="主题风格">
         <div class="flex flex-wrap gap-3">
@@ -261,6 +286,30 @@ onMounted(load)
           placeholder="如：粤ICP备xxxxxxxx号（留空不显示）"
           maxlength="100"
           show-word-limit
+        />
+      </el-form-item>
+
+      <!-- ════ 联系方式（企业官网展示） ════ -->
+      <el-divider content-position="left">联系方式（企业官网展示）</el-divider>
+      <el-form-item label="联系电话">
+        <el-input
+          v-model="form.contactPhone"
+          placeholder="如：400-xxx-xxxx"
+          maxlength="50"
+        />
+      </el-form-item>
+      <el-form-item label="联系邮箱">
+        <el-input
+          v-model="form.contactEmail"
+          placeholder="如：hello@example.com"
+          maxlength="200"
+        />
+      </el-form-item>
+      <el-form-item label="公司地址">
+        <el-input
+          v-model="form.contactAddress"
+          placeholder="如：深圳市南山区 xxx"
+          maxlength="300"
         />
       </el-form-item>
 

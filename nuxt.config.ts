@@ -54,6 +54,12 @@ export default defineNuxtConfig({
         footerText: process.env.NUXT_PUBLIC_SITE_FOOTER_TEXT || '',
         copyright: process.env.NUXT_PUBLIC_SITE_COPYRIGHT || '',
         icp: process.env.NUXT_PUBLIC_SITE_ICP || '',
+        // 前台模板：blog / corporate（企业官网）
+        template: process.env.NUXT_PUBLIC_SITE_TEMPLATE || 'blog',
+        // 企业模板联系方式
+        contactPhone: process.env.NUXT_PUBLIC_SITE_CONTACT_PHONE || '',
+        contactEmail: process.env.NUXT_PUBLIC_SITE_CONTACT_EMAIL || '',
+        contactAddress: process.env.NUXT_PUBLIC_SITE_CONTACT_ADDRESS || '',
       },
     },
   },
