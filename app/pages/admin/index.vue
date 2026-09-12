@@ -1,7 +1,15 @@
 <script setup lang="ts">
+import { use } from 'echarts/core'
+import { CanvasRenderer } from 'echarts/renderers'
+import { LineChart } from 'echarts/charts'
+import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
+import VChart from 'vue-echarts'
+
 definePageMeta({
   layout: 'admin',
 })
+
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent])
 
 const authStore = useAuthStore()
 const { get } = useApi()
@@ -45,8 +53,6 @@ const loadTopArticles = async () => {
 }
 
 const trend = ref<Array<{ day: string; pv: number; uv: number }>>([])
-const CHART_W = 600
-const CHART_H = 150
 
 const loadTrend = async () => {
   if (!isAdmin.value) return
@@ -58,22 +64,33 @@ const loadTrend = async () => {
   }
 }
 
-const trendMax = computed(() => Math.max(1, ...trend.value.map(p => p.pv)))
 const trendTotalPv = computed(() => trend.value.reduce((s, p) => s + Number(p.pv), 0))
 const trendTotalUv = computed(() => trend.value.reduce((s, p) => s + Number(p.uv), 0))
 
-// 零依赖 SVG 折线：把数据点映射到 0..CHART_W / 0..CHART_H
-const linePoints = (key: 'pv' | 'uv') => {
-  const n = trend.value.length
-  if (n === 0) return ''
-  return trend.value
-    .map((p, i) => {
-      const x = n === 1 ? CHART_W / 2 : (i / (n - 1)) * CHART_W
-      const y = CHART_H - (Number(p[key]) / trendMax.value) * CHART_H
-      return `${x.toFixed(1)},${y.toFixed(1)}`
-    })
-    .join(' ')
-}
+// ECharts 折线配置：单点/多点都能正常绘制
+const trendOption = computed(() => ({
+  grid: { left: 8, right: 12, top: 30, bottom: 4, containLabel: true },
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['PV', 'UV'], right: 0, top: 0, icon: 'roundRect' },
+  xAxis: {
+    type: 'category',
+    boundaryGap: false,
+    data: trend.value.map(p => String(p.day).slice(5)),
+  },
+  yAxis: { type: 'value', minInterval: 1 },
+  series: [
+    {
+      name: 'PV', type: 'line', smooth: true, symbolSize: 6,
+      data: trend.value.map(p => Number(p.pv)),
+      itemStyle: { color: '#2563eb' },
+    },
+    {
+      name: 'UV', type: 'line', smooth: true, symbolSize: 6,
+      data: trend.value.map(p => Number(p.uv)),
+      itemStyle: { color: '#10b981' },
+    },
+  ],
+}))
 
 onMounted(async () => {
   // 确保用户信息已加载（角色决定统计口径）
@@ -115,18 +132,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="card">
-      <h2 class="text-lg font-semibold mb-4">快速操作</h2>
-      <div class="flex gap-4">
-        <NuxtLink to="/admin/articles">
-          <el-button type="primary">{{ isAdmin ? '管理文章' : '我的文章' }}</el-button>
-        </NuxtLink>
-        <NuxtLink to="/admin/articles/create">
-          <el-button>写文章</el-button>
-        </NuxtLink>
-      </div>
-    </div>
-
     <div v-if="isAdmin" class="card mt-8">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold">访问趋势（近 30 天）</h2>
@@ -138,32 +143,9 @@ onMounted(async () => {
       <div v-if="trend.length === 0" class="text-gray-400 text-sm py-10 text-center">
         还没有访问数据——埋点已开启，从今天起开始积累
       </div>
-      <template v-else>
-        <svg :viewBox="`0 0 ${CHART_W} ${CHART_H}`" class="w-full h-40" preserveAspectRatio="none">
-          <polyline
-            :points="linePoints('pv')"
-            fill="none" stroke="#2563eb" stroke-width="2"
-            vector-effect="non-scaling-stroke"
-          />
-          <polyline
-            :points="linePoints('uv')"
-            fill="none" stroke="#10b981" stroke-width="2" stroke-dasharray="4 3"
-            vector-effect="non-scaling-stroke"
-          />
-        </svg>
-        <div class="flex items-center justify-between text-xs text-gray-400 mt-2">
-          <span>{{ trend[0]?.day }}</span>
-          <span class="flex gap-4">
-            <span class="flex items-center gap-1">
-              <i class="inline-block w-3" style="height:2px;background:#2563eb"></i>PV
-            </span>
-            <span class="flex items-center gap-1">
-              <i class="inline-block w-3" style="height:2px;background:#10b981"></i>UV
-            </span>
-          </span>
-          <span>{{ trend[trend.length - 1]?.day }}</span>
-        </div>
-      </template>
+      <ClientOnly v-else>
+        <VChart :option="trendOption" autoresize style="height: 200px; width: 100%" />
+      </ClientOnly>
     </div>
 
     <div v-if="isAdmin" class="card mt-8">
