@@ -17,8 +17,6 @@ const stats = ref({
 })
 
 const loading = ref(true)
-// 全新空站（无任何栏目）提示走初始化向导；关闭后本次会话不再提示
-const showSetupTip = ref(true)
 
 const loadStats = async () => {
   loading.value = true
@@ -45,30 +43,6 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div v-if="isAdmin && showSetupTip && stats.categoryCount === 0" class="card mb-8 overflow-hidden">
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <div class="flex items-center gap-3 mb-3">
-            <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-brand-50 text-brand-600">
-              <Icon name="ep:magic-stick" class="text-2xl" />
-            </span>
-            <div>
-              <h2 class="text-xl font-bold text-gray-900">欢迎！先初始化你的站点</h2>
-              <p class="text-gray-500 text-sm">你的站点还没有任何栏目。用向导花几分钟设置站名、主题与栏目，即可开始发布内容。</p>
-            </div>
-          </div>
-          <NuxtLink to="/admin/setup">
-            <el-button type="primary" size="large">
-              开始站点初始化向导
-            </el-button>
-          </NuxtLink>
-        </div>
-        <el-button text circle @click="showSetupTip = false" title="暂不，稍后再配置">
-          <Icon name="ep:close" />
-        </el-button>
-      </div>
-    </div>
-
     <h1 class="text-2xl font-bold text-gray-900 mb-6">
       {{ isAdmin ? '仪表盘' : '我的数据' }}
     </h1>
