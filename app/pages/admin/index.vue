@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart } from 'echarts/charts'
+import { LineChart, BarChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 
@@ -9,7 +9,7 @@ definePageMeta({
   layout: 'admin',
 })
 
-use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent])
+use([CanvasRenderer, LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent])
 
 const authStore = useAuthStore()
 const { get } = useApi()
@@ -22,6 +22,11 @@ const stats = ref({
   categoryCount: 0,
   tagCount: 0,
   totalViewCount: 0,
+  userCount: 0,
+  publishedCount: 0,
+  draftCount: 0,
+  monthArticleCount: 0,
+  pendingCommentCount: 0,
 })
 
 const loading = ref(true)
@@ -67,6 +72,68 @@ const loadTrend = async () => {
 const trendTotalPv = computed(() => trend.value.reduce((s, p) => s + Number(p.pv), 0))
 const trendTotalUv = computed(() => trend.value.reduce((s, p) => s + Number(p.uv), 0))
 
+// 分类文章数分布（第一档）
+const categoryDist = ref<Array<{ name: string; count: number }>>([])
+
+const loadCategoryDist = async () => {
+  if (!isAdmin.value) return
+  try {
+    const res = await get<any[]>('/api/admin/stats/category-distribution')
+    categoryDist.value = res.data || []
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+// 文章发布趋势（按月，第一档）
+const articleTrend = ref<Array<{ month: string; count: number }>>([])
+
+const loadArticleTrend = async () => {
+  if (!isAdmin.value) return
+  try {
+    const res = await get<any[]>('/api/admin/stats/article-trend', { months: 6 })
+    articleTrend.value = res.data || []
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+// 分类分布：横向柱状（数量多的在上方，故渲染前反转）
+const categoryOption = computed(() => {
+  const rows = [...categoryDist.value].reverse()
+  return {
+    grid: { left: 8, right: 20, top: 10, bottom: 4, containLabel: true },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'value', minInterval: 1 },
+    yAxis: { type: 'category', data: rows.map(c => c.name) },
+    series: [
+      {
+        name: '文章数', type: 'bar', barMaxWidth: 18,
+        data: rows.map(c => Number(c.count)),
+        itemStyle: { color: '#2563eb', borderRadius: [0, 4, 4, 0] },
+      },
+    ],
+  }
+})
+
+// 文章发布趋势：按月柱状
+const articleTrendOption = computed(() => ({
+  grid: { left: 8, right: 12, top: 24, bottom: 4, containLabel: true },
+  tooltip: { trigger: 'axis' },
+  xAxis: {
+    type: 'category',
+    data: articleTrend.value.map(p => String(p.month).slice(2)),
+  },
+  yAxis: { type: 'value', minInterval: 1 },
+  series: [
+    {
+      name: '新增文章', type: 'bar', barMaxWidth: 28,
+      data: articleTrend.value.map(p => Number(p.count)),
+      itemStyle: { color: '#10b981', borderRadius: [4, 4, 0, 0] },
+    },
+  ],
+}))
+
 // ECharts 折线配置：单点/多点都能正常绘制
 const trendOption = computed(() => ({
   grid: { left: 8, right: 12, top: 30, bottom: 4, containLabel: true },
@@ -100,6 +167,8 @@ onMounted(async () => {
   loadStats()
   loadTopArticles()
   loadTrend()
+  loadCategoryDist()
+  loadArticleTrend()
 })
 </script>
 
@@ -109,27 +178,56 @@ onMounted(async () => {
       {{ isAdmin ? '仪表盘' : '我的数据' }}
     </h1>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
       <div class="card text-center">
         <div class="text-3xl font-bold text-brand-600" v-text="stats.articleCount" />
         <div class="text-gray-500 text-sm mt-1">文章总数</div>
       </div>
-      <div v-if="isAdmin" class="card text-center">
-        <div class="text-3xl font-bold text-green-500" v-text="stats.commentCount" />
-        <div class="text-gray-500 text-sm mt-1">评论总数</div>
-      </div>
+      <template v-if="isAdmin">
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-blue-500" v-text="stats.publishedCount" />
+          <div class="text-gray-500 text-sm mt-1">已发布</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-gray-500" v-text="stats.draftCount" />
+          <div class="text-gray-500 text-sm mt-1">草稿</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-cyan-500" v-text="stats.monthArticleCount" />
+          <div class="text-gray-500 text-sm mt-1">本月新增</div>
+        </div>
+      </template>
       <div class="card text-center">
         <div class="text-3xl font-bold text-red-500" v-text="stats.totalViewCount" />
         <div class="text-gray-500 text-sm mt-1">总访问量</div>
       </div>
-      <div v-if="isAdmin" class="card text-center">
-        <div class="text-3xl font-bold text-orange-500" v-text="stats.categoryCount" />
-        <div class="text-gray-500 text-sm mt-1">分类数量</div>
-      </div>
-      <div v-if="isAdmin" class="card text-center">
-        <div class="text-3xl font-bold text-purple-500" v-text="stats.tagCount" />
-        <div class="text-gray-500 text-sm mt-1">标签数量</div>
-      </div>
+      <template v-if="isAdmin">
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-indigo-500" v-text="stats.userCount" />
+          <div class="text-gray-500 text-sm mt-1">用户总数</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-green-500" v-text="stats.commentCount" />
+          <div class="text-gray-500 text-sm mt-1">评论总数</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-amber-500" v-text="stats.pendingCommentCount" />
+          <div class="text-gray-500 text-sm mt-1">待审评论</div>
+          <NuxtLink
+            v-if="stats.pendingCommentCount > 0"
+            to="/admin/comments"
+            class="text-xs text-brand-600 hover:underline"
+          >去审核 →</NuxtLink>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-orange-500" v-text="stats.categoryCount" />
+          <div class="text-gray-500 text-sm mt-1">分类数量</div>
+        </div>
+        <div class="card text-center">
+          <div class="text-3xl font-bold text-purple-500" v-text="stats.tagCount" />
+          <div class="text-gray-500 text-sm mt-1">标签数量</div>
+        </div>
+      </template>
     </div>
 
     <div v-if="isAdmin" class="card mt-8">
@@ -145,6 +243,28 @@ onMounted(async () => {
       </div>
       <ClientOnly v-else>
         <VChart :option="trendOption" autoresize style="height: 200px; width: 100%" />
+      </ClientOnly>
+    </div>
+
+    <div v-if="isAdmin" class="card mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">分类文章分布</h2>
+        <NuxtLink to="/admin/categories" class="text-sm text-brand-600 hover:underline">管理分类</NuxtLink>
+      </div>
+      <div v-if="categoryDist.length === 0" class="text-gray-400 text-sm py-6 text-center">暂无分类</div>
+      <ClientOnly v-else>
+        <VChart :option="categoryOption" autoresize style="height: 220px; width: 100%" />
+      </ClientOnly>
+    </div>
+
+    <div v-if="isAdmin" class="card mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">文章发布趋势（近 6 个月）</h2>
+        <NuxtLink to="/admin/articles" class="text-sm text-brand-600 hover:underline">全部文章</NuxtLink>
+      </div>
+      <div v-if="articleTrend.length === 0" class="text-gray-400 text-sm py-6 text-center">暂无数据</div>
+      <ClientOnly v-else>
+        <VChart :option="articleTrendOption" autoresize style="height: 200px; width: 100%" />
       </ClientOnly>
     </div>
 
