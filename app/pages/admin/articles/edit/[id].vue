@@ -68,7 +68,7 @@ const loadArticle = async () => {
     form.content = article.content
     form.excerpt = article.excerpt || ''
     form.status = article.status
-    form.categoryId = article.categoryId || 0
+    form.categoryId = article.categoryId ?? 0
     form.tagIds = (article.tags || []).map((t: any) => t.id) || []
     selectedTagIds.value = (article.tags || []).map((t: any) => t.id) || []
     coverImageUrl.value = article.coverImage || ''
@@ -101,10 +101,17 @@ const handleSubmit = async () => {
   }
 }
 
-onMounted(() => {
-  loadCategories()
-  loadTags()
-  loadArticle()
+// 分类默认选中第一个：文章本身没有分类时，避免下拉框把占位值 0 显示出来
+const applyDefaultCategory = () => {
+  const first = categories.value[0]
+  if (!form.categoryId && first) {
+    form.categoryId = first.id
+  }
+}
+
+onMounted(async () => {
+  await Promise.all([loadCategories(), loadTags(), loadArticle()])
+  applyDefaultCategory()
 })
 </script>
 
