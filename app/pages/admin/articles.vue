@@ -20,6 +20,8 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 const keyword = ref('')
+const sortBy = ref('')
+const sortOrder = ref('')
 
 const loadArticles = async () => {
   if (isSubRoute.value) {
@@ -33,6 +35,10 @@ const loadArticles = async () => {
       size: pageSize.value,
     }
     if (keyword.value.trim()) params.keyword = keyword.value.trim()
+    if (sortBy.value) {
+      params.sortBy = sortBy.value
+      params.order = sortOrder.value
+    }
     const res = await get<PageResult<ArticleItem>>(`/api/admin/articles`, params)
     articles.value = res.data.records
     total.value = res.data.total
@@ -61,6 +67,19 @@ const handlePageChange = (p: number) => {
 
 const handleSizeChange = (s: number) => {
   pageSize.value = s
+  page.value = 1
+  loadArticles()
+}
+
+// 表头排序：order 为 ascending / descending / null（取消排序=回到默认）
+const handleSortChange = ({ prop, order }: { prop: string; order: string | null }) => {
+  if (!order) {
+    sortBy.value = ''
+    sortOrder.value = ''
+  } else {
+    sortBy.value = prop
+    sortOrder.value = order === 'ascending' ? 'asc' : 'desc'
+  }
   page.value = 1
   loadArticles()
 }
@@ -119,9 +138,9 @@ onMounted(() => {
     </div>
 
     <div class="card overflow-x-auto">
-      <el-skeleton v-if="loading" :rows="5" animated />
+      <el-skeleton v-if="loading && articles.length === 0" :rows="5" animated />
       <template v-else>
-        <el-table :data="articles" class="min-w-[640px]">
+        <el-table :data="articles" class="min-w-[640px]" @sort-change="handleSortChange">
           <el-table-column prop="title" label="标题" min-width="200" show-overflow-tooltip />
           <el-table-column label="分类" width="100" class="hidden md:table-cell">
             <template #default="{ row }">
@@ -136,8 +155,8 @@ onMounted(() => {
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column prop="viewCount" label="阅读" width="70" class="hidden sm:table-cell" />
-          <el-table-column prop="commentCount" label="评论" width="70" class="hidden sm:table-cell" />
+          <el-table-column prop="viewCount" label="阅读" width="90" sortable="custom" class="hidden sm:table-cell" />
+          <el-table-column prop="commentCount" label="评论" width="70" sortable="custom" class="hidden sm:table-cell" />
           <el-table-column label="创建时间" width="160" class="hidden lg:table-cell">
             <template #default="{ row }">
               {{ new Date(row.createdAt).toLocaleString() }}
