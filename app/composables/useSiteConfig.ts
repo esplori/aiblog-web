@@ -17,10 +17,6 @@ export interface SiteConfig {
   footerText: string
   copyright: string
   icp: string
-  template: string
-  contactPhone: string
-  contactEmail: string
-  contactAddress: string
 }
 
 interface SiteResponse {
@@ -44,10 +40,6 @@ const envSite = (): SiteConfig => {
     footerText: site.footerText || '',
     copyright: site.copyright || '',
     icp: site.icp || '',
-    template: site.template || 'blog',
-    contactPhone: site.contactPhone || '',
-    contactEmail: site.contactEmail || '',
-    contactAddress: site.contactAddress || '',
   }
 }
 
