@@ -5,7 +5,7 @@ definePageMeta({
   layout: 'admin',
 })
 
-const { get, put } = useApi()
+const { get, put, del } = useApi()
 const authStore = useAuthStore()
 
 const users = ref<UserResponse[]>([])
@@ -63,6 +63,32 @@ const handleRoleChange = async (row: UserResponse, newRole: string) => {
   }
 }
 
+const handleDeleteUser = async (row: UserResponse) => {
+  if (isSelf(row)) {
+    ElMessage.warning('不能删除自己')
+    return
+  }
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除用户「${row.displayName || row.username}」吗？此操作不可恢复。`,
+      '删除用户',
+      { type: 'warning', confirmButtonText: '删除', cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
+  saving.value = true
+  try {
+    await del(`/api/admin/users/${row.id}`)
+    ElMessage.success('用户已删除')
+    loadUsers()
+  } catch (e: any) {
+    ElMessage.error(e?.data?.message || '删除失败')
+  } finally {
+    saving.value = false
+  }
+}
+
 onMounted(() => {
   loadUsers()
   loadRoles()
@@ -110,6 +136,18 @@ onMounted(() => {
         <el-table-column label="最后登录" width="160" class="hidden lg:table-cell">
           <template #default="{ row }">
             {{ row.lastLoginAt ? new Date(row.lastLoginAt).toLocaleString() : '未登录' }}
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="100">
+          <template #default="{ row }">
+            <el-button
+              type="danger"
+              size="small"
+              :disabled="isSelf(row) || saving"
+              @click="handleDeleteUser(row)"
+            >
+              删除
+            </el-button>
           </template>
         </el-table-column>
       </el-table>
