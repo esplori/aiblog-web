@@ -2,10 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 品牌主色 CSS 变量：可通过 runtimeConfig / .env 的
-   NUXT_PUBLIC_SITE_BRAND_COLOR 覆盖，实现整站换肤 */
+/* 品牌主色 CSS 变量:可通过 runtimeConfig / .env 的
+   NUXT_PUBLIC_SITE_BRAND_COLOR 覆盖,实现整站换肤 */
 :root {
   --color-brand: #2563eb;
+}
+
+/* ===== 登录页设计令牌(docs/login-redesign-plan.md §4.1) =====
+   ⚠ `--auth-panel-base` 是**固定值**,不参与换肤 —— 这是对比度的保证,见 §4.3:
+   品牌侧承载文字的区域底色一律走它,品牌色只作装饰层 ⇒ 白字对它约 17:1,
+   与品牌色无关,换任何品牌色都不破 WCAG AA。 */
+:root {
+  --auth-surface: #ffffff;
+  --auth-text: #1f1f1f;
+  --auth-muted: #6b7280;
+  --auth-border: rgba(15, 23, 42, 0.08);
+  --auth-panel-base: #0b1220;
+  --auth-radius-card: 16px; /* 对齐全站 .card 的 16px(原先登录页用 rounded-lg 的 8px) */
+  --auth-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --auth-motion: 200ms ease;
 }
 
 body {
@@ -35,7 +50,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* 品牌色链接：跟随 --color-brand 变量，实现主题化 */
+/* 品牌色链接:跟随 --color-brand 变量,实现主题化 */
 a {
   color: var(--color-brand);
   text-decoration: none;
@@ -45,8 +60,8 @@ a:hover {
   color: color-mix(in srgb, var(--color-brand) 82%, black);
 }
 
-/* Element Plus 主色跟随品牌变量（按钮/选中态等）
-   用 :root:root 提升特异性，确保覆盖 Element 组件库 css 里同名的 :root 变量 */
+/* Element Plus 主色跟随品牌变量(按钮/选中态等)
+   用 :root:root 提升特异性,确保覆盖 Element 组件库 css 里同名的 :root 变量 */
 :root:root {
   --el-color-primary: var(--color-brand);
   --el-color-primary-light-3: color-mix(in srgb, var(--color-brand) 72%, white);
@@ -57,7 +72,7 @@ a:hover {
   --el-color-primary-dark-2: color-mix(in srgb, var(--color-brand) 82%, black);
 }
 
-/* 后管侧边栏菜单（浅色风格，与前管一致，跟随品牌色） */
+/* 后管侧边栏菜单(浅色风格,与前管一致,跟随品牌色) */
 .el-menu {
   --el-menu-active-color: var(--color-brand);
   --el-menu-hover-bg-color: color-mix(in srgb, var(--color-brand) 6%, white);
@@ -67,4 +82,144 @@ a:hover {
   background-color: color-mix(in srgb, var(--color-brand) 6%, white);
   color: var(--color-brand);
   font-weight: 500;
+}
+
+/* ===== 登录页外壳(独立布局,layout: false) ===== */
+
+/* 移动端浏览器地址栏收起/展开时 100vh 不跟随可视高度,内容会被裁掉,故用 dvh;
+   第一行 100vh 是给不支持 dvh 的老浏览器的兜底。
+   ⚠ 两行顺序不能颠倒:后一行在同名属性上生效。 */
+.auth-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* 滚动容器:保证横屏手机(高度很小)时注册表单 5 个字段 + 按钮仍可滚动到达,
+   并避让 iOS 底部安全区 */
+.auth-scroll {
+  overflow-y: auto;
+  padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* 表单卡片:圆角/阴影统一到全站 .card 规格(修 V5) */
+.auth-card {
+  background: var(--auth-surface);
+  border-radius: var(--auth-radius-card);
+  box-shadow: var(--auth-shadow-card);
+  padding: 1.5rem;
+  animation: auth-card-in var(--auth-motion) both;
+}
+
+@media (min-width: 640px) {
+  .auth-card {
+    padding: 2rem;
+  }
+}
+
+@keyframes auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ===== 品牌侧(仅 ≥lg 显示;装饰层绝对定位,不参与布局、不产生横向滚动) ===== */
+.auth-brand {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background-color: var(--auth-panel-base);
+}
+
+/* 品牌色光斑:纯装饰 ⇒ aria-hidden + pointer-events:none */
+.auth-brand__glow {
+  position: absolute;
+  top: -18%;
+  right: -22%;
+  width: 32rem;
+  height: 32rem;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand) 62%, transparent) 0%,
+    transparent 62%
+  );
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* 细网格纹理:同样纯装饰 */
+.auth-brand__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, white 5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, white 5%, transparent) 1px, transparent 1px);
+  background-size: 44px 44px;
+  pointer-events: none;
+}
+
+/* 文字侧遮罩:把文字所在区域的底色**压回** --auth-panel-base,
+   这样即使光斑在同一行、即使品牌色是亮黄,文字对比度也不受影响(§4.3 的落地) */
+.auth-brand__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    var(--auth-panel-base) 0%,
+    color-mix(in srgb, var(--auth-panel-base) 78%, transparent) 52%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ===== 登录/注册切换器(替代原先的 el-tabs) ===== */
+.auth-mode-switch {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin-bottom: 1.5rem;
+  border-radius: 9999px;
+  background-color: color-mix(in srgb, var(--color-brand) 6%, white);
+}
+
+.auth-mode-switch__item {
+  flex: 1 1 0%;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--auth-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--auth-motion),
+    color var(--auth-motion);
+}
+
+.auth-mode-switch__item.is-active {
+  background-color: var(--auth-surface);
+  color: var(--color-brand);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+/* 焦点环跟随品牌色;⚠ 不用 outline:none 抹掉焦点可见性 */
+.auth-mode-switch__item:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+/* ===== 动效降级(修 R4):尊重系统「减少动态效果」设置 ===== */
+@media (prefers-reduced-motion: reduce) {
+  .auth-card {
+    animation: none;
+  }
+  .auth-mode-switch__item {
+    transition: none;
+  }
 }

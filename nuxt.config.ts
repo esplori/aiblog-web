@@ -55,6 +55,15 @@ export default defineNuxtConfig({
         copyright: process.env.NUXT_PUBLIC_SITE_COPYRIGHT || '',
         icp: process.env.NUXT_PUBLIC_SITE_ICP || '',
       },
+      // 登录页开关(docs/login-redesign-plan.md §7.6):全部可在 .env 覆盖,便于按部署/客户差异化
+      auth: {
+        // 品牌侧是否展示。false ⇒ 退化为单卡片居中(接近改造前形态),也是**无需发版的回滚手段**
+        brandPanel: process.env.NUXT_PUBLIC_AUTH_BRAND_PANEL !== 'false',
+        // 后端目前**没有**「忘记密码」端点 ⇒ 默认空、不渲染入口(不发死链接)
+        forgotPasswordUrl: process.env.NUXT_PUBLIC_AUTH_FORGOT_URL || '',
+        // 后端目前**没有**验证码接口 ⇒ 默认关;后端就位后再置 true
+        captchaEnabled: process.env.NUXT_PUBLIC_AUTH_CAPTCHA_ENABLED === 'true',
+      },
     },
   },
 

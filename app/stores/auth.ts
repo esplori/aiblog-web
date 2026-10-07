@@ -1,17 +1,14 @@
 import { defineStore } from 'pinia'
 import type { User, LoginData } from '~/types'
+import { authCookieOptions, REFRESH_TOKEN_COOKIE, TOKEN_COOKIE } from '~/utils/authCookie'
 
-// Cookie 选项：HTTP 环境下 secure 必须为 false
-// sameSite 使用浏览器默认值（lax），避免跨端口问题
-const cookieOptions = {
-  maxAge: 60 * 60 * 24 * 7, // 7天
-  secure: false,
-  path: '/',
-}
-
+// cookie 选项统一由 app/utils/authCookie.ts 提供:
+// 原先此处与 composables/useApi.ts 各存一份**完全相同**的定义,一旦漂移就会出现
+// 「store 写的 cookie 与 useApi 读的不是同一套选项」这类极难排查的问题。
 export const useAuthStore = defineStore('auth', () => {
-  const token = useCookie('token', cookieOptions)
-  const refreshToken = useCookie('refreshToken', cookieOptions)
+  const cookieOptions = authCookieOptions()
+  const token = useCookie(TOKEN_COOKIE, cookieOptions)
+  const refreshToken = useCookie(REFRESH_TOKEN_COOKIE, cookieOptions)
   const user = ref<User | null>(null)
   const isLoggedIn = computed(() => !!token.value)
 

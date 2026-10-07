@@ -1,13 +1,16 @@
 import type { ApiResponse } from '~/types'
-
-const cookieOptions = {
-  maxAge: 60 * 60 * 24 * 7,
-  secure: false,
-  path: '/',
-}
+import { authCookieOptions, TOKEN_COOKIE } from '~/utils/authCookie'
 
 export const useApi = () => {
-  const token = useCookie('token', cookieOptions)
+  const token = useCookie(TOKEN_COOKIE, authCookieOptions())
+  // 401 回跳用:在 setup 语境里先捕获当前路径。
+  // 不能在异步回调里再取 useRoute() —— 那时 Nuxt 上下文可能已丢失(如 onMounted 里发起的请求)。
+  let currentPath: string | null = null
+  try {
+    currentPath = useRoute().fullPath
+  } catch {
+    currentPath = null
+  }
 
   const request = async <T>(
     url: string,
@@ -71,7 +74,13 @@ export const useApi = () => {
     } catch (error: any) {
       if (error.statusCode === 401) {
         token.value = null
-        navigateTo('/login')
+        // 带上来路,登录后可回到原页面;合法性由登录页的 useAuthRedirect 再校验一次。
+        // ⚠ 不回跳登录页自身,避免自跳环。
+        const target =
+          currentPath && currentPath !== '/login' && !currentPath.startsWith('/login?')
+            ? `/login?redirect=${encodeURIComponent(currentPath)}`
+            : '/login'
+        navigateTo(target)
       }
       throw error
     }

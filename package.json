@@ -7,7 +7,9 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "test": "vitest run",
+    "test:node": "node --test tests/article-cover.test.mjs"
   },
   "dependencies": {
     "@element-plus/nuxt": "^1.0.10",
@@ -29,6 +31,9 @@
     "@iconify-json/ep": "^1.2.4",
     "@nuxt/icon": "^1.12.5",
     "@nuxtjs/tailwindcss": "^6.13.2",
-    "typescript": "^5.8.3"
+    "@vue/test-utils": "^2.5.1",
+    "happy-dom": "^20.14.5",
+    "typescript": "^5.8.3",
+    "vitest": "^5.0.3"
   }
 }
