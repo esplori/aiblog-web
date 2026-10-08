@@ -13,7 +13,12 @@ interface MenuItem {
   roles: string[]
 }
 
-const { get, put } = useApi()
+const { get, put, del } = useApi()
+
+// 与后端 MenuServiceImpl.PROTECTED_PATHS 保持一致：这三条删掉后管理员会失去入口，
+// 且 menus.path 带 UNIQUE 约束、菜单无新增端点，无法经 UI 恢复。
+const PROTECTED_PATHS = ['/admin', '/admin/menus', '/admin/roles']
+const isProtected = (row: MenuItem) => PROTECTED_PATHS.includes(row.path)
 
 const menus = ref<MenuItem[]>([])
 const loading = ref(true)
@@ -54,6 +59,32 @@ const handleSave = async (row: MenuItem) => {
   }
 }
 
+const handleDelete = async (row: MenuItem) => {
+  if (isProtected(row)) {
+    ElMessage.warning('内置菜单不可删除')
+    return
+  }
+  try {
+    await ElMessageBox.confirm(
+      `确定要删除菜单「${row.name}」（${row.path}）吗？删除后它将从后台侧边栏消失，其在「角色管理」中的授权也会一并清除；非管理员角色再访问该路径会被拦成 403。菜单没有新增入口，此操作不可恢复。`,
+      '删除菜单',
+      { type: 'warning', confirmButtonText: '删除', cancelButtonText: '取消' },
+    )
+  } catch {
+    return
+  }
+  saving.value = true
+  try {
+    await del(`/api/admin/menus/${row.id}`)
+    ElMessage.success(`菜单「${row.name}」已删除`)
+    await loadMenus()
+  } catch (e: any) {
+    ElMessage.error(e?.data?.message || '删除失败')
+  } finally {
+    saving.value = false
+  }
+}
+
 onMounted(() => {
   loadMenus()
   loadRoles()
@@ -86,14 +117,24 @@ onMounted(() => {
               </el-checkbox-group>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="100" fixed="right">
+          <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
               <el-button size="small" type="primary" text :loading="saving" @click="handleSave(row)">保存</el-button>
+              <el-button
+                size="small"
+                type="danger"
+                text
+                :disabled="isProtected(row) || saving"
+                @click="handleDelete(row)"
+              >
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
         <p class="text-gray-400 text-sm mt-3">
           提示：勾选角色后点击「保存」，该菜单将只对勾选的角色显示。角色列表来自「角色管理」。
+          删除菜单会连带清除它在所有角色下的授权，且不可恢复；「仪表盘 / 菜单管理 / 角色管理」为内置项，不可删除。
         </p>
       </template>
     </div>
