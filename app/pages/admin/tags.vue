@@ -22,11 +22,7 @@ const editingId = ref<number | null>(null)
 const submitting = ref(false)
 const form = reactive({
   name: '',
-  color: '#409eff',
 })
-
-// 可选颜色
-const colorOptions = ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#909399', '#9b59b6', '#00bcd4', '#ff7043']
 
 const loadTags = async () => {
   loading.value = true
@@ -57,7 +53,6 @@ const handleSizeChange = (s: number) => {
 
 const resetForm = () => {
   form.name = ''
-  form.color = '#409eff'
   editingId.value = null
 }
 
@@ -71,7 +66,6 @@ const handleEdit = (row: Tag) => {
   isEdit.value = true
   editingId.value = row.id
   form.name = row.name
-  form.color = row.color || '#409eff'
   dialogVisible.value = true
 }
 
@@ -127,14 +121,6 @@ onMounted(loadTags)
       <template v-else>
         <el-table :data="tags" class="min-w-[400px]">
           <el-table-column prop="name" label="名称" min-width="120" show-overflow-tooltip />
-          <el-table-column label="颜色" width="80" class="hidden sm:table-cell">
-            <template #default="{ row }">
-              <span
-                class="inline-block w-4 h-4 rounded-full"
-                :style="{ backgroundColor: row.color || '#409eff' }"
-              />
-            </template>
-          </el-table-column>
           <el-table-column prop="articleCount" label="文章数" width="80" class="hidden sm:table-cell" />
           <el-table-column label="操作" width="140" fixed="right">
             <template #default="{ row }">
@@ -167,18 +153,6 @@ onMounted(loadTags)
       <el-form :model="form" label-width="80px">
         <el-form-item label="名称" required>
           <el-input v-model="form.name" placeholder="标签名称" />
-        </el-form-item>
-        <el-form-item label="颜色">
-          <div class="flex items-center gap-2 flex-wrap">
-            <span
-              v-for="c in colorOptions"
-              :key="c"
-              class="inline-block w-6 h-6 rounded-full cursor-pointer border-2"
-              :class="form.color === c ? 'border-gray-800' : 'border-transparent'"
-              :style="{ backgroundColor: c }"
-              @click="form.color = c"
-            />
-          </div>
         </el-form-item>
       </el-form>
       <template #footer>
