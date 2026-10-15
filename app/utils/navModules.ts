@@ -42,7 +42,7 @@ export const MODULES: NavModule[] = [
         key: 'content',
         label: '内容',
         items: [
-          { key: 'home', label: '工作台', path: '/', icon: 'grid' },
+          { key: 'home', label: '首页', path: '/', icon: 'grid' },
           { key: 'articles', label: '全部文章', path: '/articles', icon: 'doc', badge: 'articles' },
           { key: 'write', label: '写文章', path: '/admin/articles', icon: 'plus', auth: true },
         ],

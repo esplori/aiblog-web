@@ -1,153 +1,101 @@
 <script setup lang="ts">
-import type { ArticleItem, Category, PageResult } from '~/types'
+import type { ArticleItem, Category, PageResult, Tag } from '~/types'
 import type { AiItem, AiStats } from '~/types/ai'
 import type { RecentRead } from '~/composables/useRecentReading'
-import { TYPE_LABEL } from '~/types/ai'
 
-// 工作台首页：登录后的任务起点（文章 + AI 广场两条线各一块）
-definePageMeta({ layout: 'workbench', middleware: 'workspace-only' })
+// 公开门户首页：文章 + AI 广场混排，访客可看可爬；
+// 个人区（继续阅读 / 快捷动作）只在登录后出现（方案：同一路由按登录态分流）。
+definePageMeta({ layout: 'workbench' })
 
-useSeoMeta({ title: '工作台', robots: 'noindex, nofollow' })
-
+const site = useSiteConfig()
 const authStore = useAuthStore()
 const { get } = useApi()
 
 const { data: articlesData, pending: articlesPending } = await useAsyncData(
-  'wb-latest-articles',
-  () => get<PageResult<ArticleItem>>('/api/articles', { page: 1, size: 5, status: 'published' }),
+  'home-articles',
+  () => get<PageResult<ArticleItem>>('/api/articles', { page: 1, size: 6, status: 'published' }),
   { default: () => null }
 )
-const { data: aiHotData, pending: aiPending } = await useAsyncData(
-  'wb-ai-hot',
-  () => get<AiItem[]>('/api/ai/hot', { size: 5 }),
+const { data: aiData, pending: aiPending } = await useAsyncData(
+  'home-ai-items',
+  () => get<PageResult<AiItem>>('/api/ai/items', { page: 1, size: 6, sort: 'hot' }),
   { default: () => null }
 )
-const { data: aiStats } = await useAsyncData(
-  'wb-ai-stats',
-  () => get<AiStats>('/api/ai/stats'),
-  { default: () => null }
-)
-const { data: categoriesData } = await useAsyncData(
-  'wb-categories',
-  () => get<Category[]>('/api/categories'),
-  { default: () => null }
-)
+const { data: aiHotData } = await useAsyncData('home-ai-hot', () => get<AiItem[]>('/api/ai/hot', { size: 5 }), {
+  default: () => null,
+})
+const { data: aiStats } = await useAsyncData('home-ai-stats', () => get<AiStats>('/api/ai/stats'), {
+  default: () => null,
+})
+const { data: categoriesData } = await useAsyncData('home-categories', () => get<Category[]>('/api/categories'), {
+  default: () => null,
+})
+const { data: tagsData } = await useAsyncData('home-tags', () => get<Tag[]>('/api/tags/hot', { size: 12 }), {
+  default: () => null,
+})
 
 const articles = computed(() => articlesData.value?.data?.records || [])
 const articleTotal = computed(() => Number(articlesData.value?.data?.total) || articles.value.length)
+const aiItems = computed(() => aiData.value?.data?.records || [])
 const aiHot = computed(() => aiHotData.value?.data || [])
 const stats = computed(() => aiStats.value?.data || null)
-const categories = computed(() => categoriesData.value?.data || [])
+const categories = computed(() => (categoriesData.value?.data || []).slice(0, 8))
+const tags = computed(() => (tagsData.value?.data || []).slice(0, 12))
 
-const platformBars = computed(() => {
-  const byPlatform = stats.value?.byPlatform || {}
-  const list = Object.entries(byPlatform).map(([name, count]) => ({ name, count: Number(count) }))
-  const max = Math.max(1, ...list.map(i => i.count))
-  return list.slice(0, 8).map(i => ({ ...i, percent: Math.round((i.count / max) * 100) }))
-})
-
-const selectedCount = computed(() => aiHot.value.filter(i => i.featured).length)
-
-// 「继续阅读」来自本地记录（不落库）
+// 继续阅读来自本地记录，只能在客户端读
 const recent = ref<RecentRead[]>([])
-const greeting = ref('你好')
 onMounted(() => {
-  recent.value = useRecentReading().read()
-  const hour = new Date().getHours()
-  greeting.value = hour < 6 ? '夜深了' : hour < 12 ? '早上好' : hour < 18 ? '下午好' : '晚上好'
+  if (authStore.isLoggedIn) recent.value = useRecentReading().read()
 })
 
-const displayName = computed(() => authStore.user?.displayName || authStore.user?.username || '')
-const today = new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })
+useSeoMeta({
+  description: () =>
+    (site.description || '') +
+    ` 站内包含 ${articleTotal.value} 篇技术文章与 ${stats.value?.total || 0} 个经过精选的 AI 资源条目（MCP / Skill / 提示词 / 模型 / 工具）。`,
+})
 </script>
 
 <template>
   <div>
-    <!-- 概览 -->
-    <div class="mb-5">
-      <h1 class="text-xl font-bold text-slate-900">{{ greeting }}<span v-if="displayName">，{{ displayName }}</span></h1>
-      <p class="mt-1 text-sm text-slate-500">
-        {{ today }} · 站点 {{ articleTotal }} 篇文章，AI 广场 {{ stats?.total || 0 }} 个条目，覆盖 {{ stats?.platforms?.length || 0 }} 个客户端
+    <!-- 门户头部 -->
+    <section class="mb-6 rounded-2xl border border-slate-200 bg-white p-6 lg:p-8">
+      <p class="text-xs font-semibold uppercase tracking-wide text-brand-600">{{ site.tagline || '博客 · AI 广场' }}</p>
+      <h1 class="mt-2 text-2xl font-bold text-slate-900 lg:text-3xl">{{ site.name }}</h1>
+      <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-500">{{ site.description }}</p>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <NuxtLink to="/articles" class="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white transition-colors hover:bg-brand-700">
+          开始阅读
+        </NuxtLink>
+        <NuxtLink
+          to="/ai"
+          class="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 transition-colors hover:border-brand-300 hover:text-brand-600"
+        >
+          逛 AI 广场
+        </NuxtLink>
+      </div>
+      <p class="mt-4 text-xs text-slate-400">
+        {{ articleTotal }} 篇文章 · {{ stats?.total || 0 }} 个 AI 条目 · 覆盖 {{ stats?.platforms?.length || 0 }} 个客户端 · 每个条目标注权限风险
       </p>
-    </div>
+    </section>
 
-    <!-- KPI -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-      <div class="bg-white rounded-xl border border-slate-200 p-4">
-        <p class="text-xs text-slate-500">文章总数</p>
-        <p class="mt-1 text-2xl font-bold text-slate-900">{{ articleTotal }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-4">
-        <p class="text-xs text-slate-500">AI 条目</p>
-        <p class="mt-1 text-2xl font-bold text-slate-900">{{ stats?.total || 0 }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-4">
-        <p class="text-xs text-slate-500">覆盖客户端</p>
-        <p class="mt-1 text-2xl font-bold text-slate-900">{{ stats?.platforms?.length || 0 }}</p>
-      </div>
-      <div class="bg-white rounded-xl border border-slate-200 p-4">
-        <p class="text-xs text-slate-500">分类</p>
-        <p class="mt-1 text-2xl font-bold text-slate-900">{{ categories.length }}</p>
-      </div>
-    </div>
-
-    <!-- Bento -->
-    <div class="grid grid-cols-1 lg:grid-cols-6 gap-4">
-      <!-- 继续阅读 -->
-      <section class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-4">
-        <h2 class="text-sm font-semibold text-slate-900 mb-3">继续阅读</h2>
+    <!-- 个人区（仅登录后） -->
+    <section v-if="authStore.isLoggedIn" class="mb-6 grid gap-4 sm:grid-cols-2">
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <h2 class="mb-3 text-sm font-semibold text-slate-900">继续阅读</h2>
         <ul v-if="recent.length" class="space-y-2">
           <li v-for="item in recent" :key="item.path">
-            <NuxtLink :to="item.path" class="block text-sm text-slate-700 hover:text-brand-600 truncate">
+            <NuxtLink :to="item.path" class="block truncate text-sm text-slate-700 hover:text-brand-600">
               {{ item.title }}
             </NuxtLink>
           </li>
         </ul>
-        <div v-else class="text-sm text-slate-400">
-          <p>还没有阅读记录。</p>
-          <NuxtLink to="/articles" class="mt-2 inline-block text-brand-600 hover:underline">去文章列表看看 →</NuxtLink>
-        </div>
-      </section>
-
-      <!-- 最新文章 -->
-      <section class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-4">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-semibold text-slate-900">最新文章</h2>
-          <NuxtLink to="/articles" class="text-xs text-brand-600 hover:underline">全部</NuxtLink>
-        </div>
-        <el-skeleton v-if="articlesPending && !articles.length" :rows="4" animated />
-        <ul v-else-if="articles.length" class="space-y-2">
-          <li v-for="a in articles" :key="a.uuid" class="flex items-baseline gap-2">
-            <NuxtLink :to="'/post/' + a.uuid" class="text-sm text-slate-700 hover:text-brand-600 truncate">
-              {{ a.title }}
-            </NuxtLink>
-            <span class="ml-auto shrink-0 text-[11px] text-slate-400">{{ (a.createdAt || '').slice(0, 10) }}</span>
-          </li>
-        </ul>
-        <p v-else class="text-sm text-slate-400">还没有文章。去后台写第一篇？</p>
-      </section>
-
-      <!-- AI 热门 -->
-      <section class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-4">
-        <div class="flex items-center justify-between mb-3">
-          <h2 class="text-sm font-semibold text-slate-900">AI 广场热门</h2>
-          <NuxtLink to="/ai" class="text-xs text-brand-600 hover:underline">全部</NuxtLink>
-        </div>
-        <el-skeleton v-if="aiPending && !aiHot.length" :rows="4" animated />
-        <ul v-else class="space-y-2.5">
-          <li v-for="item in aiHot" :key="item.slug">
-            <NuxtLink :to="'/ai/' + item.slug" class="flex items-center gap-2">
-              <span class="ai-type" :class="'ai-type--' + item.type">{{ TYPE_LABEL[item.type] || item.type }}</span>
-              <span class="text-sm text-slate-700 hover:text-brand-600 truncate">{{ item.name }}</span>
-              <span class="ml-auto shrink-0 text-[11px] text-slate-400">★ {{ item.starCount }}</span>
-            </NuxtLink>
-          </li>
-        </ul>
-      </section>
-
-      <!-- 快捷动作 -->
-      <section class="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-4">
-        <h2 class="text-sm font-semibold text-slate-900 mb-3">快捷动作</h2>
+        <p v-else class="text-sm text-slate-400">
+          还没有阅读记录，去挑一篇 →
+          <NuxtLink to="/articles" class="text-brand-600 hover:underline">文章列表</NuxtLink>
+        </p>
+      </div>
+      <div class="rounded-xl border border-slate-200 bg-white p-4">
+        <h2 class="mb-3 text-sm font-semibold text-slate-900">快捷动作</h2>
         <div class="flex flex-wrap gap-2">
           <NuxtLink to="/admin/articles" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
             <AppIcon name="plus" />写文章
@@ -155,32 +103,133 @@ const today = new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'nume
           <NuxtLink to="/admin/ai-items" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
             <AppIcon name="upload" />录入 AI 条目
           </NuxtLink>
-          <NuxtLink to="/ai?sort=new" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
-            <AppIcon name="spark" />逛广场
+          <NuxtLink to="/admin" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
+            <AppIcon name="chart" />后台
           </NuxtLink>
           <NuxtLink to="/admin/site-settings" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
             <AppIcon name="settings" />站点设置
           </NuxtLink>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <!-- 平台分布 -->
-      <section class="lg:col-span-4 bg-white rounded-xl border border-slate-200 p-4">
-        <h2 class="text-sm font-semibold text-slate-900 mb-1">条目覆盖的客户端</h2>
-        <p class="text-xs text-slate-400 mb-3">按条目的客户端兼容行统计（{{ selectedCount }} 个精选条目）</p>
-        <ul v-if="platformBars.length" class="space-y-2.5">
-          <li v-for="bar in platformBars" :key="bar.name">
-            <div class="flex items-center justify-between text-xs text-slate-600 mb-1">
-              <span>{{ bar.name }}</span>
-              <span class="text-slate-400">{{ bar.count }}</span>
-            </div>
-            <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden">
-              <div class="h-full rounded-full bg-brand-400" :style="{ width: bar.percent + '%' }" />
-            </div>
-          </li>
-        </ul>
-        <p v-else class="text-sm text-slate-400">还没有条目数据。</p>
-      </section>
+    <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <div class="min-w-0 space-y-8">
+        <!-- 最新文章 -->
+        <section>
+          <div class="mb-3 flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900">最新文章</h2>
+            <NuxtLink to="/articles" class="text-sm text-brand-600 hover:underline">全部 {{ articleTotal }} 篇 →</NuxtLink>
+          </div>
+          <el-skeleton v-if="articlesPending && !articles.length" :rows="4" animated />
+          <div v-else-if="articles.length" class="grid gap-4 sm:grid-cols-2">
+            <NuxtLink
+              v-for="article in articles"
+              :key="article.id"
+              :to="'/post/' + article.uuid"
+              class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-brand-300"
+            >
+              <div v-if="article.coverImage" class="aspect-[16/9] overflow-hidden bg-slate-100">
+                <img :src="article.coverImage" :alt="article.title" class="h-full w-full object-cover" loading="lazy" />
+              </div>
+              <div class="flex flex-1 flex-col p-4">
+                <div class="mb-1.5 flex items-center gap-2 text-[11px] text-slate-400">
+                  <span v-if="article.category" class="font-medium text-brand-600">{{ article.category.name }}</span>
+                  <span>{{ (article.createdAt || '').slice(0, 10) }}</span>
+                </div>
+                <h3 class="line-clamp-2 text-[15px] font-semibold leading-snug text-slate-900 group-hover:text-brand-600">
+                  {{ article.title }}
+                </h3>
+                <p class="mt-1.5 line-clamp-2 text-[13px] leading-relaxed text-slate-500">{{ article.excerpt }}</p>
+                <div class="mt-auto flex items-center gap-3 pt-2 text-[11px] text-slate-400">
+                  <span v-if="article.author">{{ article.author.displayName }}</span>
+                  <span>{{ article.viewCount }} 阅读</span>
+                </div>
+              </div>
+            </NuxtLink>
+          </div>
+          <p v-else class="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-400">还没有文章。</p>
+        </section>
+
+        <!-- AI 广场 -->
+        <section>
+          <div class="mb-1 flex items-center justify-between">
+            <h2 class="text-base font-bold text-slate-900">AI 广场</h2>
+            <NuxtLink to="/ai" class="text-sm text-brand-600 hover:underline">全部 {{ stats?.total || 0 }} 个条目 →</NuxtLink>
+          </div>
+          <p class="mb-3 text-xs text-slate-400">编辑精选的 MCP 服务、Skill、提示词、模型与工具，标注权限风险与客户端兼容性</p>
+          <el-skeleton v-if="aiPending && !aiItems.length" :rows="4" animated />
+          <div v-else-if="aiItems.length" class="grid gap-4 sm:grid-cols-2">
+            <AiItemCard v-for="item in aiItems" :key="item.slug" :item="item" />
+          </div>
+          <p v-else class="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-400">还没有条目。</p>
+        </section>
+      </div>
+
+      <!-- 右栏 -->
+      <aside class="space-y-4">
+        <section class="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 class="mb-3 text-sm font-semibold text-slate-900">AI 热度榜</h2>
+          <ol class="space-y-2">
+            <li v-for="(item, i) in aiHot" :key="item.slug" class="flex items-baseline gap-2">
+              <span class="w-3 text-xs text-slate-300">{{ i + 1 }}</span>
+              <NuxtLink :to="'/ai/' + item.slug" class="truncate text-sm text-slate-700 hover:text-brand-600">
+                {{ item.name }}
+              </NuxtLink>
+              <span class="ml-auto text-[11px] text-slate-400">★ {{ item.starCount }}</span>
+            </li>
+          </ol>
+        </section>
+
+        <section class="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 class="mb-3 text-sm font-semibold text-slate-900">分类</h2>
+          <nav class="flex flex-col gap-0.5">
+            <NuxtLink
+              v-for="cat in categories"
+              :key="cat.id"
+              :to="{ path: '/articles', query: { category: cat.id } }"
+              class="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900"
+            >
+              <span>{{ cat.name }}</span>
+              <span class="text-xs text-slate-400">{{ cat.articleCount }}</span>
+            </NuxtLink>
+          </nav>
+        </section>
+
+        <section v-if="tags.length" class="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 class="mb-3 text-sm font-semibold text-slate-900">热门标签</h2>
+          <div class="flex flex-wrap gap-1.5">
+            <NuxtLink
+              v-for="tag in tags"
+              :key="tag.id"
+              :to="{ path: '/articles', query: { tag: tag.id } }"
+              class="rounded-full bg-slate-50 px-2.5 py-1 text-xs text-slate-600 transition-colors hover:bg-brand-50 hover:text-brand-600"
+            >
+              {{ tag.name }}
+            </NuxtLink>
+          </div>
+        </section>
+
+        <section class="rounded-xl border border-slate-200 bg-white p-4">
+          <h2 class="mb-3 text-sm font-semibold text-slate-900">客户端覆盖</h2>
+          <ul class="space-y-2 text-sm">
+            <li v-for="(count, name) in stats?.byPlatform || {}" :key="name" class="flex items-center">
+              <NuxtLink :to="{ path: '/ai', query: { platform: name } }" class="text-slate-600 hover:text-brand-600">
+                {{ name }}
+              </NuxtLink>
+              <span class="ml-auto text-xs text-slate-400">{{ count }}</span>
+            </li>
+          </ul>
+        </section>
+
+        <section v-if="!authStore.isLoggedIn" class="rounded-xl border border-slate-200 bg-white p-4 text-sm">
+          <h2 class="mb-2 text-sm font-semibold text-slate-900">登录后</h2>
+          <p class="text-xs leading-relaxed text-slate-500">可以继续上次的阅读，也能直接录入 / 管理 AI 广场条目。</p>
+          <NuxtLink to="/login" class="mt-3 block rounded-lg bg-brand-600 py-1.5 text-center text-sm text-white hover:bg-brand-700">
+            登录
+          </NuxtLink>
+        </section>
+      </aside>
     </div>
   </div>
 </template>

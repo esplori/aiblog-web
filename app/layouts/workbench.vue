@@ -170,9 +170,9 @@ const onLogout = () => {
           </div>
         </nav>
 
-        <!-- 用户 -->
+        <!-- 用户 / 登录 -->
         <div class="border-t border-slate-100 p-3">
-          <div class="flex items-center gap-2">
+          <div v-if="authStore.isLoggedIn" class="flex items-center gap-2">
             <span class="w-8 h-8 rounded-full bg-brand-100 text-brand-700 text-sm font-semibold flex items-center justify-center shrink-0">
               {{ userInitial }}
             </span>
@@ -186,6 +186,23 @@ const onLogout = () => {
               <AppIcon name="logout" />
             </button>
           </div>
+
+          <template v-else>
+            <NuxtLink
+              v-if="collapsed"
+              to="/login"
+              class="flex items-center justify-center text-slate-500 hover:text-brand-600"
+              aria-label="登录"
+            >
+              <AppIcon name="user" />
+            </NuxtLink>
+            <template v-else>
+              <NuxtLink to="/login" class="block rounded-lg bg-brand-600 py-1.5 text-center text-sm text-white transition-colors hover:bg-brand-700">
+                登录
+              </NuxtLink>
+              <p class="mt-2 text-center text-[11px] leading-relaxed text-slate-400">登录后可继续上次阅读</p>
+            </template>
+          </template>
         </div>
       </aside>
 
@@ -215,6 +232,13 @@ const onLogout = () => {
 
           <NuxtLink to="/ai" class="text-slate-500 hover:text-brand-600" aria-label="AI 广场">
             <AppIcon name="spark" />
+          </NuxtLink>
+          <NuxtLink
+            v-if="!authStore.isLoggedIn"
+            to="/login"
+            class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-brand-700"
+          >
+            登录
           </NuxtLink>
           <NuxtLink v-if="authStore.isLoggedIn" to="/admin" class="text-slate-500 hover:text-brand-600" aria-label="管理后台">
             <AppIcon name="settings" />
