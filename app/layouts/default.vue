@@ -42,6 +42,10 @@ onMounted(() => {
             文章
           </NuxtLink>
 
+          <NuxtLink to="/ai" class="text-gray-600 hover:text-brand-600">
+            AI 广场
+          </NuxtLink>
+
           <template v-if="authStore.isLoggedIn">
             <NuxtLink to="/admin" class="text-gray-600 hover:text-brand-600">
               管理

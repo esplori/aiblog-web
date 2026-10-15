@@ -21,6 +21,14 @@ const { data: articleData, pending: articlePending, error: articleError, refresh
 
 const article = computed(() => articleData.value?.data || null)
 
+// 记录阅读痕迹（工作台首页的「继续阅读」读取本地记录，不落库）
+const recentReading = useRecentReading()
+watch(article, (value) => {
+  if (value) {
+    recentReading.remember({ path: route.fullPath, title: value.title, kind: 'article' })
+  }
+}, { immediate: true })
+
 // 动态设置 SEO 元信息（SSR 时生效，爬虫可见）
 useSeoMeta({
   title: () => article.value?.title || '文章详情',

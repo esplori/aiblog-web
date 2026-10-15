@@ -223,3 +223,59 @@ a:hover {
     transition: none;
   }
 }
+
+/* ============ AI 广场：类型 / 风险徽章 ============
+   固定语义色，不随品牌换肤；风险档位顺序恒为 只读 < 可写 < 联网 < 执行。 */
+.ai-type,
+.ai-risk {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.ai-type { height: 22px; padding: 0 8px; font-size: 12px; }
+.ai-risk { height: 20px; padding: 0 7px; font-size: 11.5px; }
+
+.ai-type--skill { color: #2563eb; background: color-mix(in srgb, #2563eb 9%, white); border-color: color-mix(in srgb, #2563eb 20%, white); }
+.ai-type--mcp { color: #7c3aed; background: color-mix(in srgb, #7c3aed 9%, white); border-color: color-mix(in srgb, #7c3aed 20%, white); }
+.ai-type--prompt { color: #0891b2; background: color-mix(in srgb, #0891b2 10%, white); border-color: color-mix(in srgb, #0891b2 22%, white); }
+.ai-type--model { color: #b45309; background: color-mix(in srgb, #d97706 12%, white); border-color: color-mix(in srgb, #d97706 24%, white); }
+.ai-type--tool { color: #475569; background: color-mix(in srgb, #475569 10%, white); border-color: color-mix(in srgb, #475569 22%, white); }
+
+.ai-risk--read { color: #047857; background: color-mix(in srgb, #047857 9%, white); border-color: color-mix(in srgb, #047857 20%, white); }
+.ai-risk--write { color: #b45309; background: color-mix(in srgb, #b45309 9%, white); border-color: color-mix(in srgb, #b45309 20%, white); }
+.ai-risk--net { color: #1d4ed8; background: color-mix(in srgb, #1d4ed8 9%, white); border-color: color-mix(in srgb, #1d4ed8 20%, white); }
+.ai-risk--exec { color: #b91c1c; background: color-mix(in srgb, #b91c1c 8%, white); border-color: color-mix(in srgb, #b91c1c 20%, white); }
+
+/* 风险警示条（执行级条目详情页常驻） */
+.ai-warn {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: #b91c1c;
+  background: color-mix(in srgb, #b91c1c 6%, white);
+  border: 1px solid color-mix(in srgb, #b91c1c 22%, white);
+}
+
+/* 代码 / 命令块 */
+.ai-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  line-height: 1.65;
+  background: #f6f7f9;
+  border: 1px solid #e8eaed;
+  border-radius: 10px;
+  padding: 10px 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: #1f2328;
+}
+

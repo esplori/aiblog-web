@@ -29,6 +29,20 @@ export default {
           800: 'color-mix(in srgb, var(--color-brand) 60%, black)',
           900: 'color-mix(in srgb, var(--color-brand) 42%, black)',
         },
+        // AI 广场：固定语义色（不随品牌换肤）
+        type: {
+          skill: '#2563eb',
+          mcp: '#7c3aed',
+          prompt: '#0891b2',
+          model: '#d97706',
+          tool: '#475569',
+        },
+        risk: {
+          read: '#047857',
+          write: '#b45309',
+          net: '#1d4ed8',
+          exec: '#b91c1c',
+        },
       },
     },
   },
