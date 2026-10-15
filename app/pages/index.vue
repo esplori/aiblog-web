@@ -123,30 +123,7 @@ useSeoMeta({
           </div>
           <el-skeleton v-if="articlesPending && !articles.length" :rows="4" animated />
           <div v-else-if="articles.length" class="grid gap-4 sm:grid-cols-2">
-            <NuxtLink
-              v-for="article in articles"
-              :key="article.id"
-              :to="'/post/' + article.uuid"
-              class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-brand-300"
-            >
-              <div v-if="article.coverImage" class="aspect-[16/9] overflow-hidden bg-slate-100">
-                <img :src="article.coverImage" :alt="article.title" class="h-full w-full object-cover" loading="lazy" />
-              </div>
-              <div class="flex flex-1 flex-col p-4">
-                <div class="mb-1.5 flex items-center gap-2 text-[11px] text-slate-400">
-                  <span v-if="article.category" class="font-medium text-brand-600">{{ article.category.name }}</span>
-                  <span>{{ (article.createdAt || '').slice(0, 10) }}</span>
-                </div>
-                <h3 class="line-clamp-2 text-[15px] font-semibold leading-snug text-slate-900 group-hover:text-brand-600">
-                  {{ article.title }}
-                </h3>
-                <p class="mt-1.5 line-clamp-2 text-[13px] leading-relaxed text-slate-500">{{ article.excerpt }}</p>
-                <div class="mt-auto flex items-center gap-3 pt-2 text-[11px] text-slate-400">
-                  <span v-if="article.author">{{ article.author.displayName }}</span>
-                  <span>{{ article.viewCount }} 阅读</span>
-                </div>
-              </div>
-            </NuxtLink>
+            <BlogArticleCard v-for="article in articles" :key="article.id" :article="article" />
           </div>
           <p v-else class="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-400">还没有文章。</p>
         </section>
@@ -220,14 +197,6 @@ useSeoMeta({
               <span class="ml-auto text-xs text-slate-400">{{ count }}</span>
             </li>
           </ul>
-        </section>
-
-        <section v-if="!authStore.isLoggedIn" class="rounded-xl border border-slate-200 bg-white p-4 text-sm">
-          <h2 class="mb-2 text-sm font-semibold text-slate-900">登录后</h2>
-          <p class="text-xs leading-relaxed text-slate-500">可以继续上次的阅读，也能直接录入 / 管理 AI 广场条目。</p>
-          <NuxtLink to="/login" class="mt-3 block rounded-lg bg-brand-600 py-1.5 text-center text-sm text-white hover:bg-brand-700">
-            登录
-          </NuxtLink>
         </section>
       </aside>
     </div>

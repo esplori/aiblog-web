@@ -147,35 +147,8 @@ watch([category, tag], () => {
             <div v-if="articles.length === 0" class="text-center py-16 text-gray-400">
               <p class="text-base">暂无文章</p>
             </div>
-            <div v-else class="space-y-6">
-              <NuxtLink
-                v-for="article in articles"
-                :key="article.id"
-                :to="`/post/${article.uuid}`"
-                class="group flex gap-5 pb-6 border-b border-gray-50 last:border-0"
-              >
-                <div
-                  v-if="article.coverImage"
-                  class="w-36 h-24 rounded-xl bg-cover bg-center flex-shrink-0 overflow-hidden"
-                >
-                  <img :src="article.coverImage" class="w-full h-full object-cover" />
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 text-xs text-gray-400 mb-1.5">
-                    <span v-if="article.category" class="text-brand-600 font-medium">{{ article.category.name }}</span>
-                    <span v-if="article.category" class="text-gray-300">·</span>
-                    <span>{{ new Date(article.createdAt).toLocaleDateString() }}</span>
-                  </div>
-                  <h2 class="text-lg font-semibold text-gray-900 group-hover:text-brand-600 transition-colors leading-snug mb-1.5">
-                    {{ article.title }}
-                  </h2>
-                  <p class="text-sm text-gray-500 leading-relaxed line-clamp-2">{{ article.excerpt }}</p>
-                  <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                    <span v-if="article.author">{{ article.author.displayName }}</span>
-                    <span>{{ article.viewCount }} 阅读</span>
-                  </div>
-                </div>
-              </NuxtLink>
+            <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <BlogArticleCard v-for="article in articles" :key="article.id" :article="article" />
             </div>
 
             <div v-if="total > pageSize" class="flex justify-center mt-10">
