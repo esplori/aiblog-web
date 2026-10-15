@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI 广场 · UI 设计稿总览</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f5;color:#111827;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans","PingFang SC","Microsoft YaHei",sans-serif}
+  .head{max-width:1240px;margin:0 auto;padding:40px 24px 8px}
+  .head h1{margin:0 0 10px;font-size:28px;letter-spacing:-.5px}
+  .head p{margin:0;color:#6b7280;line-height:1.8;max-width:860px}
+  .head .kpis{display:flex;gap:26px;margin-top:18px;flex-wrap:wrap}
+  .head .kpis div{font-size:12px;color:#6b7280}
+  .head .kpis b{display:block;font-size:20px;color:#111827}
+  .tokens{max-width:1240px;margin:24px auto 0;padding:0 24px}
+  .panel{background:#fff;border-radius:16px;padding:20px 22px;box-shadow:0 1px 3px rgba(0,0,0,.06);margin-bottom:24px}
+  .panel h2{margin:0 0 6px;font-size:15px}
+  .panel .sub{color:#9ca3af;font-size:12.5px;margin:0 0 16px}
+  .sw{display:flex;gap:10px;flex-wrap:wrap}
+  .sw div{border-radius:10px;padding:10px 12px;min-width:104px;font-size:11px;line-height:1.6;border:1px solid rgba(15,23,42,.06)}
+  .grid{max-width:1240px;margin:0 auto;padding:0 24px 60px;display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
+  .frame{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(17,24,39,.1);display:flex;flex-direction:column}
+  .frame .bar{display:flex;align-items:center;gap:12px;padding:13px 18px;border-bottom:1px solid #e5e7eb}
+  .frame .bar b{font-size:14.5px}
+  .frame .bar small{color:#9ca3af;font-size:12px}
+  .frame .bar a{margin-left:auto;font-size:12px;color:#2563eb;text-decoration:none;border:1px solid #dbeafe;
+    padding:5px 12px;border-radius:999px;white-space:nowrap}
+  .frame iframe{width:100%;height:600px;border:0;background:#fff}
+  .frame.wide{grid-column:span 2}
+  .frame.wide iframe{height:660px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}.frame.wide{grid-column:span 1}}
+  footer{max-width:1240px;margin:0 auto;padding:0 24px 60px;color:#6b7280;font-size:13px;line-height:1.9}
+  code{background:#f3f4f6;border-radius:4px;padding:1px 5px;font-family:ui-monospace,Menlo,monospace;font-size:12px}
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>AI 广场 · UI 设计稿</h1>
+  <p>一套面向实施的高保真稿：7 屏 + 组件状态页。视觉体系沿用 aiblog-web 现有约定（品牌色变量、11 档 brand 色阶、16px 卡片圆角、1200px 容器、既有的 190 / 1fr / 264 三栏），因此落地时不需要新建视觉语言，只需新增组件。</p>
+  <div class="kpis">
+    <div><b>7</b>屏设计稿</div><div><b>12</b>个组件</div><div><b>5</b>类条目</div><div><b>4</b>档风险</div><div><b>2</b>处新增语义色板</div>
+  </div>
+</div>
+
+<div style="max-width:1240px;margin:20px auto 0;padding:0 24px">
+  <div style="background:#0e1117;color:#e5e7eb;border-radius:14px;padding:16px 20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+    <b style="font-size:14px">这是 v1（内容站风格）</b>
+    <span style="font-size:13px;color:#94a3b8">boss 已提出改为「工作台」布局：左侧模块栏 + 右侧功能区，博客与 AI 广场作为同级模块</span>
+    <a href="v2/index.html" style="margin-left:auto;background:#2563eb;color:#fff;font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;text-decoration:none">看 v2 工作台版 →</a>
+  </div>
+</div>
+<div class="tokens">
+  <div class="panel">
+    <h2>设计令牌</h2>
+    <p class="sub">品牌相关一律走变量，换肤不破；类型色与风险色是<strong>固定语义色</strong>，不参与换肤。</p>
+    <div class="sw">
+      <div style="background:#2563eb;color:#fff">品牌 brand<br>#2563eb（可换）</div>
+      <div style="background:#eff6ff;color:#2563eb">brand-50<br>8% tint</div>
+      <div style="background:#f9fafb">soft<br>#f9fafb</div>
+      <div style="background:#fff;border:1px solid #e5e7eb">surface / line<br>#fff / #e5e7eb</div>
+      <div style="background:#7c3aed;color:#fff">类型 mcp<br>#7c3aed</div>
+      <div style="background:#d97706;color:#fff">类型 model<br>#d97706</div>
+      <div style="background:#b91c1c;color:#fff">风险 exec<br>#b91c1c</div>
+      <div style="background:#047857;color:#fff">风险 read<br>#047857</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame wide">
+    <div class="bar"><b>01 · 广场列表页</b><small>桌面 1200 · 三栏 · 类型 Tab + 筛选 + 卡片网格</small><a href="01-plaza.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="01-plaza.html"></iframe>
+  </div>
+  <div class="frame wide">
+    <div class="bar"><b>02 · 条目详情页</b><small>风险提示 + 平台安装块 + 兼容性矩阵 + 实测报告</small><a href="02-detail.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="02-detail.html"></iframe>
+  </div>
+  <div class="frame">
+    <div class="bar"><b>03 · 清单广场</b><small>组合包，可整包导出</small><a href="03-collections.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="03-collections.html"></iframe>
+  </div>
+  <div class="frame">
+    <div class="bar"><b>04 · 提交条目</b><small>四步表单 + 实时卡片预览 + 提交检查</small><a href="04-submit.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="04-submit.html"></iframe>
+  </div>
+  <div class="frame wide">
+    <div class="bar"><b>05 · 后台管理</b><small>条目审核 / 实测报告 / 清单三个 Tab，含审核弹窗</small><a href="05-admin.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="05-admin.html"></iframe>
+  </div>
+  <div class="frame wide">
+    <div class="bar"><b>06 · 组件与状态规范</b><small>徽章 / 卡片四态 / 安装块 / 矩阵 / 空态 / 错误态 / 导出弹窗</small><a href="06-components.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="06-components.html"></iframe>
+  </div>
+  <div class="frame wide">
+    <div class="bar"><b>07 · 移动端 375</b><small>列表 / 详情 / 筛选抽屉</small><a href="07-mobile.html" target="_blank">单独打开 ↗</a></div>
+    <iframe src="07-mobile.html"></iframe>
+  </div>
+</div>
+
+<footer>
+  <p><strong>怎么用这叠稿子：</strong>每屏都可单独打开、拖到手机宽度看响应式；组件页是实施时的对照表。</p>
+  <p>设计说明与实现映射见 <code>docs/ai-plaza-design/DESIGN.md</code>；数据模型与接口见 <code>docs/ai-community-plan.md</code>。这 7 屏只覆盖 P0 + P1 的界面，P2（排行榜、文章内嵌卡片、UGC 开放）在 DESIGN.md §9 列出。</p>
+</footer>
+</body>
+</html>
+

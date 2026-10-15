@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI 广场 · 04 提交条目</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<style>
+  .sub{padding:28px 0 72px}
+  .sub h1{font-size:24px}
+  .sub .lead{color:var(--muted);margin-top:8px;max-width:660px}
+  .steps{display:flex;gap:0;margin:24px 0 26px;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+  .steps div{flex:1;padding:11px 16px;font-size:12.5px;color:var(--faint);border-right:1px solid var(--line);display:flex;gap:8px;align-items:center}
+  .steps div:last-child{border-right:0}
+  .steps div.on{background:var(--brand-50);color:var(--brand);font-weight:600}
+  .steps b{width:18px;height:18px;border-radius:50%;background:var(--line);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;flex:none}
+  .steps div.on b{background:var(--brand)}
+  .layout2{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:32px}
+  @media(max-width:1080px){.layout2{grid-template-columns:minmax(0,1fr)}.layout2>aside{display:none}}
+  .fs{padding:20px 0;border-top:1px solid var(--line-2)}
+  .fs:first-child{border-top:0;padding-top:0}
+  .fs>h2{font-size:15px;margin-bottom:4px}
+  .fs>p{font-size:12.5px;color:var(--faint);margin-bottom:14px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+  .f{margin-bottom:16px}
+  .types{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  .tcard{border:1px solid var(--line);border-radius:var(--r-md);padding:12px 10px;text-align:center;cursor:pointer;transition:.18s}
+  .tcard:hover{border-color:var(--brand-200);background:var(--brand-50)}
+  .tcard.on{border-color:var(--brand);background:var(--brand-50);box-shadow:0 0 0 3px var(--brand-100)}
+  .tcard .ic{font-size:17px;margin-bottom:6px}
+  .tcard .nm{font-size:13px;font-weight:600}
+  .tcard .ds{font-size:11px;color:var(--faint);margin-top:3px}
+  .riskpick{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .rp{border:1px solid var(--line);border-radius:var(--r-md);padding:11px 13px;cursor:pointer;display:flex;gap:10px;align-items:flex-start}
+  .rp.on{border-color:var(--brand);background:var(--brand-50)}
+  .rp .tt{font-size:13px;font-weight:600}
+  .rp .dd{font-size:11.5px;color:var(--faint);margin-top:2px}
+  .notice{background:var(--warn-bg);border:1px solid #fde68a;border-radius:var(--r-md);padding:14px 16px;font-size:13px;color:#78350f}
+  .preview .card{position:sticky;top:88px}
+  .form-actions{display:flex;gap:12px;align-items:center;margin-top:22px;padding-top:20px;border-top:1px solid var(--line-2)}
+  .err{border-color:var(--danger)!important;box-shadow:0 0 0 3px var(--danger-bg)!important}
+  .errmsg{color:var(--danger);font-size:12px;margin-top:6px}
+</style>
+</head>
+<body class="mock">
+<header class="site-header"><div class="container inner">
+  <div style="display:flex;align-items:center;gap:32px">
+    <span class="logo">Pylox</span>
+    <nav class="nav"><a href="#">首页</a><a href="#">文章</a><a href="01-plaza.html" class="active">AI 广场</a><a href="03-collections.html">清单</a></nav>
+  </div>
+  <div class="nav-right"><span style="color:var(--faint);font-size:16px">⌕</span><button class="btn btn-primary">登录</button></div>
+</div></header>
+
+<div class="container sub">
+  <h1>提交条目</h1>
+  <p class="lead">把你验证过的 Skill / MCP / 提示词放进广场。<strong>先审后发</strong>：提交后进入待审核，通过后公开显示，并标注它的真实客户端兼容情况。</p>
+
+  <div class="steps">
+    <div class="on"><b>1</b> 基本信息</div>
+    <div><b>2</b> 安装与兼容</div>
+    <div><b>3</b> 风险声明</div>
+    <div><b>4</b> 预览提交</div>
+  </div>
+
+  <div class="layout2">
+    <main>
+      <!-- 1 基本信息 -->
+      <section class="fs">
+        <h2>类型</h2>
+        <p>选错类型会让它出现在错误的标签页，请按实际形态选择</p>
+        <div class="types">
+          <div class="tcard on"><div class="ic">⚡</div><div class="nm">Skill</div><div class="ds">能力包</div></div>
+          <div class="tcard"><div class="ic">◈</div><div class="nm">MCP</div><div class="ds">服务端</div></div>
+          <div class="tcard"><div class="ic">✎</div><div class="nm">提示词</div><div class="ds">模板</div></div>
+          <div class="tcard"><div class="ic">◉</div><div class="nm">模型</div><div class="ds">可本地跑</div></div>
+          <div class="tcard"><div class="ic">⌘</div><div class="nm">工具</div><div class="ds">CLI / 库</div></div>
+        </div>
+      </section>
+
+      <section class="fs">
+        <h2>基本信息</h2>
+        <p>名称与一句话会直接显示在卡片上，请尽量短</p>
+        <div class="row2">
+          <div class="f"><label class="label">名称 <span style="color:var(--danger)">*</span></label>
+            <input class="input" value="code-review" /></div>
+          <div class="f"><label class="label">原作者 / 组织</label>
+            <input class="input" value="esplori" /></div>
+        </div>
+        <div class="f"><label class="label">一句话说明 <span style="color:var(--danger)">*</span></label>
+          <input class="input" value="按团队规范给 diff 打分并给出可粘贴的改写建议" />
+          <div class="hint">建议 18–40 字，不要写「一款强大的…」</div>
+        </div>
+        <div class="f"><label class="label">仓库地址 <span style="color:var(--danger)">*</span></label>
+          <input class="input err" value="github.com/esplori/skills/code-review" />
+          <div class="errmsg">需要是完整 URL，以 https:// 开头</div>
+        </div>
+        <div class="row2">
+          <div class="f"><label class="label">许可协议</label>
+            <select class="select"><option>MIT</option><option>Apache-2.0</option><option>GPL-3.0</option><option>未声明</option></select></div>
+          <div class="f"><label class="label">标签</label>
+            <input class="input" value="代码审查, 质量, 团队规范" /></div>
+        </div>
+        <div class="f"><label class="label">详细说明</label>
+          <textarea class="input" rows="6">支持 Markdown。请写清：它解决什么问题、适合什么场景、不适合什么场景。
+
+可用 [[ai:slug]] 引用广场里的其它条目。</textarea></div>
+      </section>
+
+      <!-- 2 安装与兼容 -->
+      <section class="fs">
+        <h2>安装与兼容</h2>
+        <p>每个平台一行；至少填一个。实测通过的平台会展示给用户作为兼容依据</p>
+        <div class="f"><label class="label">支持的客户端</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span class="tag" style="border-color:var(--brand);color:var(--brand);background:var(--brand-50)">pi ✓</span>
+            <span class="tag" style="border-color:var(--brand);color:var(--brand);background:var(--brand-50)">Claude Code ✓</span>
+            <span class="tag">Cursor</span><span class="tag">VS Code</span><span class="tag">Codex CLI</span><span class="tag">＋ 其它</span>
+          </div>
+        </div>
+        <div class="f"><label class="label">安装片段（主）</label>
+          <textarea class="input mono" rows="4">pi skill add esplori/skills/code-review
+# 或手动放入 ~/.pi/skills/code-review</textarea></div>
+        <div class="row3">
+          <div class="f"><label class="label">要求版本</label><input class="input" placeholder="例如 Node >= 20" /></div>
+          <div class="f"><label class="label">你的实测环境</label><input class="input" value="pi 1.5.0 / Ubuntu" /></div>
+          <div class="f"><label class="label">实测结果</label>
+            <select class="select"><option>✓ 跑通</option><option>△ 部分可用</option><option>✕ 不可用</option></select></div>
+        </div>
+      </section>
+
+      <!-- 3 风险声明 -->
+      <section class="fs">
+        <h2>风险声明 <span style="font-size:12px;font-weight:400;color:var(--faint)">广场的招牌字段，务必如实勾选</span></h2>
+        <p>用户会先看这个再决定要不要装</p>
+        <div class="riskpick">
+          <div class="rp on"><input type="checkbox" checked /><div><div class="tt">只读</div><div class="dd">只读取文件/数据，不修改</div></div></div>
+          <div class="rp"><input type="checkbox" /><div><div class="tt">可写</div><div class="dd">会创建或修改文件</div></div></div>
+          <div class="rp"><input type="checkbox" /><div><div class="tt">联网</div><div class="dd">会访问外部网络/域名</div></div></div>
+          <div class="rp"><input type="checkbox" /><div><div class="tt">执行命令</div><div class="dd">会在本机启动进程</div></div></div>
+        </div>
+        <div class="notice" style="margin-top:14px">
+          勾选「执行命令」的条目，详情页会展示常驻风险提示与免责说明。<strong>漏报风险会被直接驳回</strong>，这是不可协商的字段。
+        </div>
+      </section>
+
+      <div class="form-actions">
+        <button class="btn btn-primary btn-lg">提交审核</button>
+        <button class="btn btn-lg">存为草稿</button>
+        <span class="faint" style="font-size:12.5px;margin-left:auto">提交后 1–2 个工作日内审核，结果会通知你</span>
+      </div>
+    </main>
+
+    <!-- 预览 -->
+    <aside class="preview">
+      <div class="card card-pad">
+        <div class="section-title">卡片预览</div>
+        <article class="card item-card" style="box-shadow:none;padding:16px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <span class="badge badge-skill">Skill</span>
+            <span class="risk risk-r">只读</span>
+            <span class="badge badge-plain" style="margin-left:auto">✓ 已实测</span>
+          </div>
+          <h3 style="font-size:15.5px;display:flex;gap:8px;align-items:baseline">code-review <span class="faint" style="font-size:12px;font-weight:400">esplori</span></h3>
+          <p style="color:var(--muted);font-size:13px;margin-top:8px;line-height:1.65">按团队规范给 diff 打分并给出可粘贴的改写建议，输出结构化清单而非泛泛点评。</p>
+          <div style="display:flex;gap:5px;margin-top:10px"><span class="mono faint" style="font-size:11.5px;border:1px solid var(--line);border-radius:5px;padding:2px 7px">pi</span><span class="mono faint" style="font-size:11.5px;border:1px solid var(--line);border-radius:5px;padding:2px 7px">claude-code</span></div>
+        </article>
+        <div class="section-title">提交检查</div>
+        <div class="kvs" style="font-size:12.5px">
+          <div class="kv"><span class="k">基本信息</span><span class="v" style="color:var(--ok)">✓ 通过</span></div>
+          <div class="kv"><span class="k">仓库地址</span><span class="v" style="color:var(--danger)">✕ 格式错误</span></div>
+          <div class="kv"><span class="k">安装片段</span><span class="v" style="color:var(--ok)">✓ 通过</span></div>
+          <div class="kv"><span class="k">风险声明</span><span class="v" style="color:var(--ok)">✓ 已勾选</span></div>
+          <div class="kv"><span class="k">重名检测</span><span class="v" style="color:var(--ok)">✓ 无重复</span></div>
+        </div>
+        <div class="hint" style="margin-top:12px">检查全部通过后才能提交；失败项会定位到具体字段。</div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="mock-note">设计稿 04 / 07 · <a href="index.html">返回总览</a></div>
+</body>
+</html>
+

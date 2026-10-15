@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI 广场 · 07 移动端</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<style>
+  .stage{background:#eef1f5;padding:32px 0 72px;min-height:100vh}
+  .stage .hd{max-width:1200px;margin:0 auto 22px;padding:0 24px}
+  .stage .hd h1{font-size:20px}
+  .stage .hd p{color:var(--muted);font-size:13px;margin-top:6px}
+  .row{max-width:1200px;margin:0 auto;display:flex;gap:28px;flex-wrap:wrap;padding:0 24px;align-items:flex-start}
+  .phone{width:375px;flex:none;background:#fff;border-radius:26px;box-shadow:0 14px 40px rgba(15,23,42,.16);
+    overflow:hidden;border:8px solid #0f172a}
+  .phone .bar{height:26px;background:#0f172a;display:flex;align-items:center;justify-content:space-between;
+    padding:0 14px;color:#94a3b8;font-size:10px}
+  .phone .body{height:660px;overflow:auto;background:#fff}
+  .ph-cap{text-align:center;font-size:12px;color:var(--faint);margin-top:12px}
+  .m-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:5}
+  .m-head .logo{font-size:16px}
+  .m-search{display:flex;gap:8px;padding:12px 14px 8px}
+  .m-search input{flex:1;height:32px;padding:0 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit}
+  .m-search button{width:32px;height:32px;border:1px solid var(--line);border-radius:8px;background:#fff;font-size:13px;color:var(--muted)}
+  .m-tabs{display:flex;gap:18px;overflow:auto;padding:6px 14px 0;border-bottom:1px solid var(--line)}
+  .m-tabs span{font-size:13.5px;color:var(--muted);padding-bottom:9px;white-space:nowrap}
+  .m-tabs span.on{color:var(--ink);font-weight:700;border-bottom:2px solid var(--brand)}
+  .m-card{margin:12px 14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:#fff}
+  .m-card h3{font-size:15px}
+  .m-card p{font-size:12.5px;color:var(--muted);margin-top:6px;line-height:1.65}
+  .m-foot{display:flex;gap:12px;font-size:11.5px;color:var(--faint);border-top:1px solid var(--line-2);margin-top:10px;padding-top:9px}
+  .m-fab{position:sticky;bottom:0;padding:10px 14px 14px;background:linear-gradient(180deg,rgba(255,255,255,0),#fff 40%)}
+  .m-fab button{width:100%;height:42px;border-radius:10px;border:0;background:var(--brand);color:#fff;font-weight:700;font-size:14.5px;font-family:inherit}
+  .m-actions{display:flex;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .m-actions button{flex:1;height:34px;border-radius:8px;border:1px solid var(--line);background:#fff;font-size:13px;font-family:inherit;color:var(--ink-2)}
+  .m-actions button.p{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:600}
+  .sheet{background:var(--soft);min-height:100%;padding:0 0 20px}
+  .sheet .sh{background:#fff;border-radius:16px 16px 0 0;padding:16px}
+  .sheet .grp{margin-bottom:18px}
+  .sheet label{display:flex;align-items:center;gap:10px;font-size:13.5px;padding:6px 0}
+  .sheet label .n{margin-left:auto;color:var(--faint);font-size:12px}
+  .drawer-top{background:var(--soft);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;font-size:13px}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="hd">
+    <h1>移动端（375 × 667）</h1>
+    <p>移动端只做三件事：看、搜、复制。筛选降级为底部抽屉，安装块横向可滚动，详情页信息顺序重排为「风险 → 能不能用 → 怎么装」。</p>
+  </div>
+  <div class="row">
+
+    <!-- 列表 -->
+    <div>
+      <div class="phone"><div class="bar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+        <div class="body">
+          <div class="m-head"><span class="logo">Pylox</span><span style="font-size:16px;color:var(--faint)">☰</span></div>
+          <div class="m-search"><input placeholder="搜索条目…" /><button>⌕</button></div>
+          <div class="m-tabs">
+            <span class="on">全部</span><span>Skill</span><span>MCP</span><span>提示词</span><span>模型</span>
+          </div>
+          <div style="display:flex;gap:8px;padding:12px 14px 0">
+            <span class="tag" style="border-color:var(--brand);color:var(--brand);background:var(--brand-50)">pi</span>
+            <span class="tag">Claude Code</span><span class="tag">+ 筛选</span>
+          </div>
+
+          <div class="m-card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px">
+              <span class="badge badge-mcp" style="height:20px;padding:0 8px;font-size:11px">MCP</span>
+              <span class="risk risk-n" style="height:18px;font-size:11px">联网</span>
+              <span class="risk risk-e" style="height:18px;font-size:11px">执行</span>
+              <span style="margin-left:auto;font-size:11px;color:var(--ok)">✓ 已实测</span>
+            </div>
+            <h3>playwright</h3>
+            <p>真实浏览器里的点击、截图与断言，让「改完自己验一遍」变成自动动作。</p>
+            <div class="m-foot"><span>★ 704</span><span>实测 45</span><span style="margin-left:auto;color:var(--brand);font-weight:600">查看 →</span></div>
+          </div>
+
+          <div class="m-card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px">
+              <span class="badge badge-mcp" style="height:20px;padding:0 8px;font-size:11px">MCP</span>
+              <span class="risk risk-n" style="height:18px;font-size:11px">联网</span>
+              <span style="margin-left:auto;font-size:11px;color:var(--ok)">✓ 已实测</span>
+            </div>
+            <h3>context7</h3>
+            <p>把库/框架的最新版本文档实时检索进上下文，专治过时 API。</p>
+            <div class="m-foot"><span>★ 486</span><span>实测 31</span><span style="margin-left:auto;color:var(--brand);font-weight:600">查看 →</span></div>
+          </div>
+
+          <div class="m-card">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px">
+              <span class="badge badge-skill" style="height:20px;padding:0 8px;font-size:11px">Skill</span>
+              <span class="risk risk-r" style="height:18px;font-size:11px">只读</span>
+              <span style="margin-left:auto;font-size:11px;color:var(--ok)">✓ 已实测</span>
+            </div>
+            <h3>code-review</h3>
+            <p>按团队规范给 diff 打分并给出可粘贴的改写建议。</p>
+            <div class="m-foot"><span>★ 355</span><span>实测 19</span><span style="margin-left:auto;color:var(--brand);font-weight:600">查看 →</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="ph-cap">① 列表 · 卡片单列，徽章只保留最关键的</div>
+    </div>
+
+    <!-- 详情 -->
+    <div>
+      <div class="phone"><div class="bar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+        <div class="body">
+          <div class="m-head"><span style="font-size:15px;color:var(--brand)">‹ 返回</span><span style="font-size:13px;font-weight:600">playwright</span><span style="font-size:15px;color:var(--faint)">☆</span></div>
+
+          <div style="padding:14px">
+            <h1 style="font-size:19px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">playwright
+              <span class="badge badge-mcp" style="height:20px;padding:0 8px;font-size:11px">MCP</span></h1>
+            <p style="font-size:13.5px;color:var(--muted);margin-top:8px;line-height:1.7">真实浏览器里的点击、截图与断言。让「改完自己验一遍」变成可回放的自动动作。</p>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <span class="risk risk-n">联网</span><span class="risk risk-e">执行</span>
+              <span class="badge badge-plain">stdio</span>
+            </div>
+          </div>
+
+          <div style="margin:0 14px 14px;padding:12px;border:1px solid #fecaca;background:var(--danger-bg);border-radius:10px">
+            <div style="font-weight:700;color:var(--danger);font-size:12.5px">⚠ 会在本机执行命令并访问网络</div>
+            <p style="font-size:12px;color:#7f1d1d;margin-top:4px">仅在你信任的仓库中启用。</p>
+          </div>
+
+          <div class="m-actions">
+            <button class="p">★ 704</button><button>＋ 清单</button><button>写报告</button>
+          </div>
+
+          <div style="padding:14px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:10px">安装（pi）</div>
+            <div class="code-head" style="max-width:100%"><span class="mono faint" style="font-size:11px">settings.json</span>
+              <button class="btn btn-sm copy" style="margin-left:auto">⧉</button></div>
+            <div class="code-block" style="font-size:11px;white-space:pre;overflow:auto">{
+  "mcpServers": { "playwright": {
+    "command": "npx",
+    "args": ["-y", "@playwright/mcp@latest", "--isolated"] } }
+}</div>
+            <p class="faint" style="font-size:11.5px;margin-top:8px">← 横向可滚动，代码不折行</p>
+          </div>
+
+          <div style="padding:0 14px 18px">
+            <div style="font-size:14px;font-weight:700;margin-bottom:10px">兼容性</div>
+            <div style="border:1px solid var(--line);border-radius:10px;overflow:hidden">
+              <div style="display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line-2);font-size:13px">
+                <span>Claude Code 2.0.30</span><span style="color:var(--ok);font-weight:600">✓ 跑通</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line-2);font-size:13px">
+                <span>Cursor 0.42.3</span><span style="color:var(--ok);font-weight:600">✓ 跑通</span></div>
+              <div style="display:flex;justify-content:space-between;padding:10px 12px;font-size:13px">
+                <span>pi 1.5.0</span><span style="color:var(--warn);font-weight:600">△ 部分可用</span></div>
+            </div>
+            <p class="faint" style="font-size:11.5px;margin-top:8px">完整矩阵与 42 份实测报告见下方</p>
+          </div>
+        </div>
+      </div>
+      <div class="ph-cap">② 详情 · 顺序重排：风险 → 能不能用 → 怎么装</div>
+    </div>
+
+    <!-- 筛选抽屉 -->
+    <div>
+      <div class="phone"><div class="bar"><span>9:41</span><span>▮▮▮ ⌁</span></div>
+        <div class="body sheet">
+          <div style="height:120px;opacity:.35">
+            <div class="m-head"><span class="logo">Pylox</span><span style="font-size:16px;color:var(--faint)">☰</span></div>
+            <div class="m-search"><input placeholder="搜索条目…" /><button>⌕</button></div>
+          </div>
+          <div class="sh">
+            <div style="display:flex;align-items:center;margin-bottom:6px">
+              <b style="font-size:15px">筛选</b>
+              <span class="link" style="margin-left:auto;font-size:13px">重置</span>
+            </div>
+            <div class="grp">
+              <div class="section-title" style="margin:12px 0 4px">平台 / 客户端</div>
+              <label><input type="checkbox" checked /> pi <span class="n">71</span></label>
+              <label><input type="checkbox" checked /> Claude Code <span class="n">84</span></label>
+              <label><input type="checkbox" /> Cursor <span class="n">62</span></label>
+              <label><input type="checkbox" /> VS Code <span class="n">38</span></label>
+            </div>
+            <div class="grp">
+              <div class="section-title" style="margin:0 0 8px">权限风险</div>
+              <div style="display:flex;gap:6px;flex-wrap:wrap">
+                <span class="risk risk-r">只读</span><span class="risk risk-w">可写</span>
+                <span class="risk risk-n">联网</span><span class="risk risk-e">执行</span>
+              </div>
+            </div>
+            <div class="grp">
+              <div class="section-title" style="margin:0 0 8px">排序</div>
+              <div class="seg" style="width:100%"><button class="on" style="flex:1">综合热度</button><button style="flex:1">最新</button><button style="flex:1">投票</button></div>
+            </div>
+            <button style="width:100%;height:42px;border-radius:10px;border:0;background:var(--brand);color:#fff;font-weight:700;font-size:14.5px;font-family:inherit">查看 71 个结果</button>
+          </div>
+        </div>
+      </div>
+      <div class="ph-cap">③ 筛选 · 桌面左栏降级为底部抽屉</div>
+    </div>
+
+  </div>
+</div>
+<div class="mock-note">设计稿 07 / 07 · <a href="index.html">返回总览</a></div>
+</body>
+</html>
+

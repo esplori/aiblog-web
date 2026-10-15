@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>工作台 v2 · 03 阅读页（博客模块）</title>
+<link rel="stylesheet" href="assets/shell.css" />
+<style>
+  .read{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:40px}
+  @container content (max-width:1000px){.read{grid-template-columns:minmax(0,1fr)}.read aside{display:none}}
+  .article{max-width:68ch}
+  .article h1{font-size:26px;letter-spacing:-.4px;line-height:1.35}
+  .article .lead{font-size:15.5px;color:var(--muted);line-height:1.8;margin-top:12px}
+  .article .meta{display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--faint);margin:16px 0 22px;
+    padding-bottom:18px;border-bottom:1px solid var(--line)}
+  .prose{font-size:16px;line-height:1.95;color:var(--ink-2)}
+  .prose p{margin:0 0 20px}
+  .prose h2{font-size:19px;color:var(--ink);margin:34px 0 14px;letter-spacing:-.2px}
+  .prose h3{font-size:16.5px;color:var(--ink);margin:26px 0 10px}
+  .prose ul{padding-left:22px;margin:0 0 20px}
+  .prose li{margin:6px 0}
+  .prose code{font-family:var(--mono);font-size:13.5px;background:var(--surface-3);border-radius:5px;padding:1.5px 6px;color:var(--brand-700)}
+  .prose blockquote{margin:0 0 20px;padding:12px 18px;border-left:3px solid var(--brand-300);background:var(--surface-2);border-radius:0 var(--r-sm) var(--r-sm) 0}
+  .toc{position:sticky;top:80px;font-size:12.5px}
+  .toc a{display:block;padding:5px 10px;border-left:2px solid var(--line);color:var(--muted)}
+  .toc a.on{border-left-color:var(--brand);color:var(--brand);font-weight:600;background:var(--brand-50)}
+  .progbar{position:sticky;top:var(--top-h);height:2px;background:transparent;z-index:19}
+  .progbar i{display:block;height:100%;width:38%;background:var(--brand)}
+</style>
+</head>
+<body>
+<a class="skip" href="#content">跳到主内容</a>
+<div class="app">
+  <aside class="side" aria-label="主导航">
+    <div class="brand"><span class="logo" aria-hidden="true">P</span><b>Pylox</b>
+      <button class="btn btn-s btn-ic" style="margin-left:auto" aria-label="折叠侧边栏">‹</button></div>
+    <div class="scroll">
+      <div class="lbl">模块 · 博客</div>
+      <a class="item" href="01-workbench.html"><span class="ic" aria-hidden="true">▤</span><span>工作台</span></a>
+      <a class="item on" href="#" aria-current="page"><span class="ic" aria-hidden="true">≡</span><span>全部文章</span><span class="cnt">128</span></a>
+      <a class="item" href="#"><span class="ic" aria-hidden="true">◇</span><span>分类</span><span class="cnt">6</span></a>
+      <a class="item" href="#"><span class="ic" aria-hidden="true">⌗</span><span>标签</span><span class="cnt">24</span></a>
+      <a class="item" href="#"><span class="ic" aria-hidden="true">☆</span><span>我的收藏</span><span class="cnt">17</span></a>
+      <div class="lbl">模块 · AI 广场</div>
+      <a class="item" href="02-ai-plaza.html"><span class="ic" aria-hidden="true">✦</span><span>广场</span><span class="cnt">132</span></a>
+      <a class="item" href="#"><span class="ic" aria-hidden="true">▥</span><span>清单</span><span class="cnt">11</span></a>
+      <div class="lbl">本文相关</div>
+      <a class="item" href="#"><span class="ic" aria-hidden="true">⌗</span><span>MCP</span><span class="cnt">12</span></a>
+      <a class="item" href="#"><span class="ic" aria-hidden="true">⌗</span><span>上下文</span><span class="cnt">7</span></a>
+      <a class="item" href="02-ai-plaza.html"><span class="ic" aria-hidden="true">✦</span><span>关联条目</span><span class="cnt">3</span></a>
+    </div>
+    <div class="foot"><div class="me" role="button" tabindex="0">
+      <span class="av" aria-hidden="true">B</span><span><span class="nm">boss</span><br /><span class="rl">管理员</span></span>
+      <span style="margin-left:auto;color:var(--faint)">⌄</span></div></div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="crumb">博客 <span aria-hidden="true">/</span> 文章 <span aria-hidden="true">/</span> <b>MCP 协议…</b></div>
+      <div class="spacer"></div>
+      <button class="searchbtn"><span aria-hidden="true">⌕</span><span>搜索…</span><span class="kbd" style="margin-left:auto">⌘K</span></button>
+      <button class="btn">✎ 编辑</button>
+      <button class="btn">☆ 收藏</button>
+    </header>
+
+    <div class="progbar" aria-hidden="true"><i></i></div>
+
+    <main class="body" id="content">
+      <div class="wrap">
+        <div class="read">
+          <article class="article">
+            <div class="meta">
+              <span class="badge badge-plain">技术</span>
+              <span>2026-10-15</span><span>·</span><span>8 分钟</span><span>·</span><span class="num">1,024 阅读</span>
+              <span style="margin-left:auto" class="mono">mcp-protocol</span>
+            </div>
+            <h1>MCP 协议到底解决了什么问题：从一次失败的集成说起</h1>
+            <p class="lead">我们花了三个月把工具的调用方式从「贴文档」改成「走协议」。这次失败让我明白：协议的价值不在连接，而在边界。</p>
+
+            <div class="prose" style="margin-top:26px">
+              <p>第一次集成是在四个月前。目标很简单：让模型能查我们的数据库。做法也很直接——把表结构打成一段文本塞进提示词，再让它写 SQL。</p>
+              <h2>一、为什么「塞提示词」会先崩</h2>
+              <p>三周之后问题开始堆积。表结构每次变更都要重新贴一遍；同一个问题在不同会话里得到不同答案；最要命的是，我们无法回答「模型到底碰过哪些数据」。</p>
+              <blockquote>把工具塞进提示词，等于把工具的<strong>边界</strong>也交给了模型的自由发挥。</blockquote>
+              <h2>二、协议给的三个东西</h2>
+              <ul>
+                <li><strong>显式的能力声明</strong>：服务端先说清楚自己能做什么，客户端再决定放不放行。</li>
+                <li><strong>可枚举的权限</strong>：读写、联网、执行，是能被勾选和审计的字段，而不是一句自然语言。</li>
+                <li><strong>可替换的传输</strong>：<code>stdio</code> 适合本地，<code>sse</code> / <code>http</code> 适合共享。</li>
+              </ul>
+              <h2>三、我们现在的做法</h2>
+              <p>所有 MCP 都登记在一张表里，权限写死为四个档位，卡片上直接给用户看。想接入新的服务，先填声明，再跑一次实测报告。</p>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:34px;padding-top:22px;border-top:1px solid var(--line)">
+              <span class="tag">MCP</span><span class="tag">上下文</span><span class="tag">工程实践</span>
+            </div>
+
+            <div class="card" style="margin-top:22px;background:var(--surface-2)">
+              <div class="card-hd"><h3>文中提到的 AI 条目</h3><a class="more" href="02-ai-plaza.html">AI 广场 →</a></div>
+              <div class="rows">
+                <div class="row"><span class="ic">C7</span><div><div class="tt">context7</div><div class="mt">MCP · 联网</div></div>
+                  <span class="right" style="color:var(--brand);font-weight:600">查看 →</span></div>
+                <div class="row"><span class="ic">PG</span><div><div class="tt">postgres-ro</div><div class="mt">MCP · 只读联网</div></div>
+                  <span class="right" style="color:var(--brand);font-weight:600">查看 →</span></div>
+              </div>
+            </div>
+          </article>
+
+          <aside aria-label="本文目录">
+            <div class="toc">
+              <div class="lbl" style="padding:0 10px 8px">本文目录</div>
+              <a href="#" class="on">一、为什么「塞提示词」会先崩</a>
+              <a href="#">二、协议给的三个东西</a>
+              <a href="#">三、我们现在的做法</a>
+              <div style="margin-top:18px;padding:12px;border:1px solid var(--line);border-radius:var(--r-card);background:var(--surface-2)">
+                <div style="font-weight:600;font-size:12.5px">阅读设置</div>
+                <div style="display:flex;gap:6px;margin-top:10px">
+                  <button class="btn btn-s" aria-pressed="false">A-</button>
+                  <button class="btn btn-s" aria-pressed="true">A</button>
+                  <button class="btn btn-s" aria-pressed="false">A+</button>
+                </div>
+                <p class="faint" style="font-size:11px;margin-top:8px">字号偏好存在本地，不影响他人</p>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+<div class="note">工作台 v2 · 03 / 07 · <a href="index.html">总览</a></div>
+</body>
+</html>
+

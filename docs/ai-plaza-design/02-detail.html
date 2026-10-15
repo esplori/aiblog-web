@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI 广场 · 02 条目详情页</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<style>
+  .dt{padding:22px 0 72px}
+  .crumb{font-size:12.5px;color:var(--faint);margin-bottom:16px}
+  .crumb a:hover{color:var(--brand)}
+  .dt-head{display:flex;gap:20px;align-items:flex-start;padding-bottom:22px;border-bottom:1px solid var(--line)}
+  .dt-head .mark{width:56px;height:56px;border-radius:14px;background:var(--t-mcp-bg);color:var(--t-mcp);
+    display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;flex:none}
+  .dt-head h1{font-size:23px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .dt-head h1 small{font-size:13px;color:var(--faint);font-weight:400;font-family:var(--mono)}
+  .dt-head .tagline{color:var(--muted);margin-top:8px;font-size:14.5px;max-width:660px}
+  .dt-head .meta{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:12px;font-size:12.5px;color:var(--faint)}
+  .dt-actions{display:flex;gap:10px;margin-left:auto;flex:none}
+  .vote{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 16px;border-radius:var(--r-sm);
+    border:1px solid var(--brand-200);background:var(--brand-50);color:var(--brand);font-weight:700;cursor:pointer;
+    font-family:inherit;font-size:14px}
+  .vote:hover{background:var(--brand-100)}
+  .warn{display:flex;gap:12px;padding:14px 16px;border:1px solid #fecaca;background:var(--danger-bg);
+    border-radius:var(--r-md);margin:20px 0}
+  .warn .t{font-weight:700;color:var(--danger);margin-bottom:2px}
+  .warn p{font-size:13px;color:#7f1d1d}
+  .layout2{display:grid;grid-template-columns:minmax(0,1fr) 288px;gap:32px;margin-top:24px}
+  @media(max-width:1080px){.layout2{grid-template-columns:minmax(0,1fr)}.layout2>aside:last-child{display:none}}
+  .blk{margin-bottom:34px}
+  .blk>h2{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .blk>h2 span{font-size:12px;color:var(--faint);font-weight:400}
+  .prose{font-size:14.5px;line-height:1.85;color:var(--ink-2)}
+  .prose h3{font-size:15px;margin:20px 0 8px;color:var(--ink)}
+  .prose p{margin:0 0 12px}
+  .prose ul{margin:0 0 12px;padding-left:20px}
+  .prose li{margin:4px 0}
+  .prose code{font-family:var(--mono);background:var(--soft);border:1px solid var(--line);
+    border-radius:4px;padding:1px 5px;font-size:12.5px;color:var(--brand-700)}
+  .prose blockquote{margin:0;padding:10px 16px;border-left:3px solid var(--brand-300);background:var(--brand-50);
+    border-radius:0 var(--r-sm) var(--r-sm) 0;color:var(--ink-2);font-size:13.5px}
+  .matrix{width:100%;border-collapse:collapse;font-size:13.5px;border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+  .matrix th{background:var(--soft);font-size:12.5px;color:var(--muted);font-weight:600;text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .matrix td{padding:12px 14px;border-bottom:1px solid var(--line-2)}
+  .matrix tr:last-child td{border-bottom:0}
+  .res{display:inline-flex;align-items:center;gap:5px;font-weight:600;font-size:12.5px}
+  .res.y{color:var(--ok)}.res.p{color:var(--warn)}.res.n{color:var(--danger)}
+  .bar{height:6px;border-radius:99px;background:var(--line-2);overflow:hidden;width:90px;display:inline-block;vertical-align:middle}
+  .bar i{display:block;height:100%;background:var(--ok)}
+  .bar.p i{background:var(--warn)}
+  .rep{padding:16px 0;border-top:1px solid var(--line-2)}
+  .rep .rh{display:flex;align-items:center;gap:10px;font-size:13px}
+  .rep .who{font-weight:600}
+  .rep .env{font-family:var(--mono);font-size:12px;color:var(--faint)}
+  .rep .body{font-size:13.5px;color:var(--ink-2);margin:8px 0 10px;line-height:1.75}
+  .rep .acts{display:flex;gap:16px;font-size:12.5px;color:var(--faint)}
+  .kvs{display:flex;flex-direction:column;gap:11px;font-size:13px}
+  .kvs .kv{display:flex;justify-content:space-between;gap:12px}
+  .kvs .k{color:var(--faint)}
+  .kvs .v{color:var(--ink-2);text-align:right;font-weight:500}
+  .rel{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line-2)}
+  .rel:last-child{border-bottom:0}
+  .rel .mark{width:32px;height:32px;border-radius:8px;background:var(--soft);color:var(--ink-2);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex:none}
+  .rel .tt{font-size:13px;font-weight:600}
+  .rel .mt{font-size:11.5px;color:var(--faint)}
+</style>
+</head>
+<body class="mock">
+<header class="site-header"><div class="container inner">
+  <div style="display:flex;align-items:center;gap:32px">
+    <span class="logo">Pylox</span>
+    <nav class="nav"><a href="#">首页</a><a href="#">文章</a><a href="01-plaza.html" class="active">AI 广场</a><a href="03-collections.html">清单</a></nav>
+  </div>
+  <div class="nav-right"><span style="color:var(--faint);font-size:16px">⌕</span><button class="btn btn-primary">登录</button></div>
+</div></header>
+
+<div class="container dt">
+  <div class="crumb"><a href="01-plaza.html">AI 广场</a> / <span>MCP</span> / <span style="color:var(--ink-2)">playwright</span></div>
+
+  <div class="dt-head">
+    <div class="mark">▶</div>
+    <div style="min-width:0;flex:1">
+      <h1>playwright <small>microsoft/playwright-mcp</small>
+        <span class="badge badge-mcp">MCP</span>
+        <span class="risk risk-n">联网</span>
+        <span class="risk risk-e">执行</span>
+        <span class="badge badge-plain" style="color:var(--ok);background:var(--ok-bg);border-color:#a7f3d0">✓ 已实测</span>
+      </h1>
+      <p class="tagline">真实浏览器里的点击、截图与断言。让「改完自己验一遍」从口头承诺变成可回放的自动动作。</p>
+      <div class="meta">
+        <span>传输 <b class="mono" style="color:var(--ink-2)">stdio</b></span>
+        <span>许可 Apache-2.0</span>
+        <span>仓库 ★ 12.4k</span>
+        <span>收录 2026-09-02</span>
+        <span>最近更新 3 天前</span>
+        <span>维护者 <b style="color:var(--ink-2)">Microsoft</b></span>
+      </div>
+    </div>
+    <div class="dt-actions">
+      <button class="vote">★ 704 <span style="font-weight:500;font-size:12.5px;color:var(--brand-700)">已投票</span></button>
+      <button class="btn btn-icon" title="收藏">☆</button>
+      <button class="btn btn-icon" title="分享">⤴</button>
+    </div>
+  </div>
+
+  <!-- 风险提示：exec 级条目常驻 -->
+  <div class="warn">
+    <span style="font-size:18px">⚠</span>
+    <div>
+      <div class="t">该条目会在本机执行命令并访问网络</div>
+      <p>playwright-mcp 会启动真实浏览器进程、读写本地缓存并访问你打开的任意网址。请仅在你信任的仓库中启用，并优先使用隔离的浏览器 profile。本站不代管、不审计第三方代码。</p>
+    </div>
+  </div>
+
+  <div class="layout2">
+    <!-- ============ 主内容 ============ -->
+    <main>
+      <section class="blk">
+        <h2>安装 <span>选你的客户端，复制即可</span></h2>
+        <div class="seg" style="margin-bottom:12px">
+          <button class="on">pi</button><button>Claude Code</button><button>Cursor</button><button>VS Code</button>
+        </div>
+        <div class="code-head">
+          <span class="mono faint">~/.pi/settings.json</span>
+          <button class="btn btn-sm copy">⧉ 复制</button>
+        </div>
+        <div class="code-block">{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--isolated"],
+      "env": { "PLAYWRIGHT_BROWSERS_PATH": "~/.cache/ms-playwright" }
+    }
+  }
+}</div>
+        <div class="hint">要求 Node ≥ 20；首次运行会自动下载浏览器内核（约 130 MB）。pi 需在 <code class="mono">permissions.network</code> 中放开 <code class="mono">playwright</code> 域名。</div>
+      </section>
+
+      <section class="blk">
+        <h2>能力说明</h2>
+        <div class="prose">
+          <p>把浏览器作为工具交给模型：导航、点击、输入、截图、读取 DOM 与网络响应。典型用途不是「写测试」，而是<strong>改完自己验一遍</strong>——模型在提交前先跑一次真实页面，肉眼可见地确认没写错选择器。</p>
+          <h3>适合的场景</h3>
+          <ul>
+            <li>前端改动的自检：截图比对 + 控制台报错捕获</li>
+            <li>爬取需要登录态的页面（用持久化 profile）</li>
+            <li>把「复现步骤」变成可回放的脚本片段</li>
+          </ul>
+          <h3>不适合的场景</h3>
+          <ul>
+            <li>规模化压测（这不是压测工具）</li>
+            <li>生产环境带真实账号的自动化（有误操作风险）</li>
+          </ul>
+          <blockquote>实测建议：始终加 <code>--isolated</code>，否则会污染你日常的浏览器 profile，登录态混淆后很难排查。</blockquote>
+        </div>
+      </section>
+
+      <section class="blk">
+        <h2>兼容性矩阵 <span>来自 42 份实测报告</span></h2>
+        <table class="matrix">
+          <thead><tr><th>客户端</th><th>版本</th><th>结果</th><th>通过率</th><th>报告数</th><th>最近验证</th></tr></thead>
+          <tbody>
+            <tr><td><b>Claude Code</b></td><td class="mono">2.0.30</td><td><span class="res y">✓ 跑通</span></td>
+              <td><span class="bar"><i style="width:94%"></i></span> <span class="faint num">94%</span></td>
+              <td class="num">18</td><td class="faint">3 天前</td></tr>
+            <tr><td><b>Cursor</b></td><td class="mono">0.42.3</td><td><span class="res y">✓ 跑通</span></td>
+              <td><span class="bar"><i style="width:89%"></i></span> <span class="faint num">89%</span></td>
+              <td class="num">9</td><td class="faint">5 天前</td></tr>
+            <tr><td><b>pi</b></td><td class="mono">1.5.0</td><td><span class="res p">△ 部分可用</span></td>
+              <td><span class="bar p"><i style="width:62%"></i></span> <span class="faint num">62%</span></td>
+              <td class="num">6</td><td class="faint">昨天</td></tr>
+            <tr><td><b>VS Code</b></td><td class="mono">1.95.1</td><td><span class="res y">✓ 跑通</span></td>
+              <td><span class="bar"><i style="width:91%"></i></span> <span class="faint num">91%</span></td>
+              <td class="num">7</td><td class="faint">1 周前</td></tr>
+            <tr><td><b>Codex CLI</b></td><td class="mono">0.9.2</td><td><span class="res n">✕ 不可用</span></td>
+              <td><span class="bar" style="background:var(--danger-bg)"><i style="width:0%"></i></span> <span class="faint num">0%</span></td>
+              <td class="num">2</td><td class="faint">2 周前</td></tr>
+          </tbody>
+        </table>
+        <div class="hint">矩阵由实测报告自动聚合：<code class="mono">(客户端, 版本, 结果)</code> 分桶。没有报告的版本不显示，不猜测。</div>
+      </section>
+
+      <section class="blk">
+        <h2>实测报告 <span>42 份 · 全部人工审核</span></h2>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="seg"><button class="on">全部</button><button>✓ 跑通</button><button>△ 部分</button><button>✕ 失败</button></div>
+          <button class="btn btn-primary">＋ 写实测报告</button>
+        </div>
+
+        <div class="rep" style="border-top:0;margin-top:14px">
+          <div class="rh">
+            <span class="badge badge-plain" style="font-weight:700">M</span>
+            <span class="who">moss</span>
+            <span class="res p">△ 部分可用</span>
+            <span class="env">pi 1.5.0 · Ubuntu 24.04</span>
+            <span class="faint" style="margin-left:auto;font-size:12px">6 小时前</span>
+          </div>
+          <p class="body">基本动作都通，但默认拿不到外网请求：pi 的 permissions 默认只放行已声明的域名，浏览器内跳转到新域名会被拦。手动把目标域名加进白名单后正常。另外 <code class="mono" style="font-family:var(--mono)">--isolated</code> 必须加。</p>
+          <div class="code-head"><span class="mono faint">我实际跑通的片段</span><button class="btn btn-sm copy">⧉ 复制</button></div>
+          <div class="code-block">{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest", "--isolated"],
+      "permissions": { "network": ["*.example.com"] }
+    }
+  }
+}</div>
+          <div class="acts" style="margin-top:10px"><span>👍 有用 14</span><span>💬 回复 3</span><span>↗ 引用到我的清单</span></div>
+        </div>
+
+        <div class="rep">
+          <div class="rh">
+            <span class="badge badge-plain" style="font-weight:700">泽</span>
+            <span class="who">阿泽</span>
+            <span class="res y">✓ 跑通</span>
+            <span class="env">Cursor 0.42.3 · macOS 15.2</span>
+            <span class="faint" style="margin-left:auto;font-size:12px">3 天前</span>
+          </div>
+          <p class="body">开箱即用，截图质量比我自己写 Puppeteer 稳定。注意首次运行下载内核约 2 分钟，别以为卡死了。</p>
+          <div class="acts"><span>👍 有用 9</span><span>💬 回复 1</span></div>
+        </div>
+
+        <div class="rep">
+          <div class="rh">
+            <span class="badge badge-plain" style="font-weight:700">匿</span>
+            <span class="who">匿名用户</span>
+            <span class="res n">✕ 不可用</span>
+            <span class="env">Codex CLI 0.9.2 · macOS</span>
+            <span class="faint" style="margin-left:auto;font-size:12px">2 周前</span>
+          </div>
+          <p class="body">该客户端尚不支持带 env 的 stdio 配置，进程起不来。等上游支持再看。</p>
+          <div class="acts"><span>👍 有用 4</span></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============ 右栏 ============ -->
+    <aside>
+      <div class="sticky">
+        <div class="card card-pad" style="margin-bottom:20px">
+          <div class="section-title">条目信息</div>
+          <div class="kvs">
+            <div class="kv"><span class="k">类型</span><span class="v">MCP Server</span></div>
+            <div class="kv"><span class="k">传输</span><span class="v mono">stdio</span></div>
+            <div class="kv"><span class="k">风险评估</span><span class="v" style="color:var(--danger)">执行 · 联网</span></div>
+            <div class="kv"><span class="k">许可</span><span class="v">Apache-2.0</span></div>
+            <div class="kv"><span class="k">支持客户端</span><span class="v">4 / 8</span></div>
+            <div class="kv"><span class="k">实测通过</span><span class="v">3 个版本</span></div>
+            <div class="kv"><span class="k">收录 / 更新</span><span class="v">09-02 / 3 天前</span></div>
+          </div>
+          <button class="btn" style="width:100%;justify-content:center;margin-top:14px">↗ 访问仓库</button>
+        </div>
+
+        <div class="card card-pad" style="margin-bottom:20px">
+          <div class="section-title">标签</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">
+            <span class="tag">浏览器</span><span class="tag">自动化</span><span class="tag">E2E</span><span class="tag">前端自检</span>
+          </div>
+        </div>
+
+        <div class="card card-pad" style="margin-bottom:20px">
+          <div class="section-title">相关条目</div>
+          <div class="rel"><div class="mark">C7</div><div><div class="tt">context7</div><div class="mt">MCP · ★ 486</div></div></div>
+          <div class="rel"><div class="mark">FS</div><div><div class="tt">filesystem</div><div class="mt">MCP · ★ 921</div></div></div>
+          <div class="rel"><div class="mark">CR</div><div><div class="tt">code-review</div><div class="mt">Skill · ★ 355</div></div></div>
+        </div>
+
+        <div class="card card-pad" style="background:var(--soft);border-style:dashed">
+          <div style="font-weight:600;font-size:13px;margin-bottom:6px">发现信息有误？</div>
+          <p class="faint" style="font-size:12.5px">版本过期、安装命令失效、权限描述不准确，都可以提交纠错，会由维护者复核。</p>
+          <div style="display:flex;gap:10px;margin-top:12px"><span class="link">纠错</span><span class="link danger">举报</span></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="mock-note">设计稿 02 / 07 · <a href="index.html">返回总览</a></div>
+</body>
+</html>
+

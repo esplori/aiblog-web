@@ -1,0 +1,167 @@
+/* ===== AI 广场 UI 设计稿 · 共享设计令牌与基础组件 =====
+   来源：与 aiblog-web 现有视觉体系对齐
+   - 品牌色变量 --color-brand（app/assets/css/main.css）
+   - brand 色阶 11 档（tailwind.config.js，用 color-mix 生成）
+   - 卡片圆角 16px / 阴影两档（.card）
+   - 容器 1200px（.container）
+   本文件仅用于设计稿预览，实施时按 docs/ai-plaza-design/DESIGN.md 的映射表落到 Vue + Tailwind。 */
+
+:root{
+  /* 品牌 */
+  --brand:#2563eb;
+  --brand-50:color-mix(in srgb,var(--brand) 8%,white);
+  --brand-100:color-mix(in srgb,var(--brand) 14%,white);
+  --brand-200:color-mix(in srgb,var(--brand) 24%,white);
+  --brand-300:color-mix(in srgb,var(--brand) 38%,white);
+  --brand-400:color-mix(in srgb,var(--brand) 58%,white);
+  --brand-700:color-mix(in srgb,var(--brand) 82%,black);
+  --brand-800:color-mix(in srgb,var(--brand) 60%,black);
+  /* 中性 */
+  --ink:#111827; --ink-2:#374151; --muted:#6b7280; --faint:#9ca3af;
+  --line:#e5e7eb; --line-2:#f3f4f6; --soft:#f9fafb; --surface:#fff;
+  /* 语义 */
+  --ok:#047857; --ok-bg:#ecfdf5;
+  --warn:#b45309; --warn-bg:#fffbeb;
+  --danger:#b91c1c; --danger-bg:#fef2f2;
+  --info:#1d4ed8; --info-bg:#eff6ff;
+  /* 类型色（新增语义色，需登记进 tailwind.config.js） */
+  --t-skill:#2563eb; --t-skill-bg:#eff6ff;
+  --t-mcp:#7c3aed;   --t-mcp-bg:#f5f3ff;
+  --t-prompt:#0891b2;--t-prompt-bg:#ecfeff;
+  --t-model:#d97706; --t-model-bg:#fffbeb;
+  --t-tool:#475569;  --t-tool-bg:#f1f5f9;
+  /* 形状 */
+  --r-card:16px; --r-md:10px; --r-sm:8px; --r-pill:999px;
+  --sh-1:0 1px 2px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);
+  --sh-2:0 4px 12px rgba(0,0,0,.08);
+  --sh-3:0 12px 32px rgba(15,23,42,.14);
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--surface);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans","PingFang SC","Microsoft YaHei",sans-serif;
+  font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+a:hover{color:var(--brand)}
+h1,h2,h3,h4{margin:0;line-height:1.35}
+p{margin:0}
+.mono{font-family:var(--mono);font-size:12.5px}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+.num{font-variant-numeric:tabular-nums}
+.container{max-width:1200px;margin:0 auto;padding:0 24px}
+
+/* ---------- 站点头部（对齐 app/layouts/default.vue：h-16 sticky） ---------- */
+.site-header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+.site-header .inner{display:flex;align-items:center;justify-content:space-between;height:64px}
+.logo{font-size:19px;font-weight:700;letter-spacing:.2px}
+.nav{display:flex;align-items:center;gap:26px;font-size:14px;color:var(--ink-2)}
+.nav a{color:var(--ink-2)}
+.nav a.active{color:var(--brand);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:14px}
+
+/* ---------- 按钮 ---------- */
+.btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;
+  border:1px solid var(--line);border-radius:var(--r-sm);background:#fff;color:var(--ink-2);
+  font-size:13.5px;font-weight:500;cursor:pointer;transition:all .18s ease;white-space:nowrap}
+.btn:hover{border-color:var(--brand-300);color:var(--brand);background:var(--brand-50)}
+.btn-primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn-primary:hover{background:var(--brand-700);border-color:var(--brand-700);color:#fff}
+.btn-ghost{border-color:transparent;background:transparent}
+.btn-ghost:hover{background:var(--soft)}
+.btn-sm{height:28px;padding:0 10px;font-size:12.5px}
+.btn-lg{height:40px;padding:0 20px;font-size:15px}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn-icon{width:34px;padding:0;justify-content:center}
+
+/* ---------- 徽章 / 标签 ---------- */
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 9px;
+  border-radius:var(--r-pill);font-size:12px;font-weight:600;line-height:1}
+.badge-plain{background:var(--soft);color:var(--muted);border:1px solid var(--line)}
+.badge-skill{background:var(--t-skill-bg);color:var(--t-skill)}
+.badge-mcp{background:var(--t-mcp-bg);color:var(--t-mcp)}
+.badge-prompt{background:var(--t-prompt-bg);color:var(--t-prompt)}
+.badge-model{background:var(--t-model-bg);color:var(--t-model)}
+.badge-tool{background:var(--t-tool-bg);color:var(--t-tool)}
+.risk{display:inline-flex;align-items:center;gap:3px;height:20px;padding:0 8px;border-radius:6px;
+  font-size:11.5px;font-weight:700;letter-spacing:.2px;border:1px solid transparent}
+.risk-r{color:var(--ok);background:var(--ok-bg);border-color:#a7f3d0}
+.risk-w{color:var(--warn);background:var(--warn-bg);border-color:#fde68a}
+.risk-n{color:var(--info);background:var(--info-bg);border-color:#bfdbfe}
+.risk-e{color:var(--danger);background:var(--danger-bg);border-color:#fecaca}
+.tag{display:inline-block;padding:3px 10px;border-radius:var(--r-pill);background:var(--soft);
+  border:1px solid var(--line);color:var(--muted);font-size:12px;cursor:pointer}
+.tag:hover{background:var(--brand-50);border-color:var(--brand-200);color:var(--brand)}
+
+/* ---------- 卡片 ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--sh-1);
+  transition:box-shadow .2s ease,border-color .2s ease,transform .2s ease}
+.card:hover{box-shadow:var(--sh-2)}
+.card-pad{padding:20px}
+.item-card:hover{border-color:var(--brand-200);box-shadow:var(--sh-2);transform:translateY(-2px)}
+.section-title{font-size:13px;font-weight:700;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+
+/* ---------- 表单 ---------- */
+.input,.select,textarea.input{width:100%;height:34px;padding:0 12px;border:1px solid var(--line);
+  border-radius:var(--r-sm);background:#fff;font-size:13.5px;color:var(--ink);font-family:inherit}
+textarea.input{height:auto;padding:10px 12px;line-height:1.7;resize:vertical}
+.input:focus,.select:focus,textarea.input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-100)}
+.label{display:block;font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:6px}
+.hint{font-size:12px;color:var(--faint);margin-top:6px}
+.check{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:var(--ink-2)}
+.check input{margin-top:3px}
+.seg{display:inline-flex;background:var(--soft);border:1px solid var(--line);border-radius:var(--r-sm);padding:2px;gap:2px}
+.seg button{border:0;background:transparent;height:26px;padding:0 12px;border-radius:6px;
+  font-size:12.5px;color:var(--muted);cursor:pointer;font-family:inherit}
+.seg button.on{background:#fff;color:var(--brand);font-weight:600;box-shadow:var(--sh-1)}
+
+/* ---------- 类型 Tab（广场顶部） ---------- */
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--line)}
+.tabs button{position:relative;border:0;background:transparent;padding:0 0 12px;cursor:pointer;
+  font-size:14.5px;color:var(--muted);font-family:inherit;font-weight:500}
+.tabs button.on{color:var(--ink);font-weight:700}
+.tabs button.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--brand);border-radius:2px}
+.tabs .cnt{font-size:12px;color:var(--faint);font-weight:400;margin-left:5px}
+
+/* ---------- 数据结构化区（安装块 / 配置片段） ---------- */
+.code-block{background:#0f172a;color:#e2e8f0;border-radius:var(--r-md);padding:14px 16px;
+  font-family:var(--mono);font-size:12.5px;line-height:1.7;overflow:auto;position:relative}
+.code-block .cmt{color:#64748b}
+.code-block .str{color:#7dd3fc}
+.code-head{display:flex;align-items:center;gap:10px;background:#f8fafc;border:1px solid var(--line);
+  border-bottom:0;border-radius:var(--r-md) var(--r-md) 0 0;padding:8px 12px}
+.code-head+.code-block{border-radius:0 0 var(--r-md) var(--r-md)}
+.copy{margin-left:auto}
+
+/* ---------- 表格（后台） ---------- */
+.table{width:100%;border-collapse:collapse;font-size:13.5px}
+.table th{text-align:left;font-weight:600;color:var(--muted);font-size:12.5px;
+  padding:10px 12px;background:var(--soft);border-bottom:1px solid var(--line);white-space:nowrap}
+.table td{padding:12px;border-bottom:1px solid var(--line-2);vertical-align:middle}
+.table tr:hover td{background:#fcfcfd}
+.table .row-actions{display:flex;gap:12px;font-size:13px}
+.link{color:var(--brand);cursor:pointer;font-weight:500}
+.link.danger{color:var(--danger)}
+
+/* ---------- 骨架 / 空态 ---------- */
+.sk{background:linear-gradient(90deg,#f1f5f9 25%,#e9eef5 37%,#f1f5f9 63%);
+  background-size:400% 100%;animation:sk 1.4s ease infinite;border-radius:8px}
+@keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+.empty{text-align:center;padding:56px 24px;border:1px dashed var(--line);border-radius:var(--r-card);background:var(--soft)}
+.empty .ic{width:44px;height:44px;border-radius:50%;background:#fff;border:1px solid var(--line);
+  margin:0 auto 14px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-size:20px}
+
+/* ---------- 栅格（对齐首页三栏：190 / 1fr / 264） ---------- */
+.shell{display:grid;grid-template-columns:190px minmax(0,1fr) 264px;gap:32px;padding:32px 0 72px}
+.shell>aside .sticky{position:sticky;top:88px}
+@media(max-width:1200px){.shell{grid-template-columns:180px minmax(0,1fr)}.shell>aside:last-child{display:none}}
+@media(max-width:900px){.shell{grid-template-columns:minmax(0,1fr)}.shell>aside:first-child{display:none}}
+
+/* ---------- 设计稿外壳（仅预览用） ---------- */
+.mock{background:#fff;min-height:100vh}
+.mock-note{position:fixed;right:18px;bottom:18px;z-index:50;background:#0f172a;color:#e2e8f0;
+  border-radius:10px;padding:8px 14px;font-size:12px;box-shadow:var(--sh-3)}
+.mock-note a{color:#7dd3fc}
+

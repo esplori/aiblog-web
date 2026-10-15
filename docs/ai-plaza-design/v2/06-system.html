@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>工作台 v2 · 06 设计系统与规范对照</title>
+<link rel="stylesheet" href="assets/shell.css" />
+<style>
+  .doc{padding:24px 0 60px}
+  .doc .wrap2{max-width:1180px;margin:0 auto;padding:0 20px}
+  .doc h1{font-size:22px}
+  .doc .lead{color:var(--muted);margin-top:8px;max-width:820px}
+  .sec{margin-top:32px;padding-top:22px;border-top:1px solid var(--line)}
+  .sec>h2{font-size:16px}
+  .sec>p{font-size:13px;color:var(--muted);margin:8px 0 16px;max-width:820px}
+  .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  @media(max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+  .sw{display:flex;flex-direction:column;gap:6px;font-size:11.5px;color:var(--muted)}
+  .sw i{display:block;height:34px;border-radius:8px;border:1px solid var(--line)}
+  .scale{display:flex;flex-direction:column;gap:8px}
+  .scale div{display:flex;align-items:center;gap:12px;font-size:12.5px}
+  .scale .bar{height:8px;background:var(--brand-200);border-radius:2px}
+  .demo-box{border:1px dashed var(--line-strong);border-radius:var(--r-card);padding:16px;background:var(--surface-2)}
+  .checklist{font-size:13px;display:flex;flex-direction:column;gap:9px}
+  .checklist div{display:flex;gap:9px;align-items:flex-start}
+  .checklist .c{color:var(--ok);font-weight:700;flex:none}
+  .rail-demo{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+  .mini-side{width:240px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:10px}
+  .mini-side.rail{width:64px}
+  .mini-side.rail .t{display:none}
+  .mini-side .it{display:flex;align-items:center;gap:9px;height:30px;padding:0 8px;border-radius:7px;font-size:13px;color:var(--ink-2)}
+  .mini-side .it.on{background:var(--brand-50);color:var(--brand);font-weight:600}
+  .mini-side.rail .it{justify-content:center;padding:0}
+</style>
+</head>
+<body>
+<div class="doc"><div class="wrap2">
+  <h1>设计系统 v2 与规范对照</h1>
+  <p class="lead">工作台版不是「换个皮」：它把首页从内容流变成了应用外壳，因此必须显式说明交互与无障碍基线。下面每一条都对着可验证的公开规范。</p>
+
+  <section class="sec">
+    <h2>1. 令牌：浅色 / 暗色双套</h2>
+    <p>暗色不是「反相」，而是独立的表面层级（bg → surface → surface-2 → surface-3）。品牌色与语义色在两个主题下都保持可辨识度。</p>
+    <div class="grid2">
+      <div class="demo-box">
+        <div style="font-weight:600;margin-bottom:12px">浅色（默认）</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div class="sw"><i style="background:#f7f8fa"></i>bg</div>
+          <div class="sw"><i style="background:#fff"></i>surface</div>
+          <div class="sw"><i style="background:#e6e8ec"></i>line</div>
+          <div class="sw"><i style="background:#2563eb"></i>brand</div>
+          <div class="sw"><i style="background:#0f1217"></i>ink</div>
+          <div class="sw"><i style="background:#6b7280"></i>muted</div>
+          <div class="sw"><i style="background:#b91c1c"></i>danger</div>
+          <div class="sw"><i style="background:#047857"></i>ok</div>
+        </div>
+      </div>
+      <div class="demo-box theme-dark" style="background:var(--bg);border-color:var(--line)">
+        <div style="font-weight:600;margin-bottom:12px;color:var(--ink)">暗色（data-theme="dark"）</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+          <div class="sw"><i style="background:#0b0d12"></i>bg</div>
+          <div class="sw"><i style="background:#111318"></i>surface</div>
+          <div class="sw"><i style="background:#242835"></i>line</div>
+          <div class="sw"><i style="background:#2563eb"></i>brand</div>
+          <div class="sw"><i style="background:#e9ebf1"></i>ink</div>
+          <div class="sw"><i style="background:#8d95a5"></i>muted</div>
+          <div class="sw"><i style="background:#f87171"></i>danger ↑</div>
+          <div class="sw"><i style="background:#34d399"></i>ok ↑</div>
+        </div>
+        <p style="font-size:11.5px;color:var(--muted);margin-top:10px">暗色下语义色需提亮，否则对比度跌破 4.5:1</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>2. 间距、圆角、字阶</h2>
+    <p>间距一律 8 的倍数（4/8/12/16/24/32）。圆角比 v1 更小：卡片 12、控件 8/6 —— 工作台的元素更密，大圆角会显得松散。</p>
+    <div class="grid2">
+      <div class="demo-box">
+        <div class="scale">
+          <div><span style="width:60px">4</span><span class="bar" style="width:4px"></span><span class="faint">图标与文字间隙</span></div>
+          <div><span style="width:60px">8</span><span class="bar" style="width:8px"></span><span class="faint">控件内边距</span></div>
+          <div><span style="width:60px">12</span><span class="bar" style="width:12px"></span><span class="faint">卡片内 gap</span></div>
+          <div><span style="width:60px">16</span><span class="bar" style="width:16px"></span><span class="faint">卡片内边距 / 网格间距</span></div>
+          <div><span style="width:60px">24</span><span class="bar" style="width:24px"></span><span class="faint">页面分区间距</span></div>
+          <div><span style="width:60px">32+</span><span class="bar" style="width:32px"></span><span class="faint">区块间距</span></div>
+        </div>
+      </div>
+      <div class="demo-box">
+        <div style="font-size:20px;font-weight:700">页面标题 20 / 700</div>
+        <div style="font-size:17px;font-weight:700;margin-top:10px">卡片标题 17 / 700</div>
+        <div style="font-size:14px;margin-top:10px">正文 14 / 1.6</div>
+        <div style="font-size:12.5px;color:var(--muted);margin-top:8px">辅助 12.5 / muted</div>
+        <div class="mono" style="margin-top:8px">等宽 12.5 · settings.json</div>
+        <p class="faint" style="font-size:11.5px;margin-top:12px">正文行高 1.6（工作台密度）／长文阅读页 1.95，两者不要混用</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>3. 侧边栏两态 + 容器查询</h2>
+    <p>宽屏 240px 展开，用户可折叠为 64px 图标轨；窄于 1024px 自动进入图标轨。模块内部的栅格用 <span class="mono">@container</span> 判断自身宽度，而不是看视口 —— 同一个卡片在「内容区窄」和「窗口窄」两种情况下的换行逻辑一致。</p>
+    <div class="rail-demo">
+      <div class="mini-side">
+        <div class="it on"><span aria-hidden="true">▤</span><span class="t">工作台</span></div>
+        <div class="it"><span aria-hidden="true">≡</span><span class="t">全部文章</span></div>
+        <div class="it"><span aria-hidden="true">✦</span><span class="t">AI 广场</span></div>
+        <div class="it"><span aria-hidden="true">▥</span><span class="t">清单</span></div>
+      </div>
+      <div class="mini-side rail">
+        <div class="it on"><span aria-hidden="true">▤</span></div>
+        <div class="it"><span aria-hidden="true">≡</span></div>
+        <div class="it"><span aria-hidden="true">✦</span></div>
+        <div class="it"><span aria-hidden="true">▥</span></div>
+      </div>
+      <div style="flex:1;min-width:260px" class="demo-box">
+        <div class="mono faint" style="font-size:11.5px">
+.container-type: inline-size;<br />
+@container content (max-width: 1080px) { .c3 { grid-column: span 6 } }
+        </div>
+        <p class="faint" style="font-size:11.5px;margin-top:10px">用容器查询而不是媒体查询，是因为模块内容区的可用宽度由「侧边栏状态 + 窗口」共同决定</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>4. 焦点、触控与状态可见性</h2>
+    <p>键盘可达是硬要求：所有可点元素必须能用 Tab 走到，焦点环用 <span class="mono">:focus-visible</span> 只在键盘操作时出现（鼠标点击不画环）。</p>
+    <div class="grid2">
+      <div class="demo-box">
+        <div style="font-weight:600;margin-bottom:10px">焦点环</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" style="outline:2px solid var(--brand);outline-offset:2px">获得焦点</button>
+          <button class="btn">普通</button>
+          <input class="btn" style="width:150px" placeholder="输入框焦点态" />
+        </div>
+        <p class="faint" style="font-size:11.5px;margin-top:10px">焦点环用品牌色 + 2px offset；深色底下也能看清（对比 ≥ 3:1）</p>
+      </div>
+      <div class="demo-box">
+        <div style="font-weight:600;margin-bottom:10px">触控目标 ≥ 44×44</div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button class="btn btn-ic" style="width:44px;height:44px" aria-label="收藏">☆</button>
+          <button class="btn btn-ic" style="width:44px;height:44px" aria-label="分享">⤴</button>
+          <span class="tag" style="padding:10px 14px">标签可点区放大</span>
+        </div>
+        <p class="faint" style="font-size:11.5px;margin-top:10px">WCAG 2.2 的下限是 24×24，移动端按 44 做</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>5. 规范对照清单</h2>
+    <p>下面每条都在工作台里有落点，实施时按此验收。</p>
+    <div class="grid2">
+      <div class="checklist">
+        <div><span class="c">✓</span><span><b>WCAG 2.2 §2.5.8</b> 触控目标 ≥ 24×24（移动端按 44 执行）</span></div>
+        <div><span class="c">✓</span><span><b>WCAG 2.2 §2.4.11</b> 焦点不被粘性顶栏遮挡 → 锚点滚动加 scroll-margin-top</span></div>
+        <div><span class="c">✓</span><span><b>WCAG 2.2 §1.4.3</b> 正文对比 ≥ 4.5:1，暗色下语义色提亮</span></div>
+        <div><span class="c">✓</span><span><b>WCAG 2.3.3</b> 尊重 prefers-reduced-motion，减弱动效时禁用过渡</span></div>
+        <div><span class="c">✓</span><span><b>WCAG 2.4.1</b> 每页首个可聚焦元素是「跳到主内容」</span></div>
+      </div>
+      <div class="checklist">
+        <div><span class="c">✓</span><span><b>ARIA APG</b> 顶部模块切换用 tabs 模式；⌘K 面板用 dialog + listbox，Esc 关闭、方向键选择</span></div>
+        <div><span class="c">✓</span><span><b>ARIA APG</b> 侧边栏折叠用 disclosure；当前项用 aria-current 而不是只靠颜色</span></div>
+        <div><span class="c">✓</span><span><b>Core Web Vitals</b> 交互响应看 INP：乐观更新 + 骨架屏，避免点击后整屏空白</span></div>
+        <div><span class="c">✓</span><span><b>现代 CSS</b> container queries / :has() / color-mix() / dvh / focus-visible</span></div>
+        <div><span class="c">✓</span><span><b>URL 即状态</b> 筛选与分页写进 query，可分享可回退；不用纯前端内存态</span></div>
+      </div>
+    </div>
+    <p class="faint" style="font-size:11.5px;margin-top:12px">
+      参考：WCAG 2.2 (w3.org/TR/WCAG22) · ARIA APG (w3.org/WAI/ARIA/apg) · MDN CSS Container Queries / :has() / color-mix() · web.dev INP
+    </p>
+  </section>
+
+  <section class="sec">
+    <h2>6. 工作台 vs 传统博客首页</h2>
+    <div class="table" style="border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden">
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:var(--surface-2)">
+          <th style="text-align:left;padding:10px 12px;font-size:11.5px;color:var(--faint)">维度</th>
+          <th style="text-align:left;padding:10px 12px;font-size:11.5px;color:var(--faint)">传统首页（v1 / 现状）</th>
+          <th style="text-align:left;padding:10px 12px;font-size:11.5px;color:var(--faint)">工作台（v2）</th>
+        </tr></thead>
+        <tbody style="font-size:13px">
+          <tr><td style="padding:10px 12px;border-top:1px solid var(--line)">首页目的</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">展示内容，给搜索引擎和陌生访客</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">回到站点继续干活，给自己和常来的人</td></tr>
+          <tr><td style="padding:10px 12px;border-top:1px solid var(--line)">信息密度</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">低（大图 + 大标题）</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">高（行式列表 + KPI + 待办）</td></tr>
+          <tr><td style="padding:10px 12px;border-top:1px solid var(--line)">模块切换</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">顶部导航跳页</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">侧边栏一级模块 + 模块内二级</td></tr>
+          <tr><td style="padding:10px 12px;border-top:1px solid var(--line)">SEO 风险</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">低</td>
+            <td style="padding:10px 12px;border-top:1px solid var(--line);color:var(--muted)">较高 → 必须保留 /articles、/post/xxx 的 SSR 与站内链接</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="faint" style="font-size:11.5px;margin-top:12px">这是本稿与 boss 最需要确认的一点：见 DESIGN-v2.md §6「SEO 与访客路径」</p>
+  </section>
+</div></div>
+<div class="note">工作台 v2 · 06 / 07 · <a href="index.html">总览</a></div>
+</body>
+</html>
+

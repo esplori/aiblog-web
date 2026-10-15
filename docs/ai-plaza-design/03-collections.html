@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI 广场 · 03 清单广场</title>
+<link rel="stylesheet" href="assets/tokens.css" />
+<style>
+  .cl-hero{background:linear-gradient(180deg,#f8fbff,#fff);border-bottom:1px solid var(--line);padding:30px 0 26px}
+  .cl-hero h1{font-size:25px;letter-spacing:-.4px}
+  .cl-hero p{color:var(--muted);margin-top:8px;max-width:620px}
+  .cl-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding:28px 0 72px}
+  @media(max-width:1080px){.cl-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media(max-width:720px){.cl-grid{grid-template-columns:minmax(0,1fr)}}
+  .cl{padding:0;overflow:hidden;display:flex;flex-direction:column;cursor:pointer}
+  .cl .cover{height:104px;background:linear-gradient(135deg,#eff6ff,#e0e7ff);position:relative;
+    display:flex;align-items:flex-end;padding:12px 16px;gap:6px}
+  .cl .cover .mini{width:30px;height:30px;border-radius:8px;background:#fff;box-shadow:var(--sh-1);
+    display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--brand)}
+  .cl .bd{padding:16px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .cl h3{font-size:15.5px}
+  .cl p{font-size:13px;color:var(--muted);line-height:1.65;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:42px}
+  .cl .foot{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--faint);margin-top:auto;
+    border-top:1px solid var(--line-2);padding-top:11px;font-variant-numeric:tabular-nums}
+  .cl .foot .av{width:22px;height:22px;border-radius:50%;background:var(--brand-100);color:var(--brand);
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+  .cl .foot .btn{margin-left:auto}
+  .featured{grid-column:span 2;flex-direction:row}
+  @media(max-width:1080px){.featured{grid-column:span 2;flex-direction:column}}
+  .featured .cover{width:220px;height:auto;flex:none;align-items:center;justify-content:center;padding:0}
+  .featured .cover .big{font-size:44px;opacity:.5;font-weight:700;color:var(--brand)}
+  @media(max-width:1080px){.featured .cover{width:auto;height:96px}}
+</style>
+</head>
+<body class="mock">
+<header class="site-header"><div class="container inner">
+  <div style="display:flex;align-items:center;gap:32px">
+    <span class="logo">Pylox</span>
+    <nav class="nav"><a href="#">首页</a><a href="#">文章</a><a href="01-plaza.html">AI 广场</a><a href="#" class="active">清单</a></nav>
+  </div>
+  <div class="nav-right"><span style="color:var(--faint);font-size:16px">⌕</span><button class="btn btn-primary">登录</button></div>
+</div></header>
+
+<section class="cl-hero"><div class="container">
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap">
+    <div>
+      <h1>清单</h1>
+      <p>别人把一套能跑起来的组合打包好了：几个 MCP + 几个 Skill，加上配置与踩坑备注。整包可以一键导出到你自己的客户端。</p>
+    </div>
+    <button class="btn btn-lg btn-primary">＋ 创建我的清单</button>
+  </div>
+</div></section>
+
+<div class="container"><div class="cl-grid">
+
+  <article class="card cl featured">
+    <div class="cover"><span class="big">27</span></div>
+    <div class="bd" style="padding:20px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="badge badge-plain" style="background:var(--brand-50);color:var(--brand);border-color:var(--brand-200)">编辑精选</span>
+        <span class="badge badge-plain">27 个条目</span>
+      </div>
+      <h3 style="font-size:18px">前端工程师的 AI 工作台</h3>
+      <p style="min-height:0;-webkit-line-clamp:3">从改一行样式到提 PR 的完整闭环：浏览器自检（playwright）、最新文档（context7）、规范评审（code-review）、截图归档（filesystem + MinIO）。附一份经过验证的 pi 配置，导入即用。</p>
+      <div class="foot" style="margin-top:14px">
+        <span class="av">m</span><span>moss</span><span>★ 312</span><span>复制 148 次</span><span>更新 2 天前</span>
+        <button class="btn btn-sm btn-primary">导出整包</button>
+      </div>
+    </div>
+  </article>
+
+  <article class="card cl">
+    <div class="cover"><span class="mini">P</span><span class="mini">FS</span><span class="mini">C7</span></div>
+    <div class="bd">
+      <h3>私有仓库离线问答</h3>
+      <p>本地模型 + 只读 SQL + 文件系统 MCP，代码不出内网，适合合规敏感的项目。</p>
+      <div class="foot"><span class="av">泽</span><span>阿泽</span><span>9 个</span><span>★ 96</span></div>
+    </div>
+  </article>
+
+  <article class="card cl">
+    <div class="cover" style="background:linear-gradient(135deg,#f5f3ff,#ede9fe)"><span class="mini">ST</span><span class="mini">CR</span><span class="mini">GH</span></div>
+    <div class="bd">
+      <h3>长任务拆解模式</h3>
+      <p>sequential-thinking 打底，配 GitHub issue 助手，把「大需求」拆成能逐个验收的小步。</p>
+      <div class="foot"><span class="av">k</span><span>kite</span><span>6 个</span><span>★ 74</span></div>
+    </div>
+  </article>
+
+  <article class="card cl">
+    <div class="cover" style="background:linear-gradient(135deg,#ecfeff,#cffafe)"><span class="mini">SS</span><span class="mini">BD</span></div>
+    <div class="bd">
+      <h3>内容运营流水线</h3>
+      <p>选题 → 出稿 → 配图 → 多平台分发，含封面生成与标题候选提示词。</p>
+      <div class="foot"><span class="av">l</span><span>lin</span><span>8 个</span><span>★ 61</span></div>
+    </div>
+  </article>
+
+  <article class="card cl">
+    <div class="cover" style="background:linear-gradient(135deg,#fffbeb,#fef3c7)"><span class="mini">PDF</span><span class="mini">PG</span></div>
+    <div class="bd">
+      <h3>研究报告精读器</h3>
+      <p>PDF 结构化抽取 + 只读库对比，把百页研报压成一张可追溯的表。</p>
+      <div class="foot"><span class="av">匿</span><span>匿名用户</span><span>5 个</span><span>★ 43</span></div>
+    </div>
+  </article>
+
+  <article class="card cl" style="border-style:dashed;background:var(--soft);align-items:center;justify-content:center;min-height:220px">
+    <div style="text-align:center;padding:32px">
+      <div style="font-size:26px;color:var(--faint);margin-bottom:10px">＋</div>
+      <div style="font-weight:600">创建我的清单</div>
+      <p class="faint" style="font-size:12.5px;margin-top:6px">把你在用的组合公开出来，别人可以直接导入</p>
+    </div>
+  </article>
+
+</div></div>
+<div class="mock-note">设计稿 03 / 07 · <a href="index.html">返回总览</a></div>
+</body>
+</html>
+
