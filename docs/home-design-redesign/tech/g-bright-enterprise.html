@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 G · 明亮企业级</title>
+<style>
+  :root{
+    --brand:#4f46e5; --brand2:#7c3aed; --pink:#ec4899;
+    --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --soft:#f8fafc;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;color:var(--ink);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.6;overflow-x:hidden}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* 顶部渐变光带 */
+  .aurora{position:absolute;top:-260px;left:50%;transform:translateX(-50%);width:1200px;height:600px;z-index:0;
+    background:radial-gradient(closest-side,rgba(99,102,241,.20),transparent 70%),
+               radial-gradient(closest-side at 25% 60%,rgba(236,72,153,.16),transparent 70%),
+               radial-gradient(closest-side at 75% 60%,rgba(59,130,246,.18),transparent 70%);
+    filter:blur(20px)}
+  section,nav,header,footer{position:relative;z-index:1}
+
+  nav{padding:18px 0}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:18px;letter-spacing:-.3px}
+  .logo .mark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--brand),var(--pink))}
+  .menu{display:flex;gap:30px;font-size:15px;color:var(--muted);font-weight:500}
+  .menu span{cursor:pointer}.menu span:hover{color:var(--ink)}
+  .nav-cta{display:flex;gap:10px;align-items:center}
+  .link{font-size:15px;font-weight:600;color:var(--ink);cursor:pointer;padding:8px 12px}
+  .btn{font-size:15px;font-weight:600;padding:10px 22px;border-radius:8px;cursor:pointer;color:#fff;
+    background:var(--brand);box-shadow:0 2px 8px rgba(79,70,229,.3);transition:.2s}
+  .btn:hover{background:#4338ca;transform:translateY(-1px)}
+
+  /* Hero */
+  .hero{text-align:center;padding:80px 0 50px}
+  .pill{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--brand);font-weight:600;
+    background:#eef2ff;padding:7px 18px;border-radius:999px;margin-bottom:26px}
+  .hero h1{font-size:62px;line-height:1.08;font-weight:800;letter-spacing:-2px;max-width:920px;margin:0 auto}
+  .hero h1 .grad{background:linear-gradient(120deg,var(--brand),var(--pink));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero p{font-size:19px;color:var(--muted);max-width:620px;margin:24px auto 34px}
+  .hero-cta{display:flex;gap:14px;justify-content:center;align-items:center}
+  .btn-lg{font-size:16px;padding:15px 32px;border-radius:10px}
+  .btn-line{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+  .btn-line:hover{background:var(--soft);transform:none}
+
+  /* 产品卡片 */
+  .shot{max-width:1000px;margin:64px auto 0;border-radius:18px;background:#fff;
+    border:1px solid var(--line);box-shadow:0 30px 70px -25px rgba(15,23,42,.25);overflow:hidden}
+  .shot-top{display:flex;gap:6px;padding:14px 18px;border-bottom:1px solid var(--line);background:var(--soft)}
+  .shot-top i{width:10px;height:10px;border-radius:50%;background:#cfd8e6}
+  .shot-body{padding:26px;display:grid;grid-template-columns:1.6fr 1fr;gap:20px;height:290px}
+  .shot-left{border:1px solid var(--line);border-radius:10px;padding:18px;display:flex;flex-direction:column;gap:12px}
+  .bar{height:10px;border-radius:5px;background:#eef1f6}
+  .bar.b1{width:70%}.bar.b2{width:45%}.bar.b3{width:85%}.bar.b4{width:55%}
+  .shot-chart{margin-top:auto;height:100px;border-radius:8px;background:linear-gradient(180deg,#eef2ff,#fff);border:1px solid var(--line);position:relative;overflow:hidden}
+  .shot-chart::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(79,70,229,.18));
+    clip-path:polygon(0 80%,15% 55%,30% 68%,45% 32%,60% 50%,75% 20%,90% 42%,100% 22%,100% 100%,0 100%)}
+  .shot-right{border:1px solid var(--line);border-radius:10px;padding:18px;background:var(--soft);display:flex;flex-direction:column;gap:14px}
+  .statcard{background:#fff;border:1px solid var(--line);border-radius:8px;padding:12px}
+  .statcard span{font-size:12px;color:var(--muted)}
+  .statcard b{font-size:20px;color:var(--brand);display:block;margin-top:2px}
+
+  /* 客户 logo */
+  .clients{padding:70px 0 40px;text-align:center}
+  .clients .lab{font-size:13px;color:var(--muted);letter-spacing:1.5px;margin-bottom:28px;font-weight:600}
+  .clients .row{display:flex;justify-content:center;gap:52px;flex-wrap:wrap;color:#94a3b8;font-size:20px;font-weight:800;letter-spacing:.5px}
+
+  /* 数据条 */
+  .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin:30px 0 90px}
+  .num{text-align:center;padding:28px;border-radius:14px;background:var(--soft);border:1px solid var(--line)}
+  .num b{font-size:36px;font-weight:800;color:var(--ink);display:block;letter-spacing:-1px}
+  .num b em{font-style:normal;color:var(--brand)}
+  .num span{font-size:14px;color:var(--muted)}
+
+  /* 功能 */
+  .head{text-align:center;margin-bottom:48px}
+  .head h2{font-size:40px;font-weight:800;letter-spacing:-1.2px}
+  .head p{color:var(--muted);margin-top:12px;font-size:17px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-bottom:90px}
+  .card{border:1px solid var(--line);border-radius:16px;padding:30px;transition:.2s;background:#fff}
+  .card:hover{box-shadow:0 20px 40px -20px rgba(15,23,42,.2);transform:translateY(-4px);border-color:#c7d2fe}
+  .card .ico{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+    font-size:21px;margin-bottom:18px;background:linear-gradient(135deg,#eef2ff,#fce7f3)}
+  .card h3{font-size:19px;font-weight:700;margin-bottom:9px}
+  .card p{font-size:15px;color:var(--muted)}
+
+  /* 客户评价 */
+  .quote{background:var(--soft);border:1px solid var(--line);border-radius:20px;padding:52px;text-align:center;margin-bottom:90px}
+  .quote p{font-size:24px;line-height:1.5;font-weight:600;max-width:800px;margin:0 auto 24px;letter-spacing:-.3px}
+  .quote .who{display:flex;align-items:center;justify-content:center;gap:12px;color:var(--muted);font-size:14px}
+  .quote .av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--pink))}
+
+  /* CTA */
+  .cta{text-align:center;border-radius:22px;padding:72px 40px;margin-bottom:90px;color:#fff;
+    background:linear-gradient(120deg,var(--brand),var(--brand2) 60%,var(--pink))}
+  .cta h2{font-size:42px;font-weight:800;letter-spacing:-1.2px;margin-bottom:16px}
+  .cta p{opacity:.9;margin-bottom:30px;font-size:17px}
+  .cta .btn{background:#fff;color:var(--brand)}
+  .cta .btn:hover{background:#f1f5f9}
+
+  footer{border-top:1px solid var(--line);padding:44px 0;color:var(--muted);font-size:14px}
+  .foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:20px}
+
+  @media(max-width:900px){
+    .menu,.nav-cta .link{display:none}
+    .hero h1{font-size:38px}
+    .nums{grid-template-columns:repeat(2,1fr)}
+    .cards{grid-template-columns:1fr}
+    .shot-body{grid-template-columns:1fr;height:auto}
+    .shot-right{display:none}
+    .quote p{font-size:19px}
+  }
+</style>
+</head>
+<body>
+<div class="aurora"></div>
+
+<nav><div class="wrap"><div class="nav-inner">
+  <div class="logo"><span class="mark"></span> Cloudbase</div>
+  <div class="menu"><span>产品</span><span>解决方案</span><span>客户案例</span><span>文档</span><span>定价</span></div>
+  <div class="nav-cta"><span class="link">登录</span><span class="btn">免费开始</span></div>
+</div></div></nav>
+
+<header><div class="wrap">
+  <div class="hero">
+    <div class="pill">🎉 新一代企业云平台 · 已服务 5000+ 团队</div>
+    <h1>让每个团队都能<span class="grad">更快地交付</span>软件</h1>
+    <p>一体化开发、部署与运维平台。从第一行代码到生产环境，全程自动化，安全可控。</p>
+    <div class="hero-cta">
+      <span class="btn btn-lg">立即免费试用</span>
+      <span class="btn btn-lg btn-line">观看演示 →</span>
+    </div>
+    <div class="shot">
+      <div class="shot-top"><i></i><i></i><i></i></div>
+      <div class="shot-body">
+        <div class="shot-left">
+          <div class="bar b1"></div><div class="bar b3"></div>
+          <div class="bar b2"></div><div class="bar b4"></div>
+          <div class="shot-chart"></div>
+        </div>
+        <div class="shot-right">
+          <div class="statcard"><span>本月构建</span><b>12,480</b></div>
+          <div class="statcard"><span>成功率</span><b>99.8%</b></div>
+          <div class="statcard"><span>平均耗时</span><b>2m 13s</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div></header>
+
+<section class="clients"><div class="wrap">
+  <div class="lab">已有 5,000+ 团队在使用</div>
+  <div class="row"><span>Stripe</span><span>Shopify</span><span>Figma</span><span>Notion</span><span>Linear</span><span>Vercel</span></div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="nums">
+    <div class="num"><b>5000<em>+</em></b><span>企业客户</span></div>
+    <div class="num"><b>99.99<em>%</em></b><span>服务可用性</span></div>
+    <div class="num"><b>70<em>%</em></b><span>交付提速</span></div>
+    <div class="num"><b>24<em>/7</em></b><span>技术支持</span></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="head"><h2>企业级能力，开箱即用</h2><p>为规模化团队设计，安全、稳定、可扩展</p></div>
+  <div class="cards">
+    <div class="card"><div class="ico">🚀</div><h3>一键部署</h3><p>提交即上线，自动灰度发布与回滚。</p></div>
+    <div class="card"><div class="ico">🛡️</div><h3>安全合规</h3><p>通过 SOC2、ISO 27001 与等保三级认证。</p></div>
+    <div class="card"><div class="ico">📈</div><h3>弹性伸缩</h3><p>按流量自动扩缩容，成本透明可控。</p></div>
+    <div class="card"><div class="ico">🔗</div><h3>无缝集成</h3><p>GitHub、GitLab、Jenkins 开箱即连。</p></div>
+    <div class="card"><div class="ico">🌍</div><h3>多区域部署</h3><p>覆盖全球 20+ 数据中心，就近访问。</p></div>
+    <div class="card"><div class="ico">💬</div><h3>专属支持</h3><p>企业版配备专属技术客户经理。</p></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="quote">
+    <p>"迁移到 Cloudbase 后，我们的发布频率提升了 4 倍，而运维人力反而减半。"</p>
+    <div class="who"><span class="av"></span> 张伟 · 某头部电商平台 技术负责人</div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="cta">
+    <h2>加入 5,000+ 高效团队</h2>
+    <p>14 天全功能免费试用，无需信用卡。</p>
+    <span class="btn btn-lg">免费开始使用</span>
+  </div>
+</div></section>
+
+<footer><div class="wrap"><div class="foot">
+  <div>© 2026 Cloudbase Inc. 保留所有权利</div>
+  <div>隐私政策 · 服务条款 · 安全 · 联系我们</div>
+</div></div></footer>
+</body>
+</html>

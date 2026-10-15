@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 N · 侧边锚定</title>
+<style>
+  :root{ --brand:#2563eb; --brand2:#7c3aed; --ink:#0f172a; --muted:#64748b; --line:#e8ebf0; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;color:var(--ink);line-height:1.65;
+       font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+  .shell{max-width:1180px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:272px 1fr;gap:52px}
+
+  /* 左栏 sticky */
+  aside{position:sticky;top:0;align-self:start;height:100vh;padding:34px 0;display:flex;flex-direction:column;
+        border-right:1px solid var(--line);padding-right:40px;margin-right:-4px}
+  .logo{display:flex;align-items:center;gap:10px;font-size:19px;font-weight:800;letter-spacing:-.3px}
+  .logo i{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:block}
+  .bio{margin-top:20px;font-size:14px;color:var(--muted);line-height:1.7}
+  .bio b{color:var(--ink)}
+  .nav-l{margin-top:30px;display:flex;flex-direction:column;gap:2px}
+  .nav-l a{font-size:14.5px;color:#475569;padding:7px 0;display:flex;justify-content:space-between;align-items:center;
+           transition:color .2s,transform .2s}
+  .nav-l a:hover{color:var(--brand);transform:translateX(3px)}
+  .nav-l a.on{color:var(--ink);font-weight:700}
+  .nav-l a u{text-decoration:none;font-size:12px;color:#a3aab6}
+  .side-h{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#a3aab6;font-weight:700;margin:30px 0 12px}
+  .tags{display:flex;flex-wrap:wrap;gap:7px}
+  .tags span{font-size:12px;color:#475569;background:#f1f5f9;padding:4px 10px;border-radius:7px;transition:.2s}
+  .tags span:hover{background:#e0e7ff;color:var(--brand)}
+  .cta{margin-top:auto;background:linear-gradient(135deg,#1e3a8a,#2563eb);border-radius:14px;padding:18px;color:#fff}
+  .cta b{font-size:14.5px;display:block}
+  .cta p{font-size:12.5px;opacity:.82;margin-top:5px;line-height:1.6}
+  .cta a{display:inline-block;margin-top:12px;background:#fff;color:var(--brand);font-size:13px;font-weight:700;
+         padding:7px 14px;border-radius:8px}
+
+  /* 右栏内容 */
+  main{padding:40px 0 60px;min-width:0}
+  .kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);font-weight:700}
+  .hero h1{margin-top:16px;font-size:40px;line-height:1.2;font-weight:800;letter-spacing:-1.4px;max-width:640px}
+  .hero p{margin-top:14px;color:var(--muted);font-size:16px;max-width:600px}
+  .hero .st{margin-top:20px;font-size:13px;color:#94a3b8;display:flex;gap:20px;flex-wrap:wrap}
+  .hero .st b{color:var(--ink)}
+
+  .head{display:flex;align-items:baseline;justify-content:space-between;margin:40px 0 20px;
+        border-top:1px solid var(--line);padding-top:26px}
+  .head h2{font-size:15px;font-weight:800;letter-spacing:-.2px}
+  .head a{font-size:13px;color:var(--brand);font-weight:600}
+
+  /* 头条卡 */
+  .lead{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:16px;overflow:hidden;
+        transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s,border-color .3s}
+  .lead:hover{transform:translateY(-4px);box-shadow:0 26px 48px -28px rgba(15,23,42,.3);border-color:#c7d2fe}
+  .lead .cov{background:linear-gradient(135deg,#2563eb,#7c3aed);position:relative;min-height:210px}
+  .lead .cov::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 25% 20%,rgba(255,255,255,.32),transparent 46%),
+               radial-gradient(circle at 82% 88%,rgba(255,255,255,.18),transparent 46%)}
+  .lead .tx{padding:26px;display:flex;flex-direction:column;justify-content:center}
+  .lead .cat{font-size:11.5px;font-weight:700;color:var(--brand)}
+  .lead h3{margin-top:10px;font-size:21px;line-height:1.4;font-weight:800;letter-spacing:-.4px}
+  .lead:hover h3{color:var(--brand)}
+  .lead p{margin-top:10px;font-size:14px;color:var(--muted)}
+  .lead .m{margin-top:14px;font-size:12.5px;color:#94a3b8}
+
+  /* 精选网格 */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .gc{border:1px solid var(--line);border-radius:14px;padding:19px;transition:transform .28s cubic-bezier(.2,.7,.3,1),box-shadow .28s,border-color .28s}
+  .gc:hover{transform:translateY(-4px);box-shadow:0 20px 38px -24px rgba(15,23,42,.28);border-color:#c7d2fe}
+  .gc .cat{font-size:11.5px;font-weight:700;color:var(--brand)}
+  .gc h3{margin-top:9px;font-size:16px;line-height:1.45;font-weight:700;letter-spacing:-.2px}
+  .gc:hover h3{color:var(--brand)}
+  .gc .m{margin-top:12px;font-size:12px;color:#94a3b8}
+
+  /* 列表 */
+  .rl{display:flex;align-items:baseline;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+  .rl .n{font-size:12px;color:#c8ccd2;width:22px;flex:none;font-variant-numeric:tabular-nums}
+  .rl h3{font-size:16px;font-weight:600;flex:1}
+  .rl:hover h3{color:var(--brand)}
+  .rl .d{font-size:12.5px;color:#94a3b8;flex:none}
+
+  @media(max-width:940px){
+    .shell{grid-template-columns:1fr;gap:0}
+    aside{position:static;height:auto;border-right:0;padding-right:0;margin-right:0;padding-bottom:20px;
+          border-bottom:1px solid var(--line)}
+    .cta{display:none}
+    .hero h1{font-size:29px}
+    .lead{grid-template-columns:1fr}
+    .lead .cov{min-height:130px}
+    .grid2{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <!-- 左栏锚定 -->
+  <aside>
+    <a href="#" class="logo"><i></i>Pylox</a>
+    <div class="bio"><b>AI 驱动的现代化博客系统。</b><br>写 AI Agent、前端工程，也写生活与随想。</div>
+
+    <div class="nav-l">
+      <a href="#" class="on">全部文章 <u>567</u></a>
+      <a href="#">技术 <u>12</u></a>
+      <a href="#">生活 <u>5</u></a>
+      <a href="#">随想 <u>0</u></a>
+      <a href="#">实事 <u>0</u></a>
+    </div>
+
+    <div class="side-h">热门标签</div>
+    <div class="tags">
+      <span>Redis</span><span>前端</span><span>Python</span><span>AI 辅助编程</span><span>MySQL</span>
+    </div>
+
+    <div class="cta">
+      <b>订阅更新</b>
+      <p>新文章发布时第一时间收到。</p>
+      <a href="#">立即订阅</a>
+    </div>
+  </aside>
+
+  <!-- 右栏内容 -->
+  <main>
+    <div class="hero">
+      <div class="kicker">AI · 技术 · 思考</div>
+      <h1>分享技术、生活与思考的 AI 内容平台</h1>
+      <p>聚焦 AI Agent、前端工程与个人成长，持续记录一线实践与深度思考。</p>
+      <div class="st"><span><b>567</b> 篇文章</span><span><b>4</b> 个分类</span><span>最近更新 2026-09-14</span></div>
+    </div>
+
+    <div class="head"><h2>本期头条</h2><a href="#">查看全部 →</a></div>
+    <a href="#" class="lead">
+      <div class="cov"></div>
+      <div class="tx">
+        <div class="cat">技术</div>
+        <h3>2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</h3>
+        <p>从单体 Agent 到多智能体协作，编排层正在成为新的技术分水岭。</p>
+        <div class="m">2026-08-30 · 128 次阅读</div>
+      </div>
+    </a>
+
+    <div class="head"><h2>精选</h2></div>
+    <div class="grid2">
+      <a href="#" class="gc"><div class="cat">技术</div><h3>智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</h3><div class="m">08-30 · 103 阅读</div></a>
+      <a href="#" class="gc"><div class="cat">技术</div><h3>2026 年 AI Agent 研究综述：从自主智能体到多智能体系统的范式转变</h3><div class="m">09-04 · 54 阅读</div></a>
+      <a href="#" class="gc"><div class="cat">技术</div><h3>2026 年 Agent 评估基准与安全对齐：前沿方法、挑战与趋势</h3><div class="m">08-30 · 52 阅读</div></a>
+      <a href="#" class="gc"><div class="cat">生活</div><h3>关于比亚迪 DM-i 车型的几点疑问</h3><div class="m">09-08 · 38 阅读</div></a>
+    </div>
+
+    <div class="head"><h2>全部文章</h2></div>
+    <a href="#" class="rl"><span class="n">01</span><h3>如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</h3><span class="d">09-14</span></a>
+    <a href="#" class="rl"><span class="n">02</span><h3>2026 年，AI Agent 到底活成了什么样？</h3><span class="d">08-28</span></a>
+    <a href="#" class="rl"><span class="n">03</span><h3>如果你失业了你怎么办</h3><span class="d">08-27</span></a>
+    <a href="#" class="rl"><span class="n">04</span><h3>2026 年 agent 最新架构探索</h3><span class="d">08-27</span></a>
+    <a href="#" class="rl"><span class="n">05</span><h3>Nuxt 3 服务端渲染最佳实践</h3><span class="d">08-24</span></a>
+  </main>
+</div>
+
+</body>
+</html>

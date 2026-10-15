@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>博客首页改造 · 4 个方案预览</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#eef1f5;font-family:system-ui,-apple-system,"PingFang SC",sans-serif;color:#111827}
+  .head{max-width:1240px;margin:0 auto;padding:40px 24px 8px}
+  .head h1{margin:0 0 8px;font-size:28px}
+  .head p{margin:0;color:#6b7280;line-height:1.7}
+  .grid{max-width:1240px;margin:0 auto;padding:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:28px}
+  .frame{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 10px 30px rgba(17,24,39,.1);display:flex;flex-direction:column}
+  .frame .bar{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #e5e7eb}
+  .frame .bar b{font-size:15px}
+  .frame .bar small{color:#9ca3af;font-size:12px}
+  .frame .bar a{margin-left:auto;font-size:12px;color:#2563eb;text-decoration:none;border:1px solid #dbeafe;padding:5px 12px;border-radius:999px}
+  .frame iframe{width:100%;height:620px;border:0;background:#fff}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>博客首页改造 · 4 个方向</h1>
+    <p>同一批内容（真实站点素材），四种不同的版面语言。每个都能直接点击查看完整页面，也可单独打开、拖到手机宽度看响应式。</p>
+  </div>
+  <div class="grid">
+    <div class="frame">
+      <div class="bar"><b>A · 杂志分栏</b><small>左内容 + 右侧栏，衬线大标题</small><a href="style-a-magazine.html" target="_blank">单独打开 ↗</a></div>
+      <iframe src="style-a-magazine.html"></iframe>
+    </div>
+    <div class="frame">
+      <div class="bar"><b>B · 暗色编辑部</b><small>深色底 + 霓虹品牌色，沉浸感</small><a href="style-b-dark.html" target="_blank">单独打开 ↗</a></div>
+      <iframe src="style-b-dark.html"></iframe>
+    </div>
+    <div class="frame">
+      <div class="bar"><b>C · 分类色块流</b><small>分类配色 + 色条卡片，内容站感</small><a href="style-c-colorblocks.html" target="_blank">单独打开 ↗</a></div>
+      <iframe src="style-c-colorblocks.html"></iframe>
+    </div>
+    <div class="frame">
+      <div class="bar"><b>D · 瑞士极简大字</b><small>编号目录式，靠排版不靠图片</small><a href="style-d-typographic.html" target="_blank">单独打开 ↗</a></div>
+      <iframe src="style-d-typographic.html"></iframe>
+    </div>
+  </div>
+</body>
+</html>

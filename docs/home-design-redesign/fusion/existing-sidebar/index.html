@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>现有博客首页 + 侧栏 · A/B/C</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d0f13;color:#e8eaf0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       padding:44px 26px 60px}
+  .wrap{max-width:1500px;margin:0 auto}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:#8b90a0;margin-top:10px;font-size:15px;line-height:1.75}
+  .sub b{color:#e8eaf0}
+
+  .cur{margin-top:26px;background:#15181f;border:1px solid #2a2f3b;border-radius:16px;overflow:hidden}
+  .cur .bar{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid #242833}
+  .cur .bar b{font-size:14.5px}
+  .cur .bar span{font-size:12.5px;color:#8b90a0;flex:1}
+  .cur .bar a{font-size:12.5px;color:#7c9cff;text-decoration:none;font-weight:600}
+  .cur iframe{width:100%;height:420px;border:0;background:#fff;display:block}
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:26px}
+  .cell{background:#15181f;border:1px solid #242833;border-radius:16px;overflow:hidden;transition:.22s}
+  .cell:hover{border-color:#3b6ef5;transform:translateY(-3px)}
+  .cell .top{padding:16px 18px 13px;border-bottom:1px solid #242833;min-height:142px}
+  .cell .top b{font-size:15.5px;display:block}
+  .cell .top .tag{font-size:12.5px;color:#8b90a0;margin-top:6px;line-height:1.55}
+  .cell .top a{display:inline-block;margin-top:10px;font-size:13px;color:#7c9cff;text-decoration:none;font-weight:600}
+  .cell .top a:hover{text-decoration:underline}
+  .cell .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .cell .meta i{font-size:11.5px;font-style:normal;color:#9aa0ae;background:#1e222c;border:1px solid #2a2f3b;
+                padding:3px 9px;border-radius:6px}
+  iframe.demo{width:100%;height:640px;border:0;background:#fff;display:block}
+  .legend{margin-top:30px;font-size:13.5px;color:#8b90a0;line-height:2;border-top:1px solid #242833;padding-top:22px}
+  .legend b{color:#e8eaf0}
+  @media(max-width:1180px){ .grid{grid-template-columns:1fr} iframe.demo{height:580px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>现有博客首页 + 侧栏 · A / B / C</h1>
+  <div class="sub">
+    基于<b>当前线上首页</b>改造（容器 1200px、品牌色 #2563eb、智能 Poster 封面），只做一件事：<b>加侧栏</b>。<br>
+    现状结构 = Hero 大卡 → 精选 2 列 → 底部三栏（分类 / 热门标签 / 关于）。<b>底部那三栏本来就是侧栏的内容，只是横放在了页脚。</b>
+  </div>
+
+  <div class="cur">
+    <div class="bar">
+      <b>改造前 · 现状</b>
+      <span>Hero 全宽 + 精选 2 列 + 底部三栏。往下滚能看到三栏被压在页脚，要滑到底才看得到。</span>
+      <a href="current.html" target="_blank">新窗口打开 ↗</a>
+    </div>
+    <iframe src="current.html" loading="lazy"></iframe>
+  </div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="top">
+        <b>A · 右侧栏</b>
+        <div class="tag">改动最小。<b>Hero 保持全宽不变</b>，精选区改成「左内容 + 右 300px 侧栏」，把底部三栏竖过来搬上来并 sticky 跟随。页脚三栏删除。</div>
+        <div class="meta"><i>单右侧栏</i><i>Hero 不动</i><i>推荐首选</i></div>
+        <a href="a-right.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe class="demo" src="a-right.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>B · 左侧栏</b>
+        <div class="tag">分类导航常驻左侧（含站点简介卡），Hero 与精选整体右移进内容区。适合栏目多、想强化分类浏览。</div>
+        <div class="meta"><i>单左侧栏</i><i>导航常驻</i><i>内容右移</i></div>
+        <a href="b-left.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe class="demo" src="b-left.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>C · 双侧栏</b>
+        <div class="tag">左导航 + 右信息（关于/统计/订阅）夹击，<b>Hero 被收进中栏</b>，不再全宽。信息密度最高，像门户。</div>
+        <div class="meta"><i>左右双侧栏</i><i>Hero 收窄</i><i>信息密度高</i></div>
+        <a href="c-both.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe class="demo" src="c-both.html" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>三案对比一句话：</b>A 只加右边、Hero 不动（改动最小）；B 只加左边、强化分类导航；C 两边都加、Hero 让位（信息最多）。<br>
+    <b>共同点：</b>侧栏都 sticky 跟随；宽度收缩到 960/860px 以下自动变单栏（侧栏落到内容上方）。<br>
+    <b>改动量：</b>A 只需在 BlogHome.vue 加一层 grid + 把页脚三栏移到侧栏；B 需要调整整页栅格；C 改动最大。
+  </div>
+</div>
+</body>
+</html>

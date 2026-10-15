@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>对话布局 + 侧栏 · D/E/F</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d0f13;color:#e8eaf0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       padding:44px 26px 60px}
+  .head{max-width:1500px;margin:0 auto 26px}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:#8b90a0;margin-top:10px;font-size:15px;line-height:1.7}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1500px;margin:0 auto}
+  .cell{background:#15181f;border:1px solid #242833;border-radius:16px;overflow:hidden;transition:.22s}
+  .cell:hover{border-color:#3b6ef5;transform:translateY(-3px)}
+  .cell .top{padding:16px 18px 13px;border-bottom:1px solid #242833;min-height:136px}
+  .cell .top b{font-size:15.5px;display:block}
+  .cell .top .tag{font-size:12.5px;color:#8b90a0;margin-top:6px;line-height:1.55}
+  .cell .top a{display:inline-block;margin-top:10px;font-size:13px;color:#7c9cff;text-decoration:none;font-weight:600}
+  .cell .top a:hover{text-decoration:underline}
+  .cell .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .cell .meta i{font-size:11.5px;font-style:normal;color:#9aa0ae;background:#1e222c;border:1px solid #2a2f3b;
+                padding:3px 9px;border-radius:6px}
+  iframe{width:100%;height:620px;border:0;background:#fff;display:block}
+  .legend{max-width:1500px;margin:30px auto 0;font-size:13.5px;color:#8b90a0;line-height:2;
+          border-top:1px solid #242833;padding-top:22px}
+  .legend b{color:#e8eaf0}
+  @media(max-width:1180px){ .grid{grid-template-columns:1fr} iframe{height:560px} }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>对话布局 + 侧栏 · D / E / F</h1>
+    <div class="sub">在 ChatGPT 式布局上再叠一个右侧栏。对应三种真实产品形态：<b style="color:#e8eaf0">引用来源 / 产物画布 / 上下文管理</b>。</div>
+  </div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="top">
+        <b>D · 右侧引用栏</b>
+        <div class="tag">Perplexity 式。正文里的 [1][2] 角标 ↔ 右栏来源卡一一对应。顶部「来源 5」按钮可开合。</div>
+        <div class="meta"><i>只读信息</i><i>编号角标</i><i>可开关</i></div>
+        <a href="d-ref-rail.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="d-ref-rail.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>E · 右侧画布栏</b>
+        <div class="tag">Claude Artifacts 式。对话被压窄到 400px，右侧让给「产物」。顶部切 预览 / 代码 两个 tab。</div>
+        <div class="meta"><i>可交互产物</i><i>预览/代码切换</i><i>对话让位</i></div>
+        <a href="e-canvas.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="e-canvas.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>F · 右侧上下文栏</b>
+        <div class="tag">项目知识库式。右栏是文件树（可勾选挂载）+ 底部 token 占用进度条 12.4k/128k。</div>
+        <div class="meta"><i>文件树</i><i>可勾选</i><i>token 计量</i></div>
+        <a href="f-context.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="f-context.html" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>共同结构：</b>左侧会话栏 + 中间对话流 + <b>右侧新增栏</b>，右栏都能关闭（关闭后中间内容自动变宽）。<br>
+    <b>三案的区别在「右栏装什么」：</b>D 装只读的<b>证据</b>、E 装可交互的<b>成品</b>、F 装可管理的<b>资源</b>。<br>
+    <b>可以试：</b>D 点右上「来源 5」收起右栏；E 点「代码」tab 切换；F 勾选/取消文件、点右上「上下文 4」收起。
+  </div>
+</body>
+</html>

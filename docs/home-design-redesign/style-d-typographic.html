@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方案 D · 瑞士极简大字</title>
+<style>
+  :root{--brand:#e11d48;--ink:#0a0a0a;--muted:#737373;--line:#e5e5e5}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);
+    font-family:"Helvetica Neue",Helvetica,"PingFang SC","Microsoft YaHei",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1120px;margin:0 auto;padding:0 24px}
+  header{border-bottom:2px solid var(--ink)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .brand{font-size:22px;font-weight:800;letter-spacing:-.5px}
+  nav a{margin-left:24px;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  nav a:hover{color:var(--ink)}
+  /* intro */
+  .intro{padding:64px 0 48px;display:grid;grid-template-columns:140px 1fr;gap:24px;border-bottom:1px solid var(--line)}
+  .intro .lbl{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding-top:12px}
+  .intro h1{font-size:62px;line-height:1.02;letter-spacing:-2.5px;margin:0;font-weight:800}
+  .intro h1 em{font-style:normal;color:var(--brand)}
+  .intro .lead{margin:24px 0 0;font-size:17px;color:var(--muted);line-height:1.7;max-width:600px}
+  /* numbered index list */
+  .index{padding:8px 0 40px}
+  .ilist{border-top:1px solid var(--line)}
+  .irow{display:grid;grid-template-columns:120px 1fr 220px 120px;gap:24px;align-items:center;
+    padding:26px 0;border-bottom:1px solid var(--line);transition:.18s}
+  .irow:hover{background:#fafafa;padding-left:14px}
+  .irow .no{font-size:15px;font-weight:700;color:var(--muted);letter-spacing:1px}
+  .irow:hover .no{color:var(--brand)}
+  .irow .ti{font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1.2}
+  .irow .ex{font-size:14px;color:var(--muted);line-height:1.65}
+  .irow .dt{font-size:13px;color:var(--muted);text-align:right}
+  .irow .cat{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase}
+  /* footer meta strip */
+  .strip{display:flex;gap:56px;padding:40px 0 80px;flex-wrap:wrap}
+  .strip .col b{display:block;font-size:36px;letter-spacing:-1px}
+  .strip .col span{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+  .strip .col a{display:block;font-size:14px;color:var(--muted);padding:5px 0}
+  .strip .col a:hover{color:var(--ink)}
+  @media(max-width:900px){.intro{grid-template-columns:1fr}.intro h1{font-size:38px}
+    .irow{grid-template-columns:80px 1fr}.irow .ex,.irow .dt{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">PYLOX</div>
+    <nav><a href="#">Index</a><a href="#">Articles</a><a href="#">Archive</a><a href="#">About</a></nav>
+  </div>
+</header>
+
+<div class="container">
+  <section class="intro">
+    <div class="lbl">A blog<br/>by 图恩</div>
+    <div>
+      <h1>写作，是为了<br/><em>对抗遗忘</em>。</h1>
+      <p class="lead">记录技术踩坑、生活片段和一些想不明白的事。没有热点，没有算法，只有一个一个慢慢写下来的字。</p>
+    </div>
+  </section>
+
+  <section class="index">
+    <div class="ilist">
+      <a class="irow" href="#">
+        <span class="no">01 — 技术</span>
+        <span class="ti">手机忘记解锁密码，只能恢复出厂设置</span>
+        <span class="ex">连续输错太多次，解锁界面连"忘记密码"都没了。</span>
+        <span class="dt">2025.03.11</span>
+      </a>
+      <a class="irow" href="#">
+        <span class="no">02 — 生活</span>
+        <span class="ti">给小学毕业的女儿的一封信</span>
+        <span class="ex">你的人生才刚刚开始，往后的路要靠自己去走。</span>
+        <span class="dt">2025.06.30</span>
+      </a>
+      <a class="irow" href="#">
+        <span class="no">03 — 技术</span>
+        <span class="ti">Python 小试牛刀：爬取简书内容</span>
+        <span class="ex">早期写过一个爬虫定时抓简书前端文章，充实内容。</span>
+        <span class="dt">2025.02.20</span>
+      </a>
+      <a class="irow" href="#">
+        <span class="no">04 — 随想</span>
+        <span class="ti">用 Nuxt3 重写博客前端的取舍</span>
+        <span class="ex">SSR 首屏、SEO，以及一套代码可换肤换名的目标。</span>
+        <span class="dt">2025.08.12</span>
+      </a>
+      <a class="irow" href="#">
+        <span class="no">05 — 笔记</span>
+        <span class="ti">PostgreSQL 备份踩坑记录</span>
+        <span class="ex">容器 bind mount 到空目录会重新初始化数据库。</span>
+        <span class="dt">2025.07.02</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="strip">
+    <div class="col"><b>566</b><span>篇文章</span></div>
+    <div class="col"><b>03</b><span>个分类</span></div>
+    <div class="col">
+      <span style="display:block;margin-bottom:8px">分类</span>
+      <a href="#">技术 · 12</a><a href="#">生活 · 4</a><a href="#">随想 · 0</a>
+    </div>
+    <div class="col">
+      <span style="display:block;margin-bottom:8px">标签</span>
+      <a href="#">Nuxt</a><a href="#">Python</a><a href="#">Docker</a>
+    </div>
+  </section>
+</div>
+</body>
+</html>

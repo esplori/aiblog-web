@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 F · 对话 + 右侧上下文栏</title>
+<style>
+  :root{
+    --sb:#f9f9f9; --line:#e6e6e6; --line2:#ececec; --ink:#0d0d0d; --muted:#8f8f8f;
+    --soft:#f4f4f4; --hover:#ececec; --brand:#2563eb;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);color:var(--ink);background:#fff;height:100vh;overflow:hidden;
+       -webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  a{text-decoration:none;color:inherit}
+  svg{display:block}
+  .app{display:flex;height:100vh}
+
+  .side{width:228px;flex:none;background:var(--sb);display:flex;flex-direction:column;border-right:1px solid var(--line2)}
+  .side-top{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 8px 10px}
+  .icon-btn{width:33px;height:33px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+            color:#5d5d5d;transition:background .15s;flex:none}
+  .icon-btn:hover{background:var(--hover)}
+  .side-scroll{flex:1;overflow-y:auto;padding:0 8px}
+  .grp{font-size:12px;font-weight:600;color:var(--muted);padding:14px 10px 6px}
+  .conv{padding:8px 10px;border-radius:9px;font-size:13.5px;color:#2f2f2f;white-space:nowrap;
+        overflow:hidden;text-overflow:ellipsis;margin-bottom:1px}
+  .conv:hover,.conv.on{background:var(--hover)}
+  .side-foot{border-top:1px solid var(--line2);padding:8px}
+  .me{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:9px;width:100%}
+  .me .av{width:26px;height:26px;border-radius:50%;flex:none;background:linear-gradient(135deg,#2563eb,#7c3aed);
+          color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .me b{font-size:13.5px;font-weight:500;flex:1;text-align:left}
+
+  main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .chat-top{display:flex;align-items:center;gap:6px;padding:10px 14px;flex:none}
+  .model{display:flex;align-items:center;gap:6px;font-size:17px;font-weight:600;padding:5px 9px;border-radius:9px}
+  .model:hover{background:var(--soft)}
+  .model svg{color:var(--muted)}
+  .spacer{flex:1}
+  .ref-btn{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:500;padding:7px 12px;
+           border-radius:20px;border:1px solid var(--line);transition:background .15s}
+  .ref-btn:hover{background:var(--soft)}
+
+  .stream{flex:1;overflow-y:auto;padding:12px 0 0}
+  .stream::-webkit-scrollbar{width:9px}
+  .stream::-webkit-scrollbar-thumb{background:#dcdcdc;border-radius:5px}
+  .in{max-width:660px;margin:0 auto;padding:0 22px}
+  .msg{margin-bottom:24px}
+  .msg.user{display:flex;justify-content:flex-end}
+  .bubble{background:var(--soft);border-radius:20px;padding:11px 17px;max-width:80%;font-size:15.5px;line-height:1.55}
+  .msg.ai{display:flex;gap:13px}
+  .ai-av{width:27px;height:27px;border-radius:50%;flex:none;margin-top:2px;
+         background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center}
+  .ai-body{flex:1;min-width:0;font-size:15.5px;line-height:1.72}
+  .ai-body p{margin-bottom:11px}
+  .file-chip{display:inline-flex;align-items:center;gap:6px;background:#eef2ff;color:#3b5bdb;
+             border-radius:7px;padding:2px 8px;font-size:13px;font-family:var(--mono);margin:0 2px}
+  .file-chip svg{flex:none}
+
+  .bottom{flex:none;padding:6px 22px 12px}
+  .bottom .inner{max-width:660px;margin:0 auto}
+  .composer{border:1px solid #d6d6d6;border-radius:26px;background:#fff;padding:11px 11px 9px 17px;
+            display:flex;align-items:flex-end;gap:9px;box-shadow:0 2px 8px rgba(0,0,0,.045)}
+  .composer:focus-within{border-color:#b0b0b0}
+  .composer textarea{flex:1;border:0;outline:none;resize:none;font-family:inherit;font-size:15.5px;
+                     line-height:1.5;max-height:160px;padding:5px 0}
+  .composer textarea::placeholder{color:#9b9b9b}
+  .send{width:33px;height:33px;border-radius:50%;background:#0d0d0d;color:#fff;display:flex;
+        align-items:center;justify-content:center;flex:none}
+  .foot-note{text-align:center;font-size:11.5px;color:#9b9b9b;padding:8px 0 2px}
+
+  /* ===== 右：上下文栏 ===== */
+  .ctx{width:300px;flex:none;border-left:1px solid var(--line2);background:#fcfcfc;
+       display:flex;flex-direction:column;transition:width .3s cubic-bezier(.2,.7,.3,1),opacity .3s}
+  body.noctx .ctx{width:0;opacity:0;overflow:hidden;border-left:0}
+  .ctx-head{display:flex;align-items:center;gap:8px;padding:15px 16px 13px;border-bottom:1px solid var(--line2)}
+  .ctx-head b{font-size:14px;font-weight:600;flex:1}
+  .ctx-head span{font-size:12px;color:var(--brand);background:#eef2ff;padding:2px 8px;border-radius:10px;font-weight:600}
+
+  .ctx-scroll{flex:1;overflow-y:auto;padding:12px 12px 6px}
+  .ctx-scroll::-webkit-scrollbar{width:8px}
+  .ctx-scroll::-webkit-scrollbar-thumb{background:#dcdcdc;border-radius:4px}
+
+  .tree-h{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9ca3af;
+          padding:6px 6px 8px}
+  .node{display:flex;align-items:center;gap:9px;padding:6px 8px;border-radius:8px;font-size:13.5px;
+        cursor:pointer;transition:background .15s;margin-bottom:1px}
+  .node:hover{background:#f1f1f3}
+  .node.dir{color:#6b7280;font-weight:500}
+  .node .ck{width:15px;height:15px;border-radius:4px;border:1.6px solid #cfcfcf;flex:none;
+            display:flex;align-items:center;justify-content:center;background:#fff;transition:all .15s}
+  .node.on .ck{background:var(--brand);border-color:var(--brand)}
+  .node .ck svg{opacity:0;transition:opacity .15s;color:#fff}
+  .node.on .ck svg{opacity:1}
+  .node .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .node.ind1{padding-left:24px}
+  .node.ind2{padding-left:40px}
+  .node .ext{font-size:10.5px;color:#b0b0b0;font-family:var(--mono);flex:none}
+
+  .ctx-foot{border-top:1px solid var(--line2);padding:13px 16px}
+  .tk-row{display:flex;justify-content:space-between;font-size:11.5px;color:#8f8f8f;margin-bottom:7px}
+  .tk-row b{color:#3f3f3f;font-weight:600}
+  .bar{height:6px;border-radius:3px;background:#ececec;overflow:hidden}
+  .bar i{display:block;height:100%;width:32%;border-radius:3px;background:linear-gradient(90deg,#2563eb,#7c3aed)}
+  .ctx-actions{display:flex;gap:8px;margin-top:13px}
+  .ctx-actions button{flex:1;font-size:12.5px;padding:8px;border-radius:9px;border:1px solid var(--line);
+                      background:#fff;color:#5d5d5d;transition:background .15s}
+  .ctx-actions button:hover{background:var(--soft)}
+
+  @media(max-width:1200px){ .ctx{display:none} }
+  @media(max-width:820px){ .side{display:none} }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="side-top">
+      <button class="icon-btn" title="收起侧栏" aria-label="收起侧栏"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg></button>
+      <button class="icon-btn" title="新对话" aria-label="新对话"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg></button>
+    </div>
+    <div class="side-scroll">
+      <div class="grp">今天</div>
+      <a href="#" class="conv on">读一下 PyLox 的记忆模块</a>
+      <a href="#" class="conv">Nuxt 3 首屏优化</a>
+      <div class="grp">昨天</div>
+      <a href="#" class="conv">多智能体编排对比</a>
+      <a href="#" class="conv">PostgreSQL 备份恢复</a>
+      <div class="grp">更早</div>
+      <a href="#" class="conv">Tailwind 变量抽离</a>
+    </div>
+    <div class="side-foot"><button class="me"><span class="av">带</span><b>带娃一起</b></button></div>
+  </aside>
+
+  <main>
+    <div class="chat-top">
+      <button class="model">Pylox <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="spacer"></div>
+      <button class="ref-btn" id="tg">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>
+        上下文 <span style="color:#2563eb">4</span>
+      </button>
+    </div>
+
+    <div class="stream"><div class="in">
+      <div class="msg user"><div class="bubble">帮我看看记忆巩固是怎么实现的。</div></div>
+      <div class="msg ai">
+        <div class="ai-av"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></div>
+        <div class="ai-body">
+          <p>我读了你挂载的四个文件。核心在 <span class="file-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>consolidation.py</span>：规则层先用字符 bigram 做主题聚类，LLM 层只对高价值簇精炼。</p>
+          <p>注意一个坑——<span class="file-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 3v5h5"/><path d="M6 3h8l5 5v13H6z"/></svg>architecture.md</span> 里写的配置项和实际代码对不上，代码里停用词表是硬编码的。</p>
+          <p>要我把这个不一致修掉吗？</p>
+        </div>
+      </div>
+    </div></div>
+
+    <div class="bottom"><div class="inner">
+      <div class="composer">
+        <textarea rows="1" placeholder="给 Pylox 发送消息" aria-label="消息输入框"></textarea>
+        <button class="send" title="发送" aria-label="发送"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg></button>
+      </div>
+      <div class="foot-note">Pylox 也可能会犯错。请核查重要信息。</div>
+    </div></div>
+  </main>
+
+  <!-- 右：上下文栏 -->
+  <aside class="ctx">
+    <div class="ctx-head">
+      <b>上下文</b><span>4 个文件</span>
+      <button class="icon-btn" id="cl" title="关闭" aria-label="关闭上下文栏" style="width:28px;height:28px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+
+    <div class="ctx-scroll">
+      <div class="tree-h">工作区</div>
+
+      <div class="node dir ind1"><span class="nm">docs</span></div>
+      <div class="node on ind2" data-ck><span class="ck"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="nm">architecture.md</span><span class="ext">md</span></div>
+      <div class="node ind2" data-ck><span class="ck"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="nm">api.md</span><span class="ext">md</span></div>
+
+      <div class="node dir ind1"><span class="nm">src/memory</span></div>
+      <div class="node on ind2" data-ck><span class="ck"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="nm">consolidation.py</span><span class="ext">py</span></div>
+      <div class="node ind2" data-ck><span class="ck"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="nm">store.py</span><span class="ext">py</span></div>
+      <div class="node ind2" data-ck><span class="ck"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="nm">profile.py</span><span class="ext">py</span></div>
+
+      <div class="node on ind1" data-ck><span class="ck"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></span><span class="nm">config.yaml</span><span class="ext">yaml</span></div>
+      <div class="node ind1"><span class="nm">README.md</span><span class="ext">md</span>
+        <span class="ck" style="margin-left:auto"></span></div>
+    </div>
+
+    <div class="ctx-foot">
+      <div class="tk-row"><span>上下文占用</span><b>12.4k / 128k</b></div>
+      <div class="bar"><i></i></div>
+      <div class="ctx-actions">
+        <button type="button">清空</button>
+        <button type="button">添加文件</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+  document.getElementById('cl').addEventListener('click', () => document.body.classList.add('noctx'));
+  document.getElementById('tg').addEventListener('click', () => document.body.classList.toggle('noctx'));
+  document.querySelectorAll('[data-ck]').forEach(n => {
+    n.addEventListener('click', () => n.classList.toggle('on'));
+  });
+</script>
+</body>
+</html>

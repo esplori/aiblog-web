@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>惊艳方案 · U/V/W</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d0f13;color:#e8eaf0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       padding:44px 26px 60px}
+  .head{max-width:1500px;margin:0 auto 26px}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:#8b90a0;margin-top:10px;font-size:15px;line-height:1.7}
+  .routes{max-width:1500px;margin:0 auto 26px;display:flex;gap:10px;flex-wrap:wrap}
+  .routes span{font-size:13px;background:#1a1d26;border:1px solid #272b36;color:#a8adbb;padding:7px 14px;border-radius:999px}
+  .routes b{color:#fff}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1500px;margin:0 auto}
+  .cell{background:#15181f;border:1px solid #242833;border-radius:16px;overflow:hidden;transition:.22s}
+  .cell:hover{border-color:#3b6ef5;transform:translateY(-3px)}
+  .cell .top{padding:16px 18px 13px;border-bottom:1px solid #242833;min-height:132px}
+  .cell .top b{font-size:15.5px;display:block}
+  .cell .top .rt{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-top:5px}
+  .cell .top .tag{font-size:12.5px;color:#8b90a0;margin-top:8px;line-height:1.55}
+  .cell .top a{display:inline-block;margin-top:10px;font-size:13px;color:#7c9cff;text-decoration:none;font-weight:600}
+  .cell .top a:hover{text-decoration:underline}
+  iframe{width:100%;height:540px;border:0;background:#fff;display:block}
+  .legend{max-width:1500px;margin:30px auto 0;font-size:13.5px;color:#8b90a0;line-height:2;
+          border-top:1px solid #242833;padding-top:22px}
+  .legend b{color:#e8eaf0}
+  @media(max-width:1080px){ .grid{grid-template-columns:1fr} iframe{height:480px} }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>惊艳方案 · U / V / W</h1>
+    <div class="sub">跳出「导航 + Hero + 卡片网格」的标准骨架。按「惊艳」的三条底层路径各做一个，全部基于真实数据。</div>
+  </div>
+
+  <div class="routes">
+    <span><b>质感</b> = 光、材料、颗粒</span>
+    <span><b>动能</b> = 运动、滚动、揭示</span>
+    <span><b>构图</b> = 破格、错位、张力</span>
+    <span>建议滚动整页看，效果在滚动里</span>
+  </div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="top">
+        <b>U · 极光沉浸</b>
+        <div class="rt" style="color:#22d3ee">质感 · Aurora Glass</div>
+        <div class="tag">4 层流体渐变极光缓慢漂浮（blur 90px）+ 满屏巨型标题 + 玻璃卡 + 颗粒噪点。</div>
+        <a href="u-aurora.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="u-aurora.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>V · 滚动叙事</b>
+        <div class="rt" style="color:#c6f135">动能 · Scroll Story</div>
+        <div class="tag">满屏巨型字 + 跑马灯 + 粘性滚动（左侧标题随右侧文章切换）+ 滚动揭示 + 进度条。</div>
+        <a href="v-scrollstory.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="v-scrollstory.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>W · 破格拼贴</b>
+        <div class="rt" style="color:#2b4cff">构图 · Broken Grid</div>
+        <div class="tag">12 列网格故意错位 + 卡片微旋转 + 超大编号 + 斜色带 + 衬线/无衬线混排。</div>
+        <a href="w-broken.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="w-broken.html" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>为什么这三个不一样：</b>前 12 案都在「信息架构」上做排列组合，这三个是在「视觉语言」上换赛道 —— 质感、动能、构图。<br>
+    <b>怎么选：</b>要高级氛围选 U；要动起来、有节奏选 V；要艺术感、一眼记住选 W。<br>
+    <b>工程提示：</b>U 的极光是纯 CSS；V 用了少量 JS（IntersectionObserver + 进度条）；W 是纯 CSS。三者都支持 prefers-reduced-motion。
+  </div>
+</body>
+</html>

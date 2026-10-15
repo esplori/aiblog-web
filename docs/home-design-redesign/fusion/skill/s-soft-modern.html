@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 S · 柔和现代（技能生成）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== 设计令牌（来自 ui-ux-pro-max: PyloxSoft · Soft UI Evolution）=====
+     · 字体：技能原推荐 Caveat/Quicksand（手写圆润，偏个人 creative blog），
+       与 AI 技术站气质不符 —— 收敛为 Inter + 中文系统字体。 */
+  :root{
+    --color-primary:#18181B; --color-on-primary:#FFFFFF; --color-secondary:#3F3F46;
+    --color-accent:#2563EB; --color-background:#FAFAFA; --color-foreground:#09090B;
+    --color-muted:#E8ECF0; --color-border:#E4E4E7;
+    --space-xs:4px; --space-sm:8px; --space-md:16px; --space-lg:24px; --space-xl:32px; --space-2xl:48px; --space-3xl:64px;
+    /* Soft UI：多层柔和阴影，替代硬投影 */
+    --soft-1:0 1px 2px rgba(9,9,11,.04), 0 2px 6px rgba(9,9,11,.04);
+    --soft-2:0 2px 4px rgba(9,9,11,.04), 0 8px 24px rgba(9,9,11,.06);
+    --soft-3:0 4px 8px rgba(9,9,11,.05), 0 16px 40px rgba(9,9,11,.09);
+    --font:"Inter",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--color-background);color:var(--color-foreground);font-family:var(--font);
+       line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 var(--space-lg)}
+  a{text-decoration:none;color:inherit}
+  :focus-visible{outline:2px solid var(--color-accent);outline-offset:2px;border-radius:6px}
+
+  nav{position:sticky;top:0;z-index:30;background:rgba(250,250,250,.85);backdrop-filter:blur(12px);
+      border-bottom:1px solid var(--color-border)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .brand em{font-style:normal;color:var(--color-accent)}
+  .nav-links{display:flex;gap:var(--space-lg);font-size:14px;color:var(--color-secondary)}
+  .nav-links a{min-height:44px;display:flex;align-items:center;transition:color 200ms ease}
+  .nav-links a:hover{color:var(--color-accent)}
+
+  /* Hero */
+  .hero{padding:var(--space-3xl) 0 var(--space-2xl)}
+  .hero h1{font-size:clamp(30px,4.6vw,46px);line-height:1.15;font-weight:800;letter-spacing:-.03em;max-width:680px}
+  .hero h1 em{font-style:normal;color:var(--color-accent)}
+  .hero p{margin-top:var(--space-md);color:var(--color-secondary);font-size:17px;max-width:560px}
+
+  /* 分类 pill */
+  .pills{display:flex;gap:var(--space-sm);flex-wrap:wrap;margin-top:var(--space-xl)}
+  .pills a{min-height:36px;display:inline-flex;align-items:center;padding:0 var(--space-md);border-radius:999px;
+           background:#fff;border:1px solid var(--color-border);box-shadow:var(--soft-1);font-size:13.5px;
+           color:var(--color-secondary);transition:all 200ms ease}
+  .pills a:hover,.pills a.on{color:var(--color-accent);border-color:#BFDBFE;box-shadow:var(--soft-2)}
+
+  /* 卡片网格：Soft UI */
+  .head{display:flex;align-items:baseline;justify-content:space-between;margin:var(--space-xl) 0 var(--space-md)}
+  .head h2{font-size:16px;font-weight:700;letter-spacing:-.01em}
+  .head a{font-size:13.5px;color:var(--color-accent);font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-lg);padding-bottom:var(--space-lg)}
+  .card{background:#fff;border:1px solid var(--color-border);border-radius:14px;overflow:hidden;
+        box-shadow:var(--soft-1);display:flex;flex-direction:column;
+        transition:transform 240ms ease,box-shadow 240ms ease,border-color 240ms ease}
+  .card:hover{transform:translateY(-4px);box-shadow:var(--soft-3);border-color:#DBEAFE}
+  .card .cov{height:112px;position:relative;background:linear-gradient(135deg,#E0E7FF,#EDE9FE)}
+  .card .cov.c2{background:linear-gradient(135deg,#DBEAFE,#E0F2FE)}
+  .card .cov.c3{background:linear-gradient(135deg,#DCFCE7,#CFFAFE)}
+  .card .cov span{position:absolute;left:var(--space-md);bottom:var(--space-sm);font-size:11.5px;font-weight:600;
+                  color:var(--color-accent);background:rgba(255,255,255,.8);backdrop-filter:blur(6px);
+                  padding:4px 10px;border-radius:6px}
+  .card .bd{padding:var(--space-md) var(--space-md) var(--space-lg);display:flex;flex-direction:column;flex:1}
+  .card h3{font-size:16px;line-height:1.45;font-weight:600;letter-spacing:-.01em;
+           display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;transition:color 200ms}
+  .card:hover h3{color:var(--color-accent)}
+  .card p{margin-top:var(--space-sm);font-size:13.5px;color:var(--color-secondary);flex:1;
+          display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .ft{margin-top:var(--space-md);font-size:12.5px;color:#71717A;display:flex;justify-content:space-between}
+
+  /* 列表 */
+  .row{display:flex;align-items:baseline;gap:var(--space-md);padding:var(--space-md) 0;border-bottom:1px solid var(--color-border)}
+  .row .c{font-size:12px;color:var(--color-accent);width:38px;flex:none}
+  .row h3{font-size:16px;font-weight:600;flex:1;letter-spacing:-.01em}
+  .row:hover h3{color:var(--color-accent)}
+  .row .d{font-size:12.5px;color:#71717A;flex:none}
+
+  footer{margin-top:var(--space-2xl);border-top:1px solid var(--color-border);
+         padding:var(--space-lg) 0 var(--space-2xl);font-size:13px;color:#71717A}
+  @media(max-width:900px){ .grid{grid-template-columns:1fr} .nav-links{display:none} }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap"><div class="nav-in">
+  <a href="#" class="brand">Pylox<em>.</em></a>
+  <div class="nav-links"><a href="#">文章</a><a href="#">分类</a><a href="#">标签</a></div>
+</div></div></nav>
+
+<header class="hero"><div class="wrap">
+  <h1>分享技术、生活与思考的 <em>AI 内容平台</em></h1>
+  <p>聚焦 AI Agent、前端工程与个人成长，持续记录一线实践与深度思考。</p>
+  <div class="pills">
+    <a href="#" class="on">全部</a><a href="#">技术 12</a><a href="#">生活 5</a><a href="#">随想 0</a><a href="#">实事 0</a>
+  </div>
+</div></header>
+
+<main class="wrap">
+  <div class="head"><h2>精选文章</h2><a href="#">查看全部 →</a></div>
+  <div class="grid">
+    <a href="#" class="card">
+      <div class="cov"><span>技术</span></div>
+      <div class="bd"><h3>2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</h3>
+        <p>从单体 Agent 到多智能体协作，编排层正在成为新的技术分水岭。</p>
+        <div class="ft"><span>08-30 · 128 阅读</span><span>读 →</span></div></div>
+    </a>
+    <a href="#" class="card">
+      <div class="cov c2"><span>技术</span></div>
+      <div class="bd"><h3>智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</h3>
+        <p>记忆不是把对话存下来，而是把经历沉淀成可以复用的经验。</p>
+        <div class="ft"><span>08-30 · 103 阅读</span><span>读 →</span></div></div>
+    </a>
+    <a href="#" class="card">
+      <div class="cov c3"><span>生活</span></div>
+      <div class="bd"><h3>关于比亚迪 DM-i 车型的几点疑问</h3>
+        <p>开了一段时间之后，攒下几个真实使用中的疑问。</p>
+        <div class="ft"><span>09-08 · 38 阅读</span><span>读 →</span></div></div>
+    </a>
+  </div>
+
+  <div class="head" style="margin-top:var(--space-xl)"><h2>最新文章</h2></div>
+  <a href="#" class="row"><span class="c">技术</span><h3>2026 年 AI Agent 研究综述：从自主智能体到多智能体系统的范式转变</h3><span class="d">09-04</span></a>
+  <a href="#" class="row"><span class="c">技术</span><h3>2026 年 Agent 评估基准与安全对齐：前沿方法、挑战与趋势</h3><span class="d">08-30</span></a>
+  <a href="#" class="row"><span class="c">实事</span><h3>如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</h3><span class="d">09-14</span></a>
+  <a href="#" class="row"><span class="c">生活</span><h3>如果你失业了你怎么办</h3><span class="d">08-27</span></a>
+  <a href="#" class="row"><span class="c">技术</span><h3>Nuxt 3 服务端渲染最佳实践</h3><span class="d">08-24</span></a>
+</main>
+
+<footer><div class="wrap">© 2026 Pylox · AI 驱动的现代化博客系统</div></footer>
+
+</body>
+</html>

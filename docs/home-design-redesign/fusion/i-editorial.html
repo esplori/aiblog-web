@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 I · 编辑部（Editorial）</title>
+<style>
+  :root{ --brand:#2563eb; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;color:var(--ink);font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",serif;line-height:1.7;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  a{text-decoration:none;color:inherit}
+
+  /* 导航：细线 + 克制 */
+  nav{border-bottom:1px solid var(--line)}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-size:20px;font-weight:700;letter-spacing:-.3px;font-family:-apple-system,"PingFang SC",sans-serif}
+  .brand em{font-style:normal;color:var(--brand)}
+  .menu{display:flex;gap:24px;font-size:14px;color:var(--muted);font-family:-apple-system,"PingFang SC",sans-serif}
+  .menu a:hover{color:var(--brand)}
+  .menu a.on{color:var(--ink);font-weight:600}
+  .search{font-size:13px;color:#9ca3af;font-family:-apple-system,"PingFang SC",sans-serif}
+
+  /* Hero：左对齐，信息优先，无图 */
+  .hero{padding:64px 0 44px;border-bottom:1px solid var(--line)}
+  .hero h1{font-size:42px;line-height:1.25;font-weight:800;letter-spacing:-1.2px;max-width:760px}
+  .hero p{margin-top:16px;font-size:16.5px;color:var(--muted);max-width:600px;font-family:-apple-system,"PingFang SC",sans-serif}
+  .hero .meta{margin-top:22px;font-size:13px;color:#9ca3af;font-family:-apple-system,"PingFang SC",sans-serif;
+              display:flex;gap:18px;flex-wrap:wrap}
+  .hero .meta b{color:var(--ink);font-weight:700}
+
+  /* 主体两栏 */
+  .main{display:grid;grid-template-columns:1fr 250px;gap:56px;padding:48px 0 80px}
+  .sec-label{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);
+             font-family:-apple-system,"PingFang SC",sans-serif;margin-bottom:20px}
+
+  /* 头条 */
+  .lead{display:block;padding-bottom:30px;border-bottom:1px solid var(--line)}
+  .lead .cat{font-size:12.5px;font-weight:600;color:var(--brand);font-family:-apple-system,"PingFang SC",sans-serif}
+  .lead h2{margin-top:10px;font-size:29px;line-height:1.35;font-weight:800;letter-spacing:-.6px}
+  .lead:hover h2{color:var(--brand)}
+  .lead p{margin-top:12px;font-size:15px;color:var(--muted);font-family:-apple-system,"PingFang SC",sans-serif}
+  .byline{margin-top:14px;font-size:12.5px;color:#9ca3af;font-family:-apple-system,"PingFang SC",sans-serif}
+
+  /* 精选：两列 */
+  .picks{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px;padding:30px 0;border-bottom:1px solid var(--line)}
+  .pick h3{font-size:18px;line-height:1.45;font-weight:700;letter-spacing:-.2px}
+  .pick:hover h3{color:var(--brand)}
+  .pick p{margin-top:8px;font-size:13.5px;color:var(--muted);font-family:-apple-system,"PingFang SC",sans-serif;
+          display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .pick .cat{margin-top:10px;font-size:12px;color:#9ca3af;font-family:-apple-system,"PingFang SC",sans-serif}
+
+  /* 列表流：紧凑 */
+  .row{display:flex;align-items:baseline;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+  .row .n{font-size:12px;color:#c7cbd1;width:20px;flex:none;font-variant-numeric:tabular-nums;
+          font-family:-apple-system,"PingFang SC",sans-serif}
+  .row h3{font-size:16px;font-weight:600;flex:1;letter-spacing:-.1px}
+  .row:hover h3{color:var(--brand)}
+  .row .d{font-size:12.5px;color:#9ca3af;flex:none;font-family:-apple-system,"PingFang SC",sans-serif}
+
+  /* 侧栏 */
+  .side h4{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9ca3af;
+           font-family:-apple-system,"PingFang SC",sans-serif;margin-bottom:16px}
+  .cat{display:flex;justify-content:space-between;font-size:14px;padding:9px 0;border-bottom:1px dotted var(--line);
+       font-family:-apple-system,"PingFang SC",sans-serif}
+  .cat:hover{color:var(--brand)}
+  .cat span{color:#9ca3af;font-size:12.5px}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .tags span{font-size:12.5px;color:#4b5563;background:#f3f4f6;padding:4px 10px;border-radius:4px;
+             font-family:-apple-system,"PingFang SC",sans-serif}
+  .tags span:hover{background:#e0e7ff;color:var(--brand)}
+  .side-block{margin-bottom:38px}
+
+  footer{border-top:1px solid var(--line);padding:28px 0;font-size:13px;color:#9ca3af;
+         font-family:-apple-system,"PingFang SC",sans-serif}
+  @media(max-width:880px){
+    .main{grid-template-columns:1fr;gap:44px}
+    .hero h1{font-size:30px}
+    .picks{grid-template-columns:1fr}
+    .menu{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap"><div class="nav-in">
+  <a href="#" class="brand">Pylox<em>.</em></a>
+  <div class="menu">
+    <a href="#" class="on">全部</a><a href="#">技术</a><a href="#">生活</a><a href="#">随想</a><a href="#">实事</a>
+  </div>
+  <div class="search">搜索文章…</div>
+</div></div></nav>
+
+<header class="hero"><div class="wrap">
+  <h1>分享技术、生活与思考的<br>AI 内容平台</h1>
+  <p>聚焦 AI Agent、前端工程与个人成长，持续记录一线实践与深度思考。</p>
+  <div class="meta">
+    <span><b>567</b> 篇文章</span>
+    <span><b>4</b> 个分类</span>
+    <span><b>20+</b> 技术标签</span>
+    <span>持续更新中</span>
+  </div>
+</div></header>
+
+<main class="wrap"><div class="main">
+  <!-- 主区 -->
+  <div>
+    <div class="sec-label">最新长文</div>
+    <a href="#" class="lead">
+      <div class="cat">实事</div>
+      <h2>如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</h2>
+      <p>英语该降的是应试难度，不该降的是能力本身。他们争的"该不该降"，前提可能就不太成立。</p>
+      <div class="byline">2026-09-14 · 5 次阅读</div>
+    </a>
+
+    <div class="sec-label" style="margin-top:34px">精选</div>
+    <div class="picks">
+      <a href="#" class="pick">
+        <h3>2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</h3>
+        <p>从单体 Agent 到多智能体协作，编排层正在成为新的技术分水岭。</p>
+        <div class="cat">技术 · 128 次阅读</div>
+      </a>
+      <a href="#" class="pick">
+        <h3>智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</h3>
+        <p>记忆不是把对话存下来，而是把经历沉淀成可以复用的经验。</p>
+        <div class="cat">技术 · 103 次阅读</div>
+      </a>
+      <a href="#" class="pick">
+        <h3>2026 年 AI Agent 研究综述：从自主智能体到多智能体系统的范式转变</h3>
+        <p>2026 年标志着从生成式 AI 向自主智能体的范式转变。</p>
+        <div class="cat">技术 · 54 次阅读</div>
+      </a>
+      <a href="#" class="pick">
+        <h3>关于比亚迪 DM-i 车型的几点疑问</h3>
+        <p>开了一段时间之后，攒下几个真实使用中的疑问。</p>
+        <div class="cat">生活 · 38 次阅读</div>
+      </a>
+    </div>
+
+    <div class="sec-label" style="margin-top:34px">全部文章</div>
+    <a href="#" class="row"><span class="n">01</span><h3>2026 年 Agent 评估基准与安全对齐：前沿方法、挑战与趋势</h3><span class="d">08-30</span></a>
+    <a href="#" class="row"><span class="n">02</span><h3>2026 年 AI Agent 领域研究调研摘要</h3><span class="d">08-30</span></a>
+    <a href="#" class="row"><span class="n">03</span><h3>调研笔记：2026 年多智能体协同与编排（方向 A）</h3><span class="d">08-30</span></a>
+    <a href="#" class="row"><span class="n">04</span><h3>2026 年，AI Agent 到底活成了什么样？</h3><span class="d">08-28</span></a>
+    <a href="#" class="row"><span class="n">05</span><h3>如果你失业了你怎么办</h3><span class="d">08-27</span></a>
+    <a href="#" class="row"><span class="n">06</span><h3>2026 年 agent 最新架构探索</h3><span class="d">08-27</span></a>
+    <a href="#" class="row"><span class="n">07</span><h3>Nuxt 3 服务端渲染最佳实践</h3><span class="d">08-24</span></a>
+  </div>
+
+  <!-- 侧栏 -->
+  <aside class="side">
+    <div class="side-block">
+      <h4>分类</h4>
+      <a href="#" class="cat">技术 <span>12</span></a>
+      <a href="#" class="cat">生活 <span>5</span></a>
+      <a href="#" class="cat">随想 <span>0</span></a>
+      <a href="#" class="cat">实事 <span>0</span></a>
+    </div>
+    <div class="side-block">
+      <h4>标签</h4>
+      <div class="tags">
+        <span>Redis</span><span>前端</span><span>后端</span><span>Python</span>
+        <span>AI 辅助编程</span><span>MySQL</span><span>API 自动化</span><span>Nuxt</span>
+      </div>
+    </div>
+  </aside>
+</div></main>
+
+<footer><div class="wrap">© 2026 Pylox · AI 驱动的现代化博客系统</div></footer>
+
+</body>
+</html>

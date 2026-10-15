@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 W · 破格拼贴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f4f2ed; --ink:#111110; --muted:#77746c; --line:#d8d5cc;
+    --blue:#2b4cff; --orange:#ff5a1f;
+    --serif:"Instrument Serif","Songti SC","Noto Serif SC",Georgia,serif;
+    --sans:"Inter",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;
+       -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{text-decoration:none;color:inherit}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 30px}
+
+  /* 顶栏：细线 + 混排 */
+  nav{border-bottom:1px solid var(--ink)}
+  .nav-in{max-width:1280px;margin:0 auto;padding:0 30px;height:60px;display:flex;align-items:center;
+          justify-content:space-between}
+  .brand{font-family:var(--serif);font-size:26px;letter-spacing:-.02em}
+  .brand i{font-style:italic;color:var(--blue)}
+  .nav-links{display:flex;gap:22px;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}
+  .nav-links a{min-height:44px;display:flex;align-items:center;transition:color .2s}
+  .nav-links a:hover{color:var(--blue)}
+  .nav-meta{font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+
+  /* Hero：非对称破格 */
+  .hero{position:relative;padding:56px 0 30px;border-bottom:1px solid var(--ink)}
+  .hero .rot{position:absolute;right:30px;top:120px;font-size:11.5px;font-weight:600;letter-spacing:.22em;
+             text-transform:uppercase;color:var(--muted);
+             writing-mode:vertical-rl;transform:rotate(180deg)}
+  .hero .cr{position:absolute;left:30px;top:34px;width:52px;height:52px;border-radius:50%;background:var(--orange);
+            display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;
+            letter-spacing:.04em;transform:rotate(-8deg)}
+  .hero h1{font-family:var(--serif);font-size:clamp(44px,9.4vw,124px);line-height:.92;letter-spacing:-.035em;
+           font-weight:400;max-width:16ch}
+  .hero h1 i{font-style:italic;color:var(--blue)}
+  .hero h1 .u{position:relative;white-space:nowrap}
+  .hero h1 .u::after{content:"";position:absolute;left:0;right:0;bottom:.08em;height:.09em;background:var(--orange)}
+  .hero .row{margin-top:34px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:30px;align-items:end}
+  .hero .row p{font-size:15px;color:var(--muted);max-width:34ch}
+  .hero .row .num b{font-family:var(--serif);font-size:40px;line-height:1;display:block;letter-spacing:-.02em}
+  .hero .row .num span{font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+  /* 斜色带 */
+  .band{margin:34px -30px 0;background:var(--blue);color:#fff;padding:14px 0;transform:rotate(-1.4deg);
+        overflow:hidden;white-space:nowrap}
+  .band .t{display:inline-block;animation:mv 34s linear infinite}
+  .band span{font-size:15px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin:0 26px}
+  @keyframes mv{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media(prefers-reduced-motion:reduce){ .band .t{animation:none} }
+
+  /* 破格文章网格 */
+  .broken{display:grid;grid-template-columns:repeat(12,1fr);gap:22px;padding:64px 0 40px}
+  .sec-h{grid-column:1/-1;display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+  .sec-h h2{font-family:var(--serif);font-size:30px;font-weight:400}
+  .sec-h i{font-style:italic;color:var(--blue)}
+  .sec-h .ln{flex:1;height:1px;background:var(--line)}
+
+  .it{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;padding:24px;
+      display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.2,.7,.3,1),
+      box-shadow .3s,border-color .3s,background .3s}
+  .it:hover{transform:translateY(-5px) rotate(0deg) !important;box-shadow:0 26px 50px -30px rgba(17,17,16,.55);
+            border-color:var(--ink)}
+  .it .no{position:absolute;top:-26px;left:8px;font-family:var(--serif);font-size:64px;line-height:1;
+          color:var(--line);z-index:-1;user-select:none}
+  .it .cat{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+  .it h3{margin-top:12px;font-size:19px;line-height:1.3;font-weight:700;letter-spacing:-.02em;flex:1}
+  .it p{margin-top:10px;font-size:13.5px;color:var(--muted);flex:1}
+  .it .m{margin-top:16px;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .it.fill{background:var(--ink);color:#fff}
+  .it.fill .cat{color:var(--orange)}
+  .it.fill .m{color:#9a9a94}
+  .it.blue{background:var(--blue);color:#fff;border-color:var(--blue)}
+  .it.blue .cat{color:#ffd9cc}
+  .it.blue .m{color:#c3ccff}
+  .it.blue p{color:#dfe5ff}
+
+  /* 错位 */
+  .a{grid-column:1/span 7;transform:rotate(-.6deg)}
+  .b{grid-column:8/span 5;margin-top:52px;transform:rotate(.7deg)}
+  .c{grid-column:2/span 4;margin-top:-16px;transform:rotate(.5deg)}
+  .d{grid-column:7/span 6;margin-top:26px;transform:rotate(-.5deg)}
+  .e{grid-column:1/span 5;margin-top:14px;transform:rotate(.4deg)}
+  .f{grid-column:6/span 7;margin-top:-8px;transform:rotate(-.7deg)}
+
+  footer{margin-top:56px;border-top:1px solid var(--ink);padding:24px 0 50px;display:flex;
+         justify-content:space-between;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  @media(max-width:900px){
+    .hero .row{grid-template-columns:1fr 1fr}
+    .hero .rot{display:none}
+    .broken{grid-template-columns:1fr;gap:34px}
+    .a,.b,.c,.d,.e,.f{grid-column:1/-1;margin-top:0;transform:none}
+    .nav-links{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="nav-in">
+  <a href="#" class="brand">Pylox<i>.</i></a>
+  <div class="nav-links"><a href="#">技术</a><a href="#">生活</a><a href="#">随想</a><a href="#">实事</a></div>
+  <div class="nav-meta">567 篇 · 09-14 更新</div>
+</div></nav>
+
+<header class="wrap"><div class="hero">
+  <div class="cr">AI<br>NOTES</div>
+  <div class="rot">Independent · Since 2026</div>
+  <h1>写下技术，<br>也写下 <i>困惑</i>，<br>还有<span class="u">生活</span>。</h1>
+  <div class="row">
+    <p>Pylox 是一个 AI 技术内容站。聚焦 AI Agent、前端工程与个人成长，持续记录一线实践与深度思考。</p>
+    <div class="num"><b>567</b><span>篇文章</span></div>
+    <div class="num"><b>04</b><span>个分类</span></div>
+  </div>
+</div></header>
+
+<div class="band" aria-hidden="true"><div class="t">
+  <span>AI Agent</span><span>Multi-Agent Orchestration</span><span>Memory</span><span>Nuxt 3</span><span>567 Articles</span>
+  <span>AI Agent</span><span>Multi-Agent Orchestration</span><span>Memory</span><span>Nuxt 3</span><span>567 Articles</span>
+</div></div>
+
+<main class="wrap"><div class="broken">
+  <div class="sec-h"><h2>精选<i>文章</i></h2><span class="ln"></span></div>
+
+  <a href="#" class="it a">
+    <span class="no">01</span>
+    <div class="cat">技术</div>
+    <h3>2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</h3>
+    <p>从单体 Agent 到多智能体协作，编排层正在成为新的技术分水岭。</p>
+    <div class="m">2026-08-30 · 128 阅读</div>
+  </a>
+
+  <a href="#" class="it blue b">
+    <span class="no" style="color:rgba(255,255,255,.25)">02</span>
+    <div class="cat">技术</div>
+    <h3>智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</h3>
+    <p>记忆不是把对话存下来，而是把经历沉淀成可以复用的经验。</p>
+    <div class="m">08-30 · 103 阅读</div>
+  </a>
+
+  <a href="#" class="it c">
+    <span class="no">03</span>
+    <div class="cat">技术</div>
+    <h3>2026 年 AI Agent 研究综述</h3>
+    <p>从自主智能体到多智能体系统的范式转变。</p>
+    <div class="m">09-04 · 54 阅读</div>
+  </a>
+
+  <a href="#" class="it fill d">
+    <span class="no" style="color:rgba(255,255,255,.18)">04</span>
+    <div class="cat">实事</div>
+    <h3>如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</h3>
+    <p>英语该降的是应试难度，不该降的是能力本身。</p>
+    <div class="m">09-14 · 5 阅读</div>
+  </a>
+
+  <a href="#" class="it e">
+    <span class="no">05</span>
+    <div class="cat">生活</div>
+    <h3>关于比亚迪 DM-i 车型的几点疑问</h3>
+    <p>开了一段时间之后，攒下几个真实使用中的疑问。</p>
+    <div class="m">09-08 · 38 阅读</div>
+  </a>
+
+  <a href="#" class="it f">
+    <span class="no">06</span>
+    <div class="cat">技术</div>
+    <h3>Nuxt 3 服务端渲染最佳实践</h3>
+    <p>SSR 不是银弹，什么时候该用、坑在哪，值得先想清楚。</p>
+    <div class="m">08-24 · 18 阅读</div>
+  </a>
+</div></main>
+
+<footer><div class="wrap" style="display:flex;justify-content:space-between">
+  <span>© 2026 Pylox</span><span>AI 驱动的现代化博客系统</span>
+</div></footer>
+
+</body>
+</html>

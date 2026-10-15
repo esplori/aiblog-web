@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方案 C · 分类色块流</title>
+<style>
+  :root{--brand:#2563eb;--ink:#111827;--muted:#6b7280;--line:#e9ecef;--soft:#f8f9fb;
+    --c-tech:#2563eb;--c-life:#10b981;--c-think:#f59e0b;--c-note:#8b5cf6}
+  *{box-sizing:border-box}
+  body{margin:0;color:var(--ink);background:#fff;
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1200px;margin:0 auto;padding:0 24px}
+  header{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-weight:800;font-size:20px}
+  nav a{margin-left:22px;font-size:14px;color:#4b5563}
+  /* category tabs */
+  .tabs{display:flex;gap:8px;padding:20px 0 4px;flex-wrap:wrap}
+  .tab{font-size:14px;font-weight:600;padding:8px 16px;border-radius:999px;border:1px solid var(--line);color:#4b5563;cursor:pointer}
+  .tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tab.tech.on{background:var(--c-tech);border-color:var(--c-tech)}
+  /* lead: split color block */
+  .lead{display:grid;grid-template-columns:1fr 1fr;border-radius:18px;overflow:hidden;margin:24px 0 40px;border:1px solid var(--line)}
+  .lead .txt{padding:44px 40px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+  .lead .txt .cat{font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--c-life)}
+  .lead .txt h1{font-size:36px;line-height:1.15;margin:0}
+  .lead .txt p{margin:0;color:var(--muted);line-height:1.75}
+  .lead .vl{background:linear-gradient(135deg,#059669,#10b981 60%,#6ee7b7);position:relative;min-height:320px}
+  .lead .vl span{position:absolute;bottom:24px;left:28px;color:#fff;letter-spacing:2px;font-size:12px;text-transform:uppercase}
+  .lead .vl b{position:absolute;top:20px;right:26px;font-size:80px;color:rgba(255,255,255,.25);line-height:1}
+  /* masonry-ish feed */
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 20px}
+  .sec-head h2{font-size:22px;margin:0}
+  .feed{display:grid;grid-template-columns:repeat(2,1fr);gap:24px;padding-bottom:72px}
+  .item{border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:.2s}
+  .item:hover{box-shadow:0 14px 34px rgba(17,24,39,.09);transform:translateY(-3px)}
+  .bar{height:5px}
+  .bar.tech{background:var(--c-tech)} .bar.life{background:var(--c-life)}
+  .bar.think{background:var(--c-think)} .bar.note{background:var(--c-note)}
+  .item .cover{height:170px;display:flex;align-items:center;justify-content:center;font-size:44px;font-weight:800;color:#fff;position:relative}
+  .k1{background:linear-gradient(135deg,#1d4ed8,#60a5fa)}
+  .k2{background:linear-gradient(135deg,#047857,#6ee7b7)}
+  .k3{background:linear-gradient(135deg,#b45309,#fcd34d)}
+  .k4{background:linear-gradient(135deg,#6d28d9,#c4b5fd)}
+  .item .body{padding:20px;display:flex;flex-direction:column;gap:9px;flex:1}
+  .item .cat{font-size:12px;font-weight:700}
+  .cat.tech{color:var(--c-tech)} .cat.life{color:var(--c-life)}
+  .cat.think{color:var(--c-think)} .cat.note{color:var(--c-note)}
+  .item h3{font-size:18px;line-height:1.4;margin:0}
+  .item h3:hover{opacity:.75}
+  .item p{font-size:14px;color:var(--muted);line-height:1.7;margin:0;flex:1}
+  .item .meta{font-size:12px;color:#9ca3af}
+  @media(max-width:900px){.lead{grid-template-columns:1fr}.feed{grid-template-columns:1fr}.lead .txt h1{font-size:27px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">Pylox</div>
+    <nav><a href="#">首页</a><a href="#">文章</a><a href="#">归档</a><a href="#">关于</a></nav>
+  </div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <span class="tab on">全部</span>
+    <span class="tab tech">技术</span>
+    <span class="tab">生活</span>
+    <span class="tab">随想</span>
+    <span class="tab">笔记</span>
+  </div>
+
+  <section class="lead">
+    <div class="txt">
+      <span class="cat">生活 · 置顶</span>
+      <h1>给小学毕业的女儿的一封信</h1>
+      <p>你的人生才刚刚开始，往后的路要靠自己去走。爸爸想在这封信里，跟你说几句掏心窝的话，也说说我这些年的后悔与庆幸。</p>
+      <div class="meta" style="font-size:13px;color:#9ca3af">2025-06-30 · 520 阅读</div>
+    </div>
+    <div class="vl"><b>03</b><span>Life / Pylox</span></div>
+  </section>
+
+  <div class="sec-head"><h2>最近更新</h2><a href="#" style="font-size:13px;color:var(--brand)">全部 →</a></div>
+  <div class="feed">
+    <article class="item">
+      <div class="bar tech"></div>
+      <div class="cover k1">01</div>
+      <div class="body">
+        <span class="cat tech">技术</span>
+        <h3>手机忘记解锁密码，只能恢复出厂设置</h3>
+        <p>连续输错太多次，解锁界面连"忘记密码"都没了，等待时间从 1 分钟涨到 15 分钟。</p>
+        <div class="meta">2025-03-11 · 1290 阅读</div>
+      </div>
+    </article>
+    <article class="item">
+      <div class="bar think"></div>
+      <div class="cover k3">02</div>
+      <div class="body">
+        <span class="cat think">随想</span>
+        <h3>用 Nuxt3 重写博客前端的取舍</h3>
+        <p>SSR 首屏、SEO、以及"一套代码可换肤换名"的产品化目标，逼着我把品牌色抽成运行时配置。</p>
+        <div class="meta">2025-08-12 · —</div>
+      </div>
+    </article>
+    <article class="item">
+      <div class="bar life"></div>
+      <div class="cover k2">03</div>
+      <div class="body">
+        <span class="cat life">生活</span>
+        <h3>周末带娃去了趟科技馆</h3>
+        <p>他在磁悬浮台前站了四十分钟不肯走，我第一次觉得"好奇心"这个东西是可以被看见的。</p>
+        <div class="meta">2025-05-18 · 402 阅读</div>
+      </div>
+    </article>
+    <article class="item">
+      <div class="bar note"></div>
+      <div class="cover k4">04</div>
+      <div class="body">
+        <span class="cat note">笔记</span>
+        <h3>PostgreSQL 备份踩坑记录</h3>
+        <p>容器 bind mount 到空目录会重新初始化数据库，一次误操作让 577 篇文章差点全没。</p>
+        <div class="meta">2025-07-02 · 731 阅读</div>
+      </div>
+    </article>
+  </div>
+</div>
+</body>
+</html>

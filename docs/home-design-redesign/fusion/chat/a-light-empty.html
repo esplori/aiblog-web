@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 A · ChatGPT 风格（空状态）</title>
+<style>
+  :root{
+    --sb:#f9f9f9; --line:#e6e6e6; --line2:#ececec; --ink:#0d0d0d; --muted:#8f8f8f;
+    --soft:#f4f4f4; --hover:#ececec;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);color:var(--ink);background:#fff;height:100vh;overflow:hidden;
+       -webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  a{text-decoration:none;color:inherit}
+  svg{display:block}
+
+  .app{display:flex;height:100vh}
+
+  /* ========== 侧栏 ========== */
+  .side{width:260px;flex:none;background:var(--sb);display:flex;flex-direction:column;
+        border-right:1px solid var(--line2)}
+  .side-top{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 8px 10px}
+  .icon-btn{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+            color:#5d5d5d;transition:background .15s}
+  .icon-btn:hover{background:var(--hover)}
+  .side-search{margin:2px 8px 10px;display:flex;align-items:center;gap:9px;background:#fff;
+               border:1px solid var(--line);border-radius:10px;padding:0 11px;min-height:38px}
+  .side-search svg{color:var(--muted);flex:none}
+  .side-search input{border:0;outline:none;font-family:inherit;font-size:14px;width:100%;background:transparent}
+
+  .side-scroll{flex:1;overflow-y:auto;padding:0 8px 8px}
+  .side-scroll::-webkit-scrollbar{width:8px}
+  .side-scroll::-webkit-scrollbar-thumb{background:#dcdcdc;border-radius:4px}
+  .grp{font-size:12px;font-weight:600;color:var(--muted);padding:14px 10px 6px}
+  .conv{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;font-size:14px;
+        color:#2f2f2f;white-space:nowrap;overflow:hidden;transition:background .15s;margin-bottom:1px}
+  .conv span{flex:1;overflow:hidden;text-overflow:ellipsis}
+  .conv:hover{background:var(--hover)}
+  .conv.on{background:var(--hover)}
+  .conv .dots{opacity:0;color:var(--muted);flex:none;transition:opacity .15s}
+  .conv:hover .dots{opacity:1}
+
+  .side-foot{border-top:1px solid var(--line2);padding:8px}
+  .me{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;transition:background .15s;width:100%}
+  .me:hover{background:var(--hover)}
+  .me .av{width:28px;height:28px;border-radius:50%;flex:none;
+          background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:13px;font-weight:700;
+          display:flex;align-items:center;justify-content:center}
+  .me b{font-size:14px;font-weight:500;flex:1;text-align:left}
+
+  /* ========== 主区 ========== */
+  main{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
+  .chat-top{display:flex;align-items:center;gap:6px;padding:11px 16px;flex:none}
+  .model{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:600;padding:5px 9px;
+         border-radius:9px;transition:background .15s}
+  .model:hover{background:var(--soft)}
+  .model svg{color:var(--muted)}
+  .spacer{flex:1}
+  .share{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;padding:8px 13px;
+         border-radius:20px;transition:background .15s}
+  .share:hover{background:var(--soft)}
+
+  /* 空状态：垂直居中 */
+  .empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+         padding:0 24px 12vh;gap:0}
+  .empty h1{font-size:30px;font-weight:600;letter-spacing:-.5px;margin-bottom:30px;text-align:center}
+
+  .composer{width:100%;max-width:740px;border:1px solid #d6d6d6;border-radius:26px;background:#fff;
+            padding:12px 12px 10px 18px;display:flex;align-items:flex-end;gap:10px;
+            box-shadow:0 2px 8px rgba(0,0,0,.045);transition:border-color .2s,box-shadow .2s}
+  .composer:focus-within{border-color:#b0b0b0;box-shadow:0 4px 14px rgba(0,0,0,.07)}
+  .composer textarea{flex:1;border:0;outline:none;resize:none;font-family:inherit;font-size:16px;
+                     line-height:1.5;max-height:180px;padding:5px 0;color:var(--ink)}
+  .composer textarea::placeholder{color:#9b9b9b}
+  .c-right{display:flex;align-items:center;gap:4px;flex:none}
+  .tool{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+        color:#5d5d5d;transition:background .15s}
+  .tool:hover{background:var(--soft)}
+  .send{width:34px;height:34px;border-radius:50%;background:#0d0d0d;color:#fff;display:flex;
+        align-items:center;justify-content:center;transition:opacity .15s}
+  .send:hover{opacity:.82}
+
+  .chips{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:16px;max-width:740px}
+  .chip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:20px;
+        padding:9px 15px;font-size:13.5px;color:#4b4b4b;transition:all .16s;background:#fff}
+  .chip:hover{background:var(--soft);border-color:#d6d6d6}
+  .chip svg{color:#8f8f8f;flex:none}
+
+  .foot-note{text-align:center;font-size:12px;color:#9b9b9b;padding:10px 0 14px;flex:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- 侧栏 -->
+  <aside class="side">
+    <div class="side-top">
+      <button class="icon-btn" title="收起侧栏" aria-label="收起侧栏">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/>
+        </svg>
+      </button>
+      <button class="icon-btn" title="新对话" aria-label="新对话">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="side-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input placeholder="搜索对话" aria-label="搜索对话">
+    </div>
+
+    <div class="side-scroll">
+      <div class="grp">今天</div>
+      <a href="#" class="conv on"><span>智能体记忆：从存储到经验的进化</span>
+        <svg class="dots" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></a>
+      <a href="#" class="conv"><span>Nuxt 3 SSR 怎么配置缓存</span>
+        <svg class="dots" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></a>
+      <div class="grp">昨天</div>
+      <a href="#" class="conv"><span>多智能体编排的三种范式对比</span>
+        <svg class="dots" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></a>
+      <a href="#" class="conv"><span>PostgreSQL 备份恢复的正确姿势</span>
+        <svg class="dots" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></a>
+      <div class="grp">更早</div>
+      <a href="#" class="conv"><span>Tailwind 主题变量怎么抽离</span>
+        <svg class="dots" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></a>
+      <a href="#" class="conv"><span>给博客设计一套配色方案</span>
+        <svg class="dots" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg></a>
+    </div>
+
+    <div class="side-foot">
+      <button class="me">
+        <span class="av">带</span><b>带娃一起</b>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8f8f8f" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5v.2a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V2a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1h.2a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- 主区 -->
+  <main>
+    <div class="chat-top">
+      <button class="model">Pylox <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="spacer"></div>
+      <button class="share">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><path d="M12 3v13"/><path d="M8 7l4-4 4 4"/></svg>
+        分享
+      </button>
+    </div>
+
+    <div class="empty">
+      <h1>有什么可以帮忙的？</h1>
+      <div class="composer">
+        <textarea rows="1" placeholder="给 Pylox 发送消息" aria-label="消息输入框"></textarea>
+        <div class="c-right">
+          <button class="tool" title="添加附件" aria-label="添加附件">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </button>
+          <button class="send" title="发送" aria-label="发送">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chips">
+        <button class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 3v18M3 12h18"/></svg>总结一篇文章</button>
+        <button class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5h13l3 3v11z"/><path d="M8 12h8M8 16h5"/></svg>写一篇技术文章</button>
+        <button class="chip"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>规划我的学习路径</button>
+      </div>
+    </div>
+
+    <div class="foot-note">Pylox 也可能会犯错。请核查重要信息。</div>
+  </main>
+</div>
+</body>
+</html>

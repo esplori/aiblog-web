@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 C · ChatGPT 风格（深色）</title>
+<style>
+  :root{
+    --bg:#212121; --sb:#171717; --hover:#2f2f2f; --line:#2f2f2f;
+    --ink:#ececec; --muted:#a0a0a0; --bubble:#303030; --code:#0d1117;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);color:var(--ink);background:var(--bg);height:100vh;overflow:hidden;
+       -webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  a{text-decoration:none;color:inherit}
+  svg{display:block}
+  .app{display:flex;height:100vh}
+
+  /* 侧栏：可折叠 */
+  .side{width:260px;flex:none;background:var(--sb);display:flex;flex-direction:column;
+        transition:width .3s cubic-bezier(.2,.7,.3,1);overflow:hidden}
+  body.collapsed .side{width:0}
+  .side-in{width:260px;display:flex;flex-direction:column;height:100%}
+  .side-top{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 8px 10px}
+  .icon-btn{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;
+            color:#c4c4c4;transition:background .15s;flex:none}
+  .icon-btn:hover{background:var(--hover)}
+  .side-search{margin:2px 8px 10px;display:flex;align-items:center;gap:9px;background:#242424;
+               border:1px solid #333;border-radius:10px;padding:0 11px;min-height:38px}
+  .side-search svg{color:var(--muted);flex:none}
+  .side-search input{border:0;outline:none;font-family:inherit;font-size:14px;width:100%;background:transparent;color:var(--ink)}
+  .side-scroll{flex:1;overflow-y:auto;padding:0 8px 8px}
+  .side-scroll::-webkit-scrollbar{width:8px}
+  .side-scroll::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:4px}
+  .grp{font-size:12px;font-weight:600;color:#7a7a7a;padding:14px 10px 6px}
+  .conv{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;font-size:14px;
+        color:#d4d4d4;white-space:nowrap;transition:background .15s;margin-bottom:1px}
+  .conv span{flex:1;overflow:hidden;text-overflow:ellipsis}
+  .conv:hover,.conv.on{background:var(--hover)}
+  .side-foot{border-top:1px solid var(--line);padding:8px}
+  .me{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;transition:background .15s;width:100%}
+  .me:hover{background:var(--hover)}
+  .me .av{width:28px;height:28px;border-radius:50%;flex:none;background:linear-gradient(135deg,#2563eb,#7c3aed);
+          color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .me b{font-size:14px;font-weight:500;flex:1;text-align:left}
+
+  /* 主区 */
+  main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .chat-top{display:flex;align-items:center;gap:6px;padding:11px 16px;flex:none}
+  .model{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:600;padding:5px 9px;border-radius:9px;transition:background .15s}
+  .model:hover{background:var(--hover)}
+  .model svg{color:var(--muted)}
+  .spacer{flex:1}
+
+  /* 消息流 */
+  .stream{flex:1;overflow-y:auto;padding:14px 0 0}
+  .stream::-webkit-scrollbar{width:9px}
+  .stream::-webkit-scrollbar-thumb{background:#3a3a3a;border-radius:5px}
+  .in{max-width:768px;margin:0 auto;padding:0 24px}
+
+  .msg{margin-bottom:26px}
+  .msg.user{display:flex;justify-content:flex-end}
+  .bubble{background:var(--bubble);border-radius:20px;padding:11px 17px;max-width:78%;font-size:16px;line-height:1.55}
+
+  .msg.ai{display:flex;gap:14px}
+  .ai-av{width:28px;height:28px;border-radius:50%;flex:none;margin-top:2px;
+         background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center}
+  .ai-av svg{color:#fff}
+  .ai-body{flex:1;min-width:0;font-size:16px;line-height:1.7}
+  .ai-body p{margin-bottom:12px}
+  .ai-body p:last-child{margin-bottom:0}
+  .ai-body b{font-weight:600}
+  .ai-body ul{margin:0 0 12px 22px}
+  .ai-body li{margin-bottom:6px}
+  .ai-body code.inline{background:#333;padding:2px 6px;border-radius:5px;font-family:var(--mono);font-size:14px}
+
+  /* 思考过程折叠 */
+  .think{border:1px solid var(--line);border-radius:12px;margin-bottom:16px;overflow:hidden;background:#1c1c1c}
+  .think summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;
+                 padding:11px 15px;font-size:14px;color:var(--muted);transition:background .15s}
+  .think summary::-webkit-details-marker{display:none}
+  .think summary:hover{background:#242424}
+  .think summary svg{transition:transform .25s;flex:none}
+  .think[open] summary svg{transform:rotate(90deg)}
+  .think .tbd{padding:2px 15px 15px;font-size:14.5px;color:#b8b8b8;line-height:1.75;
+              border-top:1px solid var(--line);padding-top:12px;margin-top:2px}
+
+  /* 代码块 */
+  .code{background:var(--code);border:1px solid #21262d;border-radius:13px;margin:14px 0;overflow:hidden}
+  .code-h{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#161b22;border-bottom:1px solid #21262d}
+  .code-h span{font-size:12.5px;color:#8b949e;font-family:var(--mono)}
+  .code-h button{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#8b949e;transition:color .15s}
+  .code-h button:hover{color:#e6edf3}
+  .code pre{padding:14px 16px;overflow-x:auto}
+  .code code{font-family:var(--mono);font-size:13.5px;line-height:1.7;color:#c9d1d9}
+  .k{color:#ff7b72} .s{color:#a5d6ff} .c{color:#8b949e;font-style:italic} .f{color:#d2a8ff}
+
+  .acts{display:flex;gap:3px;margin-top:14px;align-items:center}
+  .act{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8f8f8f;transition:all .15s}
+  .act:hover{background:var(--hover);color:#ececec}
+
+  /* 底部输入 */
+  .bottom{flex:none;padding:6px 24px 12px}
+  .bottom .inner{max-width:768px;margin:0 auto}
+  .composer{border:1px solid #424242;border-radius:26px;background:#2a2a2a;padding:12px 12px 10px 18px;
+            display:flex;align-items:flex-end;gap:10px;transition:border-color .2s}
+  .composer:focus-within{border-color:#6e6e6e}
+  .composer textarea{flex:1;border:0;outline:none;resize:none;font-family:inherit;font-size:16px;
+                     line-height:1.5;max-height:180px;padding:5px 0;background:transparent;color:var(--ink)}
+  .composer textarea::placeholder{color:#8f8f8f}
+  .c-right{display:flex;align-items:center;gap:4px;flex:none}
+  .tool{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c4c4c4;transition:background .15s}
+  .tool:hover{background:#3a3a3a}
+  .send{width:34px;height:34px;border-radius:50%;background:#ececec;color:#0d0d0d;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+  .send:hover{opacity:.82}
+  .foot-note{text-align:center;font-size:12px;color:#8f8f8f;padding:9px 0 2px}
+
+  /* 折叠后露出的「展开」按钮 */
+  .reveal{position:fixed;left:10px;top:11px;z-index:50;width:36px;height:36px;border-radius:9px;
+          background:var(--sb);border:1px solid #333;display:flex;align-items:center;justify-content:center;
+          color:#c4c4c4;opacity:0;pointer-events:none;transition:opacity .25s}
+  body.collapsed .reveal{opacity:1;pointer-events:auto}
+  .reveal:hover{background:var(--hover)}
+</style>
+</head>
+<body>
+<button class="reveal" id="rv" title="展开侧栏" aria-label="展开侧栏">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg>
+</button>
+
+<div class="app">
+  <aside class="side">
+   <div class="side-in">
+    <div class="side-top">
+      <button class="icon-btn" id="cl" title="收起侧栏" aria-label="收起侧栏">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg>
+      </button>
+      <button class="icon-btn" title="新对话" aria-label="新对话">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+      </button>
+    </div>
+    <div class="side-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input placeholder="搜索对话" aria-label="搜索对话">
+    </div>
+    <div class="side-scroll">
+      <div class="grp">今天</div>
+      <a href="#" class="conv on"><span>智能体记忆：从存储到经验的进化</span></a>
+      <a href="#" class="conv"><span>Nuxt 3 SSR 怎么配置缓存</span></a>
+      <div class="grp">昨天</div>
+      <a href="#" class="conv"><span>多智能体编排的三种范式对比</span></a>
+      <a href="#" class="conv"><span>PostgreSQL 备份恢复的正确姿势</span></a>
+      <div class="grp">更早</div>
+      <a href="#" class="conv"><span>Tailwind 主题变量怎么抽离</span></a>
+      <a href="#" class="conv"><span>给博客设计一套配色方案</span></a>
+    </div>
+    <div class="side-foot">
+      <button class="me"><span class="av">带</span><b>带娃一起</b>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8f8f8f" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5v.2a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V2a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1h.2a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>
+      </button>
+    </div>
+   </div>
+  </aside>
+
+  <main>
+    <div class="chat-top">
+      <button class="model">Pylox <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="spacer"></div>
+    </div>
+
+    <div class="stream">
+      <div class="in">
+        <div class="msg user"><div class="bubble">多智能体编排到底该怎么选？Supervisor 还是 Handoff？</div></div>
+
+        <div class="msg ai">
+          <div class="ai-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></div>
+          <div class="ai-body">
+            <details class="think">
+              <summary>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+                已深度思考 12 秒
+              </summary>
+              <div class="tbd">
+                用户问的是选型。先区分两个模式的控制权归属：Supervisor 是中心化调度，Handoff 是去中心化移交。<br>
+                关键变量：任务是否可预先分解、是否需要共享状态、失败时谁来兜底。<br>
+                结论：能画成流程图 → Supervisor；轮次不固定、靠对话推进 → Handoff。
+              </div>
+            </details>
+
+            <p>一句话区分：<b>Supervisor 是"主管派活"，Handoff 是"同事转交"。</b></p>
+            <ul>
+              <li><b>Supervisor</b>——一个中心 Agent 持有全局状态，按计划调用子 Agent。可控、可观测、好调试。适合流程明确的场景。</li>
+              <li><b>Handoff</b>——每个 Agent 都能把控制权交给下一个。灵活，但状态容易丢，调试像追接力棒。</li>
+            </ul>
+            <p>实践里最稳的是<b>混合</b>：顶层用 Supervisor 控流程，节点内部用 Handoff 处理开放式对话。</p>
+
+            <div class="code">
+              <div class="code-h"><span>orchestrator.py</span><button><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>复制</button></div>
+              <pre><code><span class="c"># 顶层：Supervisor 控流程</span>
+<span class="k">async def</span> <span class="f">run</span>(task):
+    plan = <span class="k">await</span> supervisor.<span class="f">plan</span>(task)
+    <span class="k">for</span> step <span class="k">in</span> plan:
+        <span class="c"># 节点内部：Handoff 处理开放式对话</span>
+        <span class="k">await</span> worker.<span class="f">handoff</span>(step, shared_state)</code></pre>
+            </div>
+
+            <div class="acts">
+              <button class="act" title="复制"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></button>
+              <button class="act" title="重新生成"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+              <button class="act" title="有帮助"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21V10l4-7 1.5 1a2 2 0 01.7 2.3L12.5 10H18a2 2 0 012 2.3l-1.2 6A2 2 0 0116.8 21z"/></svg></button>
+              <button class="act" title="没帮助"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3v11l-4 7-1.5-1a2 2 0 01-.7-2.3L11.5 14H6a2 2 0 01-2-2.3l1.2-6A2 2 0 017.2 3z"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="inner">
+        <div class="composer">
+          <textarea rows="1" placeholder="给 Pylox 发送消息" aria-label="消息输入框"></textarea>
+          <div class="c-right">
+            <button class="tool" title="添加附件" aria-label="添加附件">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button class="send" title="发送" aria-label="发送">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="foot-note">Pylox 也可能会犯错。请核查重要信息。</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  const app = document.body;
+  document.getElementById('cl').addEventListener('click', () => app.classList.add('collapsed'));
+  document.getElementById('rv').addEventListener('click', () => app.classList.remove('collapsed'));
+</script>
+</body>
+</html>

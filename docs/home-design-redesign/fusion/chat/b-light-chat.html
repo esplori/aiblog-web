@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 B · ChatGPT 风格（对话中）</title>
+<style>
+  :root{
+    --sb:#f9f9f9; --line:#e6e6e6; --line2:#ececec; --ink:#0d0d0d; --muted:#8f8f8f;
+    --soft:#f4f4f4; --hover:#ececec; --code:#0d1117;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    --mono:"SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:var(--font);color:var(--ink);background:#fff;height:100vh;overflow:hidden;
+       -webkit-font-smoothing:antialiased}
+  button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+  a{text-decoration:none;color:inherit}
+  svg{display:block}
+
+  .app{display:flex;height:100vh}
+
+  /* 侧栏（同 A） */
+  .side{width:260px;flex:none;background:var(--sb);display:flex;flex-direction:column;border-right:1px solid var(--line2)}
+  .side-top{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 8px 10px}
+  .icon-btn{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;color:#5d5d5d;transition:background .15s}
+  .icon-btn:hover{background:var(--hover)}
+  .side-search{margin:2px 8px 10px;display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:0 11px;min-height:38px}
+  .side-search svg{color:var(--muted);flex:none}
+  .side-search input{border:0;outline:none;font-family:inherit;font-size:14px;width:100%;background:transparent}
+  .side-scroll{flex:1;overflow-y:auto;padding:0 8px 8px}
+  .grp{font-size:12px;font-weight:600;color:var(--muted);padding:14px 10px 6px}
+  .conv{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:9px;font-size:14px;color:#2f2f2f;white-space:nowrap;overflow:hidden;transition:background .15s;margin-bottom:1px}
+  .conv span{flex:1;overflow:hidden;text-overflow:ellipsis}
+  .conv:hover,.conv.on{background:var(--hover)}
+  .side-foot{border-top:1px solid var(--line2);padding:8px}
+  .me{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:9px;transition:background .15s;width:100%}
+  .me:hover{background:var(--hover)}
+  .me .av{width:28px;height:28px;border-radius:50%;flex:none;background:linear-gradient(135deg,#2563eb,#7c3aed);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .me b{font-size:14px;font-weight:500;flex:1;text-align:left}
+
+  /* 主区 */
+  main{flex:1;display:flex;flex-direction:column;min-width:0;background:#fff}
+  .chat-top{display:flex;align-items:center;gap:6px;padding:11px 16px;flex:none}
+  .model{display:flex;align-items:center;gap:6px;font-size:18px;font-weight:600;padding:5px 9px;border-radius:9px;transition:background .15s}
+  .model:hover{background:var(--soft)}
+  .model svg{color:var(--muted)}
+  .spacer{flex:1}
+  .share{display:flex;align-items:center;gap:7px;font-size:13.5px;font-weight:500;padding:8px 13px;border-radius:20px;transition:background .15s}
+  .share:hover{background:var(--soft)}
+
+  /* 消息流 */
+  .stream{flex:1;overflow-y:auto;padding:14px 0 0}
+  .stream::-webkit-scrollbar{width:9px}
+  .stream::-webkit-scrollbar-thumb{background:#dcdcdc;border-radius:5px}
+  .in{max-width:768px;margin:0 auto;padding:0 24px}
+
+  .msg{margin-bottom:26px}
+  .msg.user{display:flex;justify-content:flex-end}
+  .bubble{background:var(--soft);border-radius:20px;padding:11px 17px;max-width:78%;font-size:16px;line-height:1.55}
+
+  .msg.ai{display:flex;gap:14px}
+  .ai-av{width:28px;height:28px;border-radius:50%;flex:none;margin-top:2px;
+         background:linear-gradient(135deg,#2563eb,#7c3aed);display:flex;align-items:center;justify-content:center}
+  .ai-av svg{color:#fff}
+  .ai-body{flex:1;min-width:0;font-size:16px;line-height:1.7}
+  .ai-body p{margin-bottom:12px}
+  .ai-body p:last-child{margin-bottom:0}
+  .ai-body b{font-weight:600}
+  .ai-body ul{margin:0 0 12px 22px}
+  .ai-body li{margin-bottom:6px}
+  .ai-body code.inline{background:var(--soft);padding:2px 6px;border-radius:5px;font-family:var(--mono);font-size:14px}
+
+  /* 代码块 */
+  .code{background:var(--code);border-radius:13px;margin:14px 0;overflow:hidden}
+  .code-h{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#161b22;border-bottom:1px solid #21262d}
+  .code-h span{font-size:12.5px;color:#8b949e;font-family:var(--mono)}
+  .code-h button{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#8b949e;transition:color .15s}
+  .code-h button:hover{color:#e6edf3}
+  .code pre{padding:14px 16px;overflow-x:auto}
+  .code code{font-family:var(--mono);font-size:13.5px;line-height:1.7;color:#c9d1d9}
+  .k{color:#ff7b72} .s{color:#a5d6ff} .c{color:#8b949e;font-style:italic} .f{color:#d2a8ff}
+
+  /* AI 操作条 */
+  .acts{display:flex;gap:3px;margin-top:14px;align-items:center}
+  .act{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#8f8f8f;transition:all .15s}
+  .act:hover{background:var(--soft);color:#2f2f2f}
+  .act.ok{color:#2563eb}
+
+  /* 底部输入区 */
+  .bottom{flex:none;padding:6px 24px 12px;background:linear-gradient(to top,#fff 62%,rgba(255,255,255,0))}
+  .bottom .inner{max-width:768px;margin:0 auto}
+  .composer{border:1px solid #d6d6d6;border-radius:26px;background:#fff;padding:12px 12px 10px 18px;
+            display:flex;align-items:flex-end;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.045);transition:border-color .2s,box-shadow .2s}
+  .composer:focus-within{border-color:#b0b0b0;box-shadow:0 4px 14px rgba(0,0,0,.07)}
+  .composer textarea{flex:1;border:0;outline:none;resize:none;font-family:inherit;font-size:16px;line-height:1.5;max-height:180px;padding:5px 0}
+  .composer textarea::placeholder{color:#9b9b9b}
+  .c-right{display:flex;align-items:center;gap:4px;flex:none}
+  .tool{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#5d5d5d;transition:background .15s}
+  .tool:hover{background:var(--soft)}
+  .send{width:34px;height:34px;border-radius:50%;background:#0d0d0d;color:#fff;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+  .send:hover{opacity:.82}
+  .foot-note{text-align:center;font-size:12px;color:#9b9b9b;padding:9px 0 2px}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="side-top">
+      <button class="icon-btn" title="收起侧栏" aria-label="收起侧栏">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9.5 4v16"/></svg>
+      </button>
+      <button class="icon-btn" title="新对话" aria-label="新对话">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+      </button>
+    </div>
+    <div class="side-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input placeholder="搜索对话" aria-label="搜索对话">
+    </div>
+    <div class="side-scroll">
+      <div class="grp">今天</div>
+      <a href="#" class="conv on"><span>智能体记忆：从存储到经验的进化</span></a>
+      <a href="#" class="conv"><span>Nuxt 3 SSR 怎么配置缓存</span></a>
+      <div class="grp">昨天</div>
+      <a href="#" class="conv"><span>多智能体编排的三种范式对比</span></a>
+      <a href="#" class="conv"><span>PostgreSQL 备份恢复的正确姿势</span></a>
+      <div class="grp">更早</div>
+      <a href="#" class="conv"><span>Tailwind 主题变量怎么抽离</span></a>
+    </div>
+    <div class="side-foot">
+      <button class="me"><span class="av">带</span><b>带娃一起</b>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8f8f8f" stroke-width="2"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5v.2a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H2a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V2a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1h.2a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="chat-top">
+      <button class="model">Pylox <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="spacer"></div>
+      <button class="share">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 001 1h14a1 1 0 001-1v-7"/><path d="M12 3v13"/><path d="M8 7l4-4 4 4"/></svg>分享
+      </button>
+    </div>
+
+    <div class="stream">
+      <div class="in">
+        <!-- 用户 -->
+        <div class="msg user"><div class="bubble">帮我看看，为什么我的 Nuxt 3 页面首屏加载这么慢？</div></div>
+
+        <!-- AI 回复 -->
+        <div class="msg ai">
+          <div class="ai-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></div>
+          <div class="ai-body">
+            <p>首屏慢通常来自三个地方，按影响从大到小排：</p>
+            <ul>
+              <li><b>服务端渲染阻塞</b>——<code class="inline">useAsyncData</code> 里的请求是串行的，接口一慢整页就等。</li>
+              <li><b>水合（hydration）成本</b>——客户端要重新跑一遍组件树，包越大越慢。</li>
+              <li><b>资源体积</b>——图片没做响应式，JS chunk 没拆分。</li>
+            </ul>
+            <p>先加一段配置，把「哪些请求必须等服务端」和「哪些可以等客户端」分开：</p>
+            <div class="code">
+              <div class="code-h"><span>nuxt.config.ts</span><button><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg>复制</button></div>
+              <pre><code><span class="k">export default</span> <span class="f">defineNuxtConfig</span>({
+  <span class="c">// 让慢接口不阻塞首屏</span>
+  routeRules: {
+    <span class="s">'/articles/**'</span>: { swr: <span class="s">60</span> },
+    <span class="s">'/api/**'</span>: { cache: { maxAge: <span class="s">60</span> } }
+  },
+  experimental: { payloadExtraction: <span class="k">true</span> }
+})</code></pre>
+            </div>
+            <p>改完用 <code class="inline">nuxi analyze</code> 看看包体积，重点砍掉没用的依赖。</p>
+
+            <div class="acts">
+              <button class="act ok" id="cp" title="复制"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 012-2h10"/></svg></button>
+              <button class="act" title="重新生成"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 11-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+              <button class="act" title="有帮助"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21V10l4-7 1.5 1a2 2 0 01.7 2.3L12.5 10H18a2 2 0 012 2.3l-1.2 6A2 2 0 0116.8 21z"/></svg></button>
+              <button class="act" title="没帮助"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3v11l-4 7-1.5-1a2 2 0 01-.7-2.3L11.5 14H6a2 2 0 01-2-2.3l1.2-6A2 2 0 017.2 3z"/></svg></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 用户 -->
+        <div class="msg user"><div class="bubble">那 payloadExtraction 具体省了什么？</div></div>
+
+        <!-- 正在生成 -->
+        <div class="msg ai">
+          <div class="ai-av"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/></svg></div>
+          <div class="ai-body" style="color:#6b6b6b">正在思考…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom">
+      <div class="inner">
+        <div class="composer">
+          <textarea rows="1" placeholder="给 Pylox 发送消息" aria-label="消息输入框"></textarea>
+          <div class="c-right">
+            <button class="tool" title="停止生成" aria-label="停止生成">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+            </button>
+            <button class="tool" title="添加附件" aria-label="添加附件">
+              <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            </button>
+            <button class="send" title="发送" aria-label="发送">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="foot-note">Pylox 也可能会犯错。请核查重要信息。</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // 复制按钮给一个真实反馈
+  document.getElementById('cp').addEventListener('click', function () {
+    this.classList.add('ok');
+    navigator.clipboard?.writeText('export default defineNuxtConfig({ routeRules: {...} })').catch(() => {});
+    const s = this.innerHTML;
+    this.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+    setTimeout(() => { this.innerHTML = s; }, 1400);
+  });
+</script>
+</body>
+</html>

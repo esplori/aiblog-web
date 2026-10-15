@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>方案 A · 杂志分栏</title>
+<style>
+  :root{
+    --brand:#2563eb; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --bg:#ffffff; --soft:#f9fafb;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+  a{color:inherit;text-decoration:none}
+  .container{max-width:1200px;margin:0 auto;padding:0 24px}
+  /* header */
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:10}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-family:Georgia,"Songti SC",serif;font-size:22px;font-weight:700;letter-spacing:.5px}
+  .nav nav a{margin-left:24px;font-size:14px;color:#4b5563}
+  .nav nav a:hover{color:var(--brand)}
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.6fr 1fr;gap:48px;padding:48px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2px;color:var(--brand);text-transform:uppercase;margin-bottom:14px}
+  .hero h1{font-family:Georgia,"Songti SC",serif;font-size:46px;line-height:1.12;margin:0 0 16px}
+  .hero .excerpt{font-size:17px;color:var(--muted);line-height:1.8;margin:0 0 20px;max-width:640px}
+  .meta{font-size:13px;color:#9ca3af;display:flex;gap:10px;align-items:center}
+  /* poster */
+  .poster{aspect-ratio:4/3;border-radius:14px;overflow:hidden;position:relative;
+    background:linear-gradient(140deg,#1e3a8a,#2563eb 55%,#60a5fa);color:#fff;padding:26px;display:flex;flex-direction:column;justify-content:space-between}
+  .poster .num{font-family:Georgia,serif;font-size:60px;opacity:.25;line-height:1}
+  .poster .tag{font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.9}
+  .poster::after{content:"";position:absolute;inset:0;
+    background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);
+    background-size:26px 26px;pointer-events:none}
+  /* layout below */
+  .main{display:grid;grid-template-columns:1.6fr 1fr;gap:48px;padding:40px 0 72px}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin:0 0 22px}
+  .sec-head h2{font-family:Georgia,"Songti SC",serif;font-size:24px;margin:0}
+  .sec-head a{font-size:13px;color:var(--brand);font-weight:600}
+  /* featured rows (list style, not cards) */
+  .row{display:grid;grid-template-columns:150px 1fr;gap:20px;padding:20px 0;border-top:1px solid var(--line)}
+  .row:last-child{border-bottom:1px solid var(--line)}
+  .thumb{aspect-ratio:3/2;border-radius:10px;background:linear-gradient(135deg,#eff6ff,#dbeafe);display:flex;align-items:center;justify-content:center;
+    font-family:Georgia,serif;font-size:34px;color:#93c5fd}
+  .row h3{font-size:19px;margin:0 0 6px;line-height:1.35}
+  .row h3:hover{color:var(--brand)}
+  .row p{margin:0 0 8px;font-size:14px;color:var(--muted);line-height:1.7}
+  .row .meta{font-size:12px}
+  /* sidebar */
+  aside .block{margin-bottom:36px}
+  aside h4{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#9ca3af;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+  .hot li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed var(--line);list-style:none}
+  .hot{padding:0;margin:0}
+  .hot .rank{font-family:Georgia,serif;font-size:22px;color:#d1d5db;line-height:1;width:28px}
+  .hot .t{font-size:14px;line-height:1.5}
+  .cats{display:flex;flex-direction:column;gap:2px}
+  .cats a{display:flex;justify-content:space-between;padding:10px 0;font-size:14px;border-bottom:1px solid var(--line)}
+  .cats .c{font-size:12px;color:var(--brand);font-weight:600}
+  .tags{display:flex;flex-wrap:wrap;gap:8px}
+  .tags span{font-size:12px;padding:5px 11px;border:1px solid var(--line);border-radius:999px;color:#4b5563}
+  .sub{background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .sub p{margin:0 0 12px;font-size:13px;color:var(--muted)}
+  .sub input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:10px;font-size:14px}
+  .sub button{width:100%;padding:10px;background:var(--brand);color:#fff;border:0;border-radius:8px;font-weight:700;cursor:pointer}
+  @media(max-width:900px){.hero,.main{grid-template-columns:1fr;gap:28px}.hero h1{font-size:34px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="container nav">
+    <div class="brand">Pylox</div>
+    <nav><a href="#">首页</a><a href="#">文章</a><a href="#">分类</a><a href="#">关于</a></nav>
+  </div>
+</header>
+
+<div class="container">
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <span class="kicker">Feature · 技术</span>
+      <h1>手机忘记解锁密码，<br/>只能恢复出厂设置</h1>
+      <p class="excerpt">连续输错太多次，解锁界面连"忘记密码"都没了，等待时间从 1 分钟一路涨到 15 分钟。最后靠 iTunes 恢复模式救回机器，代价是两个月没同步的照片。</p>
+      <div class="meta"><span>2025-03-11</span><span>·</span><span>1290 阅读</span><span>·</span><span>图恩</span></div>
+    </div>
+    <div class="poster">
+      <div class="num">01</div>
+      <div>
+        <div class="tag">Pylox / Life</div>
+        <div style="font-family:Georgia,serif;font-size:24px;margin-top:8px">Poster 封面</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="main">
+    <!-- LEFT: featured list -->
+    <div>
+      <div class="sec-head"><h2>最新文章</h2><a href="#">查看全部 →</a></div>
+
+      <article class="row">
+        <div class="thumb">02</div>
+        <div>
+          <h3>Python 小试牛刀：爬取简书内容</h3>
+          <p>网站前期写过一个爬虫定时抓简书前端文章，充实内容。早期技术不过关导致整篇没分段，一年后才发现……</p>
+          <div class="meta"><span>技术</span><span>·</span><span>2025-02-20</span><span>·</span><span>863 阅读</span></div>
+        </div>
+      </article>
+
+      <article class="row">
+        <div class="thumb">03</div>
+        <div>
+          <h3>给小学毕业的女儿的一封信</h3>
+          <p>你的人生才刚刚开始，往后的路要靠自己去走。爸爸想在这封信里，跟你说几句掏心窝的话。</p>
+          <div class="meta"><span>生活</span><span>·</span><span>2025-06-30</span><span>·</span><span>520 阅读</span></div>
+        </div>
+      </article>
+
+      <article class="row">
+        <div class="thumb">04</div>
+        <div>
+          <h3>用 Nuxt3 重写博客前端的取舍</h3>
+          <p>SSR 首屏、SEO、以及"一套代码可换肤换名"的产品化目标，逼着我把品牌色和站点名全部抽成运行时配置。</p>
+          <div class="meta"><span>技术</span><span>·</span><span>2025-08-12</span><span>·</span>—</div>
+        </div>
+      </article>
+    </div>
+
+    <!-- RIGHT: sidebar -->
+    <aside>
+      <div class="block">
+        <h4>热读排行</h4>
+        <ul class="hot">
+          <li><span class="rank">1</span><span class="t">手机忘记解锁密码，只能恢复出厂设置</span></li>
+          <li><span class="rank">2</span><span class="t">Python 小试牛刀爬取简书内容</span></li>
+          <li><span class="rank">3</span><span class="t">给小学毕业的女儿的一封信</span></li>
+          <li><span class="rank">4</span><span class="t">Nuxt3 SSR 与 SEO 实践</span></li>
+        </ul>
+      </div>
+      <div class="block">
+        <h4>分类</h4>
+        <div class="cats">
+          <a href="#"><span>技术</span><span class="c">12</span></a>
+          <a href="#"><span>生活</span><span class="c">4</span></a>
+          <a href="#"><span>随想</span><span class="c">0</span></a>
+        </div>
+      </div>
+      <div class="block">
+        <h4>标签</h4>
+        <div class="tags"><span>Nuxt</span><span>Python</span><span>爬虫</span><span>生活</span><span>Docker</span><span>PostgreSQL</span></div>
+      </div>
+      <div class="block sub">
+        <h4 style="border:0;padding:0;margin-bottom:10px">订阅更新</h4>
+        <p>新文章直接发到邮箱，不定期，不打扰。</p>
+        <input placeholder="you@example.com" />
+        <button>订阅</button>
+      </div>
+    </aside>
+  </div>
+</div>
+</body>
+</html>

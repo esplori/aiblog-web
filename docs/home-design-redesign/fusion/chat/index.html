@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatGPT 风格方案 · A/B/C</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0d0f13;color:#e8eaf0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       padding:44px 26px 60px}
+  .head{max-width:1500px;margin:0 auto 26px}
+  h1{font-size:30px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:#8b90a0;margin-top:10px;font-size:15px;line-height:1.7}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1500px;margin:0 auto}
+  .cell{background:#15181f;border:1px solid #242833;border-radius:16px;overflow:hidden;transition:.22s}
+  .cell:hover{border-color:#3b6ef5;transform:translateY(-3px)}
+  .cell .top{padding:16px 18px 13px;border-bottom:1px solid #242833;min-height:132px}
+  .cell .top b{font-size:15.5px;display:block}
+  .cell .top .tag{font-size:12.5px;color:#8b90a0;margin-top:6px;line-height:1.55}
+  .cell .top a{display:inline-block;margin-top:10px;font-size:13px;color:#7c9cff;text-decoration:none;font-weight:600}
+  .cell .top a:hover{text-decoration:underline}
+  .cell .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .cell .meta i{font-size:11.5px;font-style:normal;color:#9aa0ae;background:#1e222c;border:1px solid #2a2f3b;
+                padding:3px 9px;border-radius:6px}
+  iframe{width:100%;height:600px;border:0;background:#fff;display:block}
+  .legend{max-width:1500px;margin:30px auto 0;font-size:13.5px;color:#8b90a0;line-height:2;
+          border-top:1px solid #242833;padding-top:22px}
+  .legend b{color:#e8eaf0}
+  @media(max-width:1080px){ .grid{grid-template-columns:1fr} iframe{height:540px} }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>ChatGPT 风格方案 · A / B / C</h1>
+    <div class="sub">左侧会话栏 + 中间消息流 + 底部输入框。三种状态切面：空状态 / 对话进行中 / 深色模式。</div>
+    <a href="side/index.html" style="display:inline-flex;align-items:center;gap:12px;text-decoration:none;margin-top:16px;
+       background:linear-gradient(100deg,#15181f,#1c1730);border:1px solid #3b3566;border-radius:13px;padding:14px 20px">
+      <span style="font-size:20px">▤</span>
+      <span>
+        <b style="color:#e8eaf0;font-size:14.5px;display:block">进阶：在这套对话布局上再加一个侧栏 →</b>
+        <span style="color:#8b90a0;font-size:12.5px">引用来源 / 产物画布 / 上下文管理</span>
+      </span>
+      <span style="color:#a48cff;font-size:13px;font-weight:600">D / E / F ↗</span>
+    </a>
+  </div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="top">
+        <b>A · 经典浅色（空状态）</b>
+        <div class="tag">新对话首页：居中大标题「有什么可以帮忙的？」+ 输入框居中 + 建议 chip。最像 ChatGPT 第一眼。</div>
+        <div class="meta"><i>浅色</i><i>空状态</i><i>会话分组</i></div>
+        <a href="a-light-empty.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="a-light-empty.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>B · 对话进行中</b>
+        <div class="tag">用户灰气泡右对齐 + 助手无气泡全宽 + 深色代码块（带复制）+ 底部操作条 + 正在生成状态。</div>
+        <div class="meta"><i>浅色</i><i>消息流</i><i>代码块</i></div>
+        <a href="b-light-chat.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="b-light-chat.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>C · 深色 + 可折叠</b>
+        <div class="tag">整套深色，侧栏点一下收成 0 宽、左上角浮出展开按钮；还带「已深度思考」折叠块。</div>
+        <div class="meta"><i>深色</i><i>侧栏可折叠</i><i>思考过程</i></div>
+        <a href="c-dark-fold.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="c-dark-fold.html" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>三案共同骨架：</b>侧栏 260px（会话按 今天/昨天/更早 分组）+ 消息区最大宽 768px 居中 + 底部胶囊输入框（圆角 26px）。<br>
+    <b>ChatGPT 风格的三个记忆点：</b>① 用户消息是灰气泡、助手消息没有气泡；② 输入框永远是圆角胶囊、右侧一个黑色圆形发送键；③ 全屏只用黑白灰，几乎没有品牌色。<br>
+    <b>可以试：</b>B 里点代码块右上「复制」（会变绿勾）；C 里点侧栏图标收起侧栏，左上角会出现展开按钮。
+  </div>
+</body>
+</html>

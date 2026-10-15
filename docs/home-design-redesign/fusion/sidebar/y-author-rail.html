@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 Y · 右栏信息卡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fbfbfc; --card:#fff; --ink:#111827; --muted:#6b7280; --line:#e8eaef; --brand:#2563eb;
+    --brand2:#7c3aed;
+    --font:"Inter",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.65;
+       -webkit-font-smoothing:antialiased}
+  a{text-decoration:none;color:inherit}
+
+  header.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+  .top-in{max-width:1152px;margin:0 auto;padding:0 26px;height:64px;display:flex;align-items:center;gap:32px}
+  .brand{font-size:19px;font-weight:800;letter-spacing:-.02em}
+  .brand em{font-style:normal;color:var(--brand)}
+  .top-nav{display:flex;gap:22px;font-size:14px;color:var(--muted);flex:1}
+  .top-nav a{min-height:44px;display:flex;align-items:center;transition:color .2s}
+  .top-nav a:hover{color:var(--brand)}
+  .top-nav a.on{color:var(--ink);font-weight:600}
+  .btn{min-height:38px;display:inline-flex;align-items:center;padding:0 16px;border-radius:9px;
+       background:var(--brand);color:#fff;font-size:13.5px;font-weight:600;transition:transform .2s}
+  .btn:hover{transform:translateY(-1px)}
+
+  .shell{max-width:1152px;margin:0 auto;padding:0 26px;display:grid;
+         grid-template-columns:minmax(0,1fr) 312px;gap:46px;align-items:start}
+  .col{padding:36px 0 60px;min-width:0}
+  .rail{position:sticky;top:88px;padding:36px 0 60px;display:flex;flex-direction:column;gap:18px}
+
+  /* Hero */
+  .kicker{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+  .hero h1{font-size:36px;line-height:1.22;font-weight:800;letter-spacing:-1px;margin-top:12px}
+  .hero p{margin-top:12px;color:var(--muted);font-size:15.5px;max-width:560px}
+
+  .sec-h{display:flex;align-items:baseline;justify-content:space-between;margin:36px 0 16px;
+         padding-top:24px;border-top:1px solid var(--line)}
+  .sec-h h2{font-size:15px;font-weight:700}
+  .sec-h a{font-size:13px;color:var(--brand);font-weight:600}
+
+  /* 精选大卡 */
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+        transition:transform .28s cubic-bezier(.2,.7,.3,1),box-shadow .28s,border-color .28s}
+  .feat:hover{transform:translateY(-4px);box-shadow:0 22px 44px -28px rgba(17,24,39,.3);border-color:#c7d2fe}
+  .feat .cov{height:150px;background:linear-gradient(135deg,#2563eb,#7c3aed);position:relative}
+  .feat .cov::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 24% 18%,rgba(255,255,255,.3),transparent 46%)}
+  .feat .bd{padding:20px}
+  .feat h3{font-size:20px;line-height:1.4;font-weight:700;letter-spacing:-.3px}
+  .feat:hover h3{color:var(--brand)}
+  .feat p{margin-top:9px;color:var(--muted);font-size:14px}
+  .feat .m{margin-top:14px;font-size:12.5px;color:#9ca3af}
+
+  /* 列表 */
+  .row{display:flex;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);align-items:center}
+  .row .t{flex:1}
+  .row h3{font-size:16px;font-weight:600;line-height:1.45}
+  .row:hover h3{color:var(--brand)}
+  .row .m{margin-top:6px;font-size:12.5px;color:#9ca3af;display:flex;gap:12px}
+  .row .th{width:76px;height:64px;border-radius:10px;flex:none;
+           background:linear-gradient(135deg,#e0e7ff,#ede9fe)}
+  .row .th.g2{background:linear-gradient(135deg,#dbeafe,#e0f2fe)}
+  .row .th.g3{background:linear-gradient(135deg,#dcfce7,#cffafe)}
+
+  /* 侧栏卡 */
+  .w{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .w-h{font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:#9ca3af;margin-bottom:14px}
+
+  /* 作者卡 */
+  .author{padding:0;overflow:hidden}
+  .author .cover{height:76px;background:linear-gradient(120deg,#2563eb,#7c3aed,#ec4899)}
+  .author .bd{padding:0 18px 18px;margin-top:-30px}
+  .author .av{width:60px;height:60px;border-radius:50%;background:#fff;border:3px solid #fff;
+              display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;
+              color:#fff;background:linear-gradient(135deg,#2563eb,#7c3aed);box-shadow:0 6px 16px -6px rgba(0,0,0,.3)}
+  .author h4{margin-top:10px;font-size:15.5px;font-weight:700}
+  .author .bio{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.6}
+  .author .nums{display:flex;gap:18px;margin:14px 0}
+  .author .nums b{display:block;font-size:16px;font-weight:800}
+  .author .nums span{font-size:11px;color:#9ca3af}
+  .follow{width:100%;min-height:38px;border:0;border-radius:9px;background:var(--ink);color:#fff;
+          font-weight:600;font-size:13.5px;cursor:pointer;transition:all .2s}
+  .follow:hover{background:var(--brand)}
+
+  /* 精选（带缩略） */
+  .mini{display:flex;gap:11px;padding:9px 0;align-items:center}
+  .mini .th{width:46px;height:42px;border-radius:8px;flex:none;background:linear-gradient(135deg,#dbeafe,#e0f2fe)}
+  .mini h5{font-size:13.5px;font-weight:500;line-height:1.45;
+           display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .mini:hover h5{color:var(--brand)}
+  .mini .mo{font-size:11px;color:#9ca3af;margin-top:3px}
+
+  .tags{display:flex;flex-wrap:wrap;gap:7px}
+  .tags a{font-size:12.5px;color:#4b5563;background:#f3f4f6;padding:5px 11px;border-radius:7px;transition:all .18s}
+  .tags a:hover{background:#e0e7ff;color:var(--brand)}
+
+  .sub{background:linear-gradient(160deg,#1e3a8a,#2563eb);border-radius:16px;padding:18px;color:#fff}
+  .sub b{font-size:14.5px;display:block}
+  .sub p{font-size:12.5px;opacity:.82;margin-top:5px}
+  .sub input{width:100%;min-height:38px;margin-top:12px;border:0;border-radius:8px;padding:0 12px;font-family:var(--font);font-size:13.5px}
+  .sub button{width:100%;min-height:38px;margin-top:8px;border:0;border-radius:8px;background:#fff;color:var(--brand);
+              font-weight:700;font-size:13.5px;cursor:pointer}
+
+  footer{border-top:1px solid var(--line);margin-top:30px;background:#fff}
+  footer .in{max-width:1152px;margin:0 auto;padding:24px 26px 44px;font-size:13px;color:#9ca3af;
+             display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  @media(max-width:920px){
+    .shell{grid-template-columns:1fr}
+    .rail{position:static;padding-top:0}
+    .top-nav{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top"><div class="top-in">
+  <a href="#" class="brand">Pylox<em>.</em></a>
+  <nav class="top-nav"><a href="#" class="on">全部</a><a href="#">技术</a><a href="#">生活</a><a href="#">随想</a><a href="#">实事</a></nav>
+  <a href="#" class="btn">订阅</a>
+</div></header>
+
+<div class="shell">
+  <main class="col">
+    <div class="hero">
+      <div class="kicker">AI · 技术 · 思考</div>
+      <h1>分享技术、生活与思考的 AI 内容平台</h1>
+      <p>聚焦 AI Agent、前端工程与个人成长，持续记录一线实践与深度思考。</p>
+    </div>
+
+    <div class="sec-h"><h2>精选文章</h2><a href="#">查看全部 →</a></div>
+    <a href="#" class="feat">
+      <div class="cov"></div>
+      <div class="bd">
+        <h3>2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</h3>
+        <p>从单体 Agent 到多智能体协作，编排层正在成为新的技术分水岭。</p>
+        <div class="m">2026-08-30 · 128 次阅读</div>
+      </div>
+    </a>
+
+    <div class="sec-h"><h2>最新文章</h2></div>
+    <a href="#" class="row">
+      <div class="t"><h3>智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</h3>
+        <div class="m"><span>技术</span><span>08-30</span><span>103 阅读</span></div></div>
+      <div class="th"></div>
+    </a>
+    <a href="#" class="row">
+      <div class="t"><h3>2026 年 AI Agent 研究综述：从自主智能体到多智能体系统的范式转变</h3>
+        <div class="m"><span>技术</span><span>09-04</span><span>54 阅读</span></div></div>
+      <div class="th g2"></div>
+    </a>
+    <a href="#" class="row">
+      <div class="t"><h3>如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</h3>
+        <div class="m"><span>实事</span><span>09-14</span><span>5 阅读</span></div></div>
+      <div class="th g3"></div>
+    </a>
+    <a href="#" class="row">
+      <div class="t"><h3>关于比亚迪 DM-i 车型的几点疑问</h3>
+        <div class="m"><span>生活</span><span>09-08</span><span>38 阅读</span></div></div>
+      <div class="th"></div>
+    </a>
+  </main>
+
+  <aside class="rail">
+    <div class="w author">
+      <div class="cover"></div>
+      <div class="bd">
+        <div class="av">P</div>
+        <h4>Pylox</h4>
+        <div class="bio">AI 技术内容站。写 AI Agent、前端工程，也写生活与随想。</div>
+        <div class="nums">
+          <div><b>567</b><span>文章</span></div>
+          <div><b>4</b><span>分类</span></div>
+          <div><b>20+</b><span>标签</span></div>
+        </div>
+        <button class="follow" type="button">关注本站</button>
+      </div>
+    </div>
+
+    <div class="w">
+      <div class="w-h">热门阅读</div>
+      <a href="#" class="mini"><div class="th"></div><div><h5>2026 年多智能体协同与编排前沿洞察</h5><div class="mo">128 阅读</div></div></a>
+      <a href="#" class="mini"><div class="th"></div><div><h5>智能体记忆：从"存储"到"经验"的进化</h5><div class="mo">103 阅读</div></div></a>
+      <a href="#" class="mini"><div class="th"></div><div><h5>2026 年 AI Agent 研究综述</h5><div class="mo">54 阅读</div></div></a>
+    </div>
+
+    <div class="w">
+      <div class="w-h">标签</div>
+      <div class="tags">
+        <a href="#">Redis</a><a href="#">前端</a><a href="#">Python</a><a href="#">AI 辅助编程</a>
+        <a href="#">MySQL</a><a href="#">Nuxt</a>
+      </div>
+    </div>
+
+    <div class="sub">
+      <b>订阅更新</b>
+      <p>新文章发布时第一时间收到。</p>
+      <input placeholder="邮箱地址" aria-label="邮箱地址">
+      <button type="button">立即订阅</button>
+    </div>
+  </aside>
+</div>
+
+<footer><div class="in"><span>© 2026 Pylox</span><span>AI 驱动的现代化博客系统</span></div></footer>
+
+</body>
+</html>

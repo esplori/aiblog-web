@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 K · 极简冲击（Minimal Impact）</title>
+<style>
+  :root{ --brand:#2563eb; --ink:#0b0c0e; --muted:#8a8f98; --line:#eceef1; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;color:var(--ink);line-height:1.6;
+       font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:0 30px}
+  a{text-decoration:none;color:inherit}
+
+  /* 极简顶栏：只留站名 + 一个入口 */
+  nav{padding:30px 0}
+  .nav-in{display:flex;align-items:center;justify-content:space-between}
+  .brand{font-size:17px;font-weight:800;letter-spacing:-.4px}
+  .brand em{font-style:normal;color:var(--brand)}
+  .nav-r{font-size:13.5px;color:var(--muted)}
+  .nav-r a{margin-left:20px}
+  .nav-r a:hover{color:var(--ink)}
+
+  /* 首屏：超大标题，主打冲击力 */
+  .hero{padding:70px 0 78px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--brand)}
+  .hero h1{margin-top:26px;font-size:76px;line-height:1.04;font-weight:800;letter-spacing:-3.2px}
+  .hero h1 .dim{color:#c8ccd2}
+  .hero .sub{margin-top:28px;font-size:18px;color:var(--muted);max-width:560px;line-height:1.7}
+  .hero .count{margin-top:34px;font-size:13.5px;color:var(--muted);display:flex;gap:22px;flex-wrap:wrap}
+  .hero .count b{color:var(--ink);font-weight:800}
+
+  /* 文章列表：纯粹，靠字号和留白 */
+  .list{padding:14px 0 10px}
+  .list .head{font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#b9bec6;
+              padding:26px 0 6px}
+  .item{display:flex;align-items:baseline;gap:20px;padding:20px 0;border-bottom:1px solid var(--line);
+        transition:padding-left .25s ease}
+  .item:hover{padding-left:6px}
+  .item:hover .t{color:var(--brand)}
+  .item .i{font-size:12.5px;color:#c8ccd2;width:26px;flex:none;font-variant-numeric:tabular-nums}
+  .item .t{font-size:19px;font-weight:600;letter-spacing:-.35px;flex:1;line-height:1.45;transition:color .2s}
+  .item .m{font-size:12.5px;color:#b9bec6;flex:none;white-space:nowrap}
+  .item .arrow{opacity:0;transform:translateX(-4px);transition:.25s;color:var(--brand);flex:none;font-size:14px}
+  .item:hover .arrow{opacity:1;transform:translateX(0)}
+
+  /* 底部：极简文本导航 */
+  .foot-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;padding:56px 0}
+  .foot-grid h4{font-size:11.5px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:#b9bec6;margin-bottom:16px}
+  .foot-grid a{display:block;font-size:14.5px;color:var(--muted);padding:5px 0}
+  .foot-grid a:hover{color:var(--brand)}
+  .foot-grid a b{color:var(--ink);float:right;font-weight:500;font-size:12.5px}
+  footer{border-top:1px solid var(--line);padding:26px 0 50px;font-size:13px;color:#b9bec6}
+
+  @media(max-width:760px){
+    .hero h1{font-size:42px;letter-spacing:-1.8px}
+    .hero{padding:44px 0 52px}
+    .item .t{font-size:16.5px}
+    .item .m{display:none}
+    .foot-grid{grid-template-columns:1fr;gap:26px}
+    .nav-r{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap"><div class="nav-in">
+  <a href="#" class="brand">Pylox<em>.</em></a>
+  <div class="nav-r"><a href="#">分类</a><a href="#">标签</a><a href="#">订阅</a></div>
+</div></div></nav>
+
+<header class="hero"><div class="wrap">
+  <div class="eyebrow">AI · 技术 · 思考</div>
+  <h1>写下<span class="dim">技术</span>，<br>也写下<span class="dim">困惑</span>。</h1>
+  <p class="sub">Pylox 是一个 AI 技术内容站。聚焦 AI Agent、前端工程，也记录一些生活与随想。</p>
+  <div class="count">
+    <span><b>567</b> 篇文章</span><span><b>4</b> 个分类</span><span>最近更新 2026-09-14</span>
+  </div>
+</div></header>
+
+<main class="wrap"><div class="list">
+  <div class="head">最新文章</div>
+
+  <a href="#" class="item"><span class="i">01</span><span class="t">如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</span><span class="arrow">→</span><span class="m">09-14</span></a>
+  <a href="#" class="item"><span class="i">02</span><span class="t">关于比亚迪 DM-i 车型的几点疑问</span><span class="arrow">→</span><span class="m">09-08</span></a>
+  <a href="#" class="item"><span class="i">03</span><span class="t">2026 年 AI Agent 研究综述：从自主智能体到多智能体系统的范式转变</span><span class="arrow">→</span><span class="m">09-04</span></a>
+  <a href="#" class="item"><span class="i">04</span><span class="t">智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</span><span class="arrow">→</span><span class="m">08-30</span></a>
+  <a href="#" class="item"><span class="i">05</span><span class="t">2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</span><span class="arrow">→</span><span class="m">08-30</span></a>
+  <a href="#" class="item"><span class="i">06</span><span class="t">2026 年 AI Agent 领域研究调研摘要</span><span class="arrow">→</span><span class="m">08-30</span></a>
+  <a href="#" class="item"><span class="i">07</span><span class="t">调研笔记：2026 年多智能体协同与编排（方向 A）</span><span class="arrow">→</span><span class="m">08-30</span></a>
+  <a href="#" class="item"><span class="i">08</span><span class="t">2026 年 Agent 评估基准与安全对齐：前沿方法、挑战与趋势</span><span class="arrow">→</span><span class="m">08-30</span></a>
+  <a href="#" class="item"><span class="i">09</span><span class="t">2026 年，AI Agent 到底活成了什么样？</span><span class="arrow">→</span><span class="m">08-28</span></a>
+  <a href="#" class="item"><span class="i">10</span><span class="t">如果你失业了你怎么办</span><span class="arrow">→</span><span class="m">08-27</span></a>
+</div>
+
+<div class="foot-grid">
+  <div>
+    <h4>分类</h4>
+    <a href="#">技术 <b>12</b></a><a href="#">生活 <b>5</b></a>
+    <a href="#">随想 <b>0</b></a><a href="#">实事 <b>0</b></a>
+  </div>
+  <div>
+    <h4>标签</h4>
+    <a href="#">Redis</a><a href="#">前端</a><a href="#">Python</a><a href="#">AI 辅助编程</a>
+  </div>
+  <div>
+    <h4>关于</h4>
+    <a href="#">AI 驱动的现代化博客系统</a><a href="#">RSS 订阅</a>
+  </div>
+</div>
+</main>
+
+<footer><div class="wrap">© 2026 Pylox · AI 驱动的现代化博客系统</div></footer>
+
+</body>
+</html>

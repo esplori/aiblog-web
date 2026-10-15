@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>技能生成方案 · R/S/T（ui-ux-pro-max）</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0f1115;color:#e8eaf0;font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+       padding:44px 26px 60px}
+  .head{max-width:1500px;margin:0 auto 26px}
+  h1{font-size:29px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:#8b90a0;margin-top:10px;font-size:15px;line-height:1.7}
+  .sub code{background:#1e222c;border:1px solid #2a2f3b;padding:2px 7px;border-radius:5px;font-size:13px;color:#9ecbff}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:1500px;margin:0 auto}
+  .cell{background:#15181f;border:1px solid #242833;border-radius:16px;overflow:hidden;transition:.22s}
+  .cell:hover{border-color:#3b6ef5;transform:translateY(-3px)}
+  .cell .top{padding:16px 18px 13px;border-bottom:1px solid #242833;min-height:150px}
+  .cell .top b{font-size:15.5px;display:block}
+  .cell .top .sk{font-size:12px;color:#7c9cff;margin-top:4px;font-weight:600}
+  .cell .top .tag{font-size:12.5px;color:#8b90a0;margin-top:7px;line-height:1.55}
+  .cell .top a{display:inline-block;margin-top:10px;font-size:13px;color:#7c9cff;text-decoration:none;font-weight:600}
+  .cell .top a:hover{text-decoration:underline}
+  .cell .meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .cell .meta i{font-size:11.5px;font-style:normal;color:#9aa0ae;background:#1e222c;border:1px solid #2a2f3b;
+                padding:3px 9px;border-radius:6px}
+  .sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:4px;border:1px solid #3a3f4b}
+  iframe{width:100%;height:500px;border:0;background:#fff;display:block}
+  .legend{max-width:1500px;margin:30px auto 0;font-size:13.5px;color:#8b90a0;line-height:2;
+          border-top:1px solid #242833;padding-top:22px}
+  .legend b{color:#e8eaf0}
+  @media(max-width:1080px){ .grid{grid-template-columns:1fr} iframe{height:460px} }
+</style>
+</head>
+<body>
+  <div class="head">
+    <h1>技能生成方案 · R / S / T</h1>
+    <div class="sub">
+      由 <code>ui-ux-pro-max</code> 设计智能库生成。每个方案的<strong>配色 / 字体 / 间距 / 阴影 / 动效</strong>均来自技能输出的设计令牌，
+      存档在 <code>design-system/&lt;project&gt;/MASTER.md</code>。
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="cell">
+      <div class="top">
+        <b>R · 编辑部极简</b>
+        <div class="sk">Style: Exaggerated Minimalism</div>
+        <div class="tag">超大衬线标题 + 大留白 + 居中排版。Pattern: Newsletter / Content First。</div>
+        <div class="meta">
+          <i><span class="sw" style="background:#18181B"></span>#18181B</i>
+          <i><span class="sw" style="background:#EC4899"></span>#EC4899</i>
+          <i>Newsreader / Roboto</i>
+        </div>
+        <a href="r-editorial-minimal.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="r-editorial-minimal.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>S · 柔和现代</b>
+        <div class="sk">Style: Soft UI Evolution</div>
+        <div class="tag">多层柔和阴影 + 圆角 + 蓝调强调。Pattern: Portfolio Grid。</div>
+        <div class="meta">
+          <i><span class="sw" style="background:#18181B"></span>#18181B</i>
+          <i><span class="sw" style="background:#2563EB"></span>#2563EB</i>
+          <i>Inter（原推荐已收敛）</i>
+        </div>
+        <a href="s-soft-modern.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="s-soft-modern.html" loading="lazy"></iframe>
+    </div>
+
+    <div class="cell">
+      <div class="top">
+        <b>T · 杂志粗野</b>
+        <div class="sk">Style: Editorial / Kinetic</div>
+        <div class="tag">Libre Bodoni 衬线 + 非对称大标题 + 跑马灯动能。Pattern: Hero-Centric。</div>
+        <div class="meta">
+          <i><span class="sw" style="background:#09090B"></span>#09090B</i>
+          <i><span class="sw" style="background:#EC4899"></span>#EC4899</i>
+          <i>Libre Bodoni / Public Sans</i>
+        </div>
+        <a href="t-magazine-bold.html" target="_blank">新窗口打开 ↗</a>
+      </div>
+      <iframe src="t-magazine-bold.html" loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <div class="legend">
+    <b>Design Dials（技能的三个旋钮）：</b>R = variance 3 / motion 3 / density 6（居中克制）；S = 6 / 6 / 5（均衡）；
+    T = 9 / 7 / 4（大胆非对称）。<br>
+    <b>字体适配：</b>技能按 query 匹配字体（如 S 原推荐 Caveat/Quicksand 手写体），已按 AI 技术站气质做工程收敛 —— 详见各文件注释。<br>
+    <b>验收：</b>已按技能的 Pre-Delivery Checklist 检查（触摸目标 ≥44px、焦点可见、无 emoji 图标）。
+  </div>
+</body>
+</html>

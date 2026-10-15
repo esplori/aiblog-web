@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>方案 M · 杂志分区</title>
+<style>
+  :root{ --brand:#2563eb; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#fff;color:var(--ink);line-height:1.65;
+       font-family:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+  a{text-decoration:none;color:inherit}
+
+  nav{border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);z-index:30}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{font-size:19px;font-weight:800;letter-spacing:-.3px}
+  .brand em{font-style:normal;color:var(--brand)}
+  .nav-r{display:flex;gap:22px;font-size:14px;color:var(--muted)}
+  .nav-r a:hover{color:var(--brand)}
+  .nav-r a.on{color:var(--ink);font-weight:600}
+
+  .hero{padding:52px 0 34px}
+  .hero h1{font-size:34px;font-weight:800;letter-spacing:-1px;line-height:1.25}
+  .hero p{margin-top:12px;color:var(--muted);font-size:15.5px;max-width:580px}
+  .hero .st{margin-top:18px;font-size:13px;color:#9ca3af;display:flex;gap:20px;flex-wrap:wrap}
+  .hero .st b{color:var(--ink)}
+
+  /* 分区 */
+  .section{padding:34px 0;border-top:1px solid var(--line)}
+  .s-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:22px}
+  .s-head .l{display:flex;align-items:baseline;gap:12px}
+  .s-head h2{font-size:20px;font-weight:800;letter-spacing:-.4px}
+  .s-head .dot{width:8px;height:8px;border-radius:50%;background:var(--brand)}
+  .s-head .c{font-size:12.5px;color:#9ca3af}
+  .s-head a{font-size:13px;color:var(--brand);font-weight:600}
+  .s-head a:hover{text-decoration:underline;text-underline-offset:3px}
+
+  /* 分区 A：左大卡 + 右列 */
+  .split{display:grid;grid-template-columns:1.15fr 1fr;gap:34px}
+  .feat{display:flex;flex-direction:column}
+  .feat .cov{height:200px;border-radius:14px;background:linear-gradient(135deg,#2563eb,#7c3aed);position:relative;overflow:hidden}
+  .feat .cov::after{content:"";position:absolute;inset:0;
+    background:radial-gradient(circle at 22% 18%,rgba(255,255,255,.3),transparent 46%),
+               radial-gradient(circle at 85% 92%,rgba(255,255,255,.16),transparent 46%)}
+  .feat h3{margin-top:16px;font-size:22px;line-height:1.4;font-weight:800;letter-spacing:-.4px}
+  .feat:hover h3{color:var(--brand)}
+  .feat p{margin-top:9px;font-size:14.5px;color:var(--muted)}
+  .feat .m{margin-top:12px;font-size:12.5px;color:#9ca3af}
+  .colist{display:flex;flex-direction:column;justify-content:space-between}
+  .ci{padding:13px 0;border-bottom:1px solid var(--line)}
+  .ci:first-child{padding-top:0}
+  .ci h3{font-size:15.5px;font-weight:600;line-height:1.45;letter-spacing:-.1px}
+  .ci:hover h3{color:var(--brand)}
+  .ci .m{margin-top:5px;font-size:12px;color:#9ca3af}
+
+  /* 分区 B：三卡横排 */
+  .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+  .c3{border:1px solid var(--line);border-radius:14px;padding:20px;transition:transform .3s cubic-bezier(.2,.7,.3,1),box-shadow .3s,border-color .3s}
+  .c3:hover{transform:translateY(-4px);box-shadow:0 22px 40px -24px rgba(17,24,39,.28);border-color:#c7d2fe}
+  .c3 .tag{font-size:11px;font-weight:700;color:var(--brand);background:#eef2ff;padding:3px 10px;border-radius:999px;display:inline-block}
+  .c3 h3{margin-top:13px;font-size:16.5px;font-weight:700;line-height:1.45;letter-spacing:-.2px}
+  .c3:hover h3{color:var(--brand)}
+  .c3 p{margin-top:9px;font-size:13.5px;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .c3 .m{margin-top:14px;font-size:12px;color:#9ca3af}
+
+  /* 分区 C：纯列表（两列） */
+  .rowlist{display:grid;grid-template-columns:1fr 1fr;gap:0 40px}
+  .rl{display:flex;align-items:baseline;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+  .rl h3{font-size:15.5px;font-weight:600;flex:1}
+  .rl:hover h3{color:var(--brand)}
+  .rl .d{font-size:12.5px;color:#9ca3af;flex:none}
+
+  footer{margin-top:40px;border-top:1px solid var(--line);padding:26px 0 46px;font-size:13px;color:#9ca3af}
+  @media(max-width:880px){
+    .split{grid-template-columns:1fr;gap:24px}
+    .row3{grid-template-columns:1fr}
+    .rowlist{grid-template-columns:1fr}
+    .hero h1{font-size:26px}
+    .nav-r{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap"><div class="nav-in">
+  <a href="#" class="brand">Pylox<em>.</em></a>
+  <div class="nav-r"><a href="#" class="on">全部</a><a href="#">技术</a><a href="#">生活</a><a href="#">随想</a><a href="#">实事</a></div>
+</div></div></nav>
+
+<header class="hero"><div class="wrap">
+  <h1>分享技术、生活与思考的 AI 内容平台</h1>
+  <p>聚焦 AI Agent、前端工程与个人成长，持续记录一线实践与深度思考。</p>
+  <div class="st"><span><b>567</b> 篇文章</span><span><b>4</b> 个分类</span><span><b>20+</b> 标签</span><span>最近更新 2026-09-14</span></div>
+</div></header>
+
+<main class="wrap">
+
+  <!-- 技术 -->
+  <section class="section">
+    <div class="s-head">
+      <div class="l"><span class="dot"></span><h2>技术</h2><span class="c">12 篇</span></div>
+      <a href="#">查看全部 →</a>
+    </div>
+    <div class="split">
+      <a href="#" class="feat">
+        <div class="cov"></div>
+        <h3>2026 年多智能体协同与编排（Multi-Agent Orchestration）前沿洞察</h3>
+        <p>从单体 Agent 到多智能体协作，编排层正在成为新的技术分水岭。</p>
+        <div class="m">2026-08-30 · 128 次阅读</div>
+      </a>
+      <div class="colist">
+        <a href="#" class="ci"><h3>智能体记忆：从"存储"到"经验"的进化与 2026 年实践全景</h3><div class="m">08-30 · 103 阅读</div></a>
+        <a href="#" class="ci"><h3>2026 年 AI Agent 研究综述：从自主智能体到多智能体系统的范式转变</h3><div class="m">09-04 · 54 阅读</div></a>
+        <a href="#" class="ci"><h3>2026 年 Agent 评估基准与安全对齐：前沿方法、挑战与趋势</h3><div class="m">08-30 · 52 阅读</div></a>
+        <a href="#" class="ci"><h3>Nuxt 3 服务端渲染最佳实践</h3><div class="m">08-24 · 18 阅读</div></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 生活 -->
+  <section class="section">
+    <div class="s-head">
+      <div class="l"><span class="dot" style="background:#10b981"></span><h2>生活</h2><span class="c">5 篇</span></div>
+      <a href="#">查看全部 →</a>
+    </div>
+    <div class="row3">
+      <a href="#" class="c3">
+        <span class="tag">生活</span>
+        <h3>关于比亚迪 DM-i 车型的几点疑问</h3>
+        <p>开了一段时间之后，攒下几个真实使用中的疑问。</p>
+        <div class="m">09-08 · 38 阅读</div>
+      </a>
+      <a href="#" class="c3">
+        <span class="tag">生活</span>
+        <h3>如果你失业了你怎么办</h3>
+        <p>一个不太愿意面对、但迟早要想清楚的问题。</p>
+        <div class="m">08-27 · 47 阅读</div>
+      </a>
+      <a href="#" class="c3">
+        <span class="tag">生活</span>
+        <h3>2026 年，AI Agent 到底活成了什么样？</h3>
+        <p>抛开发布会和融资新闻，看看实际落地到底是什么状态。</p>
+        <div class="m">08-28 · 46 阅读</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 实事 & 随想 -->
+  <section class="section">
+    <div class="s-head">
+      <div class="l"><span class="dot" style="background:#f59e0b"></span><h2>实事 · 随想</h2></div>
+      <a href="#">查看全部 →</a>
+    </div>
+    <div class="rowlist">
+      <a href="#" class="rl"><h3>如何看待汤家凤呼吁降低英语权重、胡锡进反驳？以及，这事有解吗？</h3><span class="d">09-14</span></a>
+      <a href="#" class="rl"><h3>调研笔记：2026 年多智能体协同与编排（方向 A）</h3><span class="d">08-30</span></a>
+      <a href="#" class="rl"><h3>2026 年 AI Agent 领域研究调研摘要</h3><span class="d">08-30</span></a>
+      <a href="#" class="rl"><h3>2026 年 agent 最新架构探索</h3><span class="d">08-27</span></a>
+    </div>
+  </section>
+
+</main>
+
+<footer><div class="wrap">© 2026 Pylox · AI 驱动的现代化博客系统</div></footer>
+
+</body>
+</html>
