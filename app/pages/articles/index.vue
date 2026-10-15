@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { ArticleItem, Category, Tag, PageResult } from '~/types'
 
+// 与 AI 广场同一套外壳：左侧模块导航 + 顶栏
+definePageMeta({ layout: 'workbench' })
+
 const route = useRoute()
 const { get } = useApi()
 
@@ -22,7 +25,7 @@ const loading = ref(true)
 const total = ref(0)
 const page = ref(1)
 const pageSize = ref(10)
-const keyword = ref('')
+const keyword = ref(String(route.query.keyword || ''))
 
 const category = computed(() => route.query.category as string)
 const tag = computed(() => route.query.tag as string)
@@ -111,19 +114,31 @@ watch([category, tag], () => {
   page.value = 1
   loadArticles()
 })
+
+// 顶栏搜索跳转过来（/articles?keyword=xxx）时同步关键词并刷新
+watch(
+  () => route.query.keyword,
+  (v) => {
+    const next = String(v || '')
+    if (next !== keyword.value) {
+      keyword.value = next
+      page.value = 1
+      loadArticles()
+    }
+  }
+)
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <div class="max-w-6xl mx-auto px-6 py-12">
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-10">
-        <!-- 文章列表 -->
-        <div class="lg:col-span-3">
-          <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-gray-900">
-              {{ listTitle }}
-            </h1>
-          </div>
+  <div>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_240px]">
+      <!-- 文章列表 -->
+      <div class="min-w-0">
+        <div class="mb-6 flex items-center justify-between">
+          <h1 class="text-xl font-bold text-slate-900">
+            {{ listTitle }}
+          </h1>
+        </div>
 
           <!-- 搜索框 -->
           <div class="mb-6 flex items-center gap-3">
@@ -199,8 +214,7 @@ watch([category, tag], () => {
               </NuxtLink>
             </div>
           </div>
-        </aside>
-      </div>
+      </aside>
     </div>
   </div>
 </template>

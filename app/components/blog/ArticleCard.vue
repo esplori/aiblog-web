@@ -6,8 +6,10 @@ defineProps<{ article: ArticleItem }>()
 </script>
 
 <template>
-  <NuxtLink
-    :to="'/post/' + article.uuid"
+  <a
+    :href="'/post/' + article.uuid"
+    target="_blank"
+    rel="noopener noreferrer"
     class="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-brand-300"
   >
     <div v-if="article.coverImage" class="aspect-[16/9] overflow-hidden bg-slate-100">
@@ -27,6 +29,6 @@ defineProps<{ article: ArticleItem }>()
         <span>{{ article.viewCount }} 阅读</span>
       </div>
     </div>
-  </NuxtLink>
+  </a>
 </template>
 

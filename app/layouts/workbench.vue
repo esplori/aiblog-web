@@ -131,15 +131,23 @@ const onLogout = () => {
         <!-- 模块切换 + 导航 -->
         <nav class="flex-1 overflow-y-auto px-2 py-3" aria-label="模块导航">
           <div v-for="mod in MODULES" :key="mod.key" class="mb-4">
+            <!-- 折叠态：模块图标即入口；展开态：模块名只作分区标题，不再和「首页 / 全部条目」重复 -->
             <NuxtLink
+              v-if="collapsed"
               :to="mod.home"
-              class="flex items-center gap-2 rounded-lg px-2 py-2 text-sm font-semibold transition-colors"
+              class="flex items-center justify-center rounded-lg px-2 py-2 transition-colors"
               :class="mod.key === currentModule.key ? 'bg-brand-50 text-brand-700' : 'text-slate-500 hover:bg-slate-50'"
-              :aria-current="mod.key === currentModule.key ? 'true' : undefined"
+              :aria-label="mod.label"
             >
               <AppIcon :name="mod.key === 'ai' ? 'spark' : 'doc'" />
-              <span v-if="!collapsed" class="truncate">{{ mod.label }}</span>
             </NuxtLink>
+            <p
+              v-else
+              class="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide"
+              :class="mod.key === currentModule.key ? 'text-brand-600' : 'text-slate-400'"
+            >
+              {{ mod.label }}
+            </p>
 
             <div v-if="!collapsed" class="mt-1">
               <template v-for="group in mod.groups" :key="group.key">

@@ -84,7 +84,17 @@ useSeoMeta({
         <h2 class="mb-3 text-sm font-semibold text-slate-900">继续阅读</h2>
         <ul v-if="recent.length" class="space-y-2">
           <li v-for="item in recent" :key="item.path">
-            <NuxtLink :to="item.path" class="block truncate text-sm text-slate-700 hover:text-brand-600">
+            <!-- 文章详情统一新开窗口；AI 条目留在当前窗口 -->
+            <a
+              v-if="item.kind === 'article'"
+              :href="item.path"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="block truncate text-sm text-slate-700 hover:text-brand-600"
+            >
+              {{ item.title }}
+            </a>
+            <NuxtLink v-else :to="item.path" class="block truncate text-sm text-slate-700 hover:text-brand-600">
               {{ item.title }}
             </NuxtLink>
           </li>
