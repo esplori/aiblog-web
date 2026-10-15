@@ -10,7 +10,7 @@
     "postinstall": "nuxt prepare",
     "test": "vitest run",
     "test:node": "node --test tests/article-cover.test.mjs",
-    "publish": "node scripts/publish-article.mjs"
+    "publish:article": "node scripts/publish-article.mjs"
   },
   "dependencies": {
     "@element-plus/nuxt": "^1.0.10",

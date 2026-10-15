@@ -42,14 +42,50 @@ pnpm generate
 
 ### 测试
 
-`package.json` 里**没有** test script，用 Node 内置测试运行器直接跑：
-
 ```bash
-node --test                                # 自动发现 tests/*.test.mjs
-node --test tests/article-cover.test.mjs   # 或指定文件
+pnpm test        # vitest：app/** 单测（26 个用例）
+pnpm test:node   # Node 内置测试运行器：app/utils/*.mjs 纯函数（5 个用例）
 ```
 
-当前覆盖 `app/utils/articleCover.mjs` 的纯函数（5 个用例）。组件与页面暂无测试。
+组件与页面暂无测试；发布文章脚本见下一节。
+
+## 用 API 发布文章
+
+给 agent / 脚本用的发布链路（人也可以在后台编辑器里写，这里只说命令行与接口）。
+
+```bash
+# 鉴权：优先 AIBLOG_API_KEY（长期令牌）；没配则用 AIBLOG_USERNAME / AIBLOG_PASSWORD 换 JWT
+export AIBLOG_API_KEY=ak_xxxxxxxx
+
+# 发单篇（默认存草稿，不直接上站）
+node scripts/publish-article.mjs content/posts/foo.md
+
+# 整个目录批量发、直接发布、指定分类与标签
+node scripts/publish-article.mjs content/posts --status published --category 技术 --tags AI,工程实践
+```
+
+markdown 的 front-matter 直接当入参，标题/分类/标签/状态都能写在这里：
+
+```markdown
+---
+title: "标题"
+category: 技术
+tags: [AI Agent, 工程实践]
+status: draft
+---
+```
+
+| 参数 | 说明 |
+| --- | --- |
+| `--status draft|published|archived` | 默认 `draft`（先存草稿更安全） |
+| `--category 名称或ID` | 分类，也可以写在 front-matter |
+| `--tags a,b` | 标签，不存在的自动创建（`--no-create-tags` 可关掉） |
+| `--cover <url>` | 封面图 URL（图片先 `POST /api/files/upload`） |
+| `--dry-run` / `--force` / `--json` | 只看不发 / 同名也新建 / 输出接口原始返回 |
+
+等价接口：`POST /api/articles`，带 `X-API-Key: ak_…`（或 `Authorization: Bearer <JWT>`）；返回值里的 `data.uuid` 就是前台地址 `{站点}/post/{uuid}`。
+
+长期令牌由管理员签发（`POST /api/admin/api-keys`），**明文只返回一次**，库里只存 SHA-256 哈希，怀疑泄露直接吊销。完整说明见 [docs/publish-via-api.md](docs/publish-via-api.md)。
 
 ## 环境变量
 
@@ -155,12 +191,13 @@ Dockerfile                多阶段构建（builder → node:22-alpine + nginx�
 | 分组 | 端点 |
 | --- | --- |
 | 认证 | `POST /api/auth/login`、`POST /api/auth/register`、`GET /api/users/me` |
-| 文章 | `GET /api/articles`、`GET /api/articles/{id}`、`GET /api/articles/uuid/{uuid}`、`POST /api/articles/{id}/like` |
+| 文章 | `POST /api/articles`（发布，需认证）、`GET /api/articles`、`GET /api/articles/{id}`、`GET /api/articles/uuid/{uuid}`、`POST /api/articles/{id}/like` |
 | 分类/标签 | `GET/POST /api/categories`、`PUT/DELETE /api/categories/{id}`、`GET /api/tags`、`GET /api/tags/hot`、`PUT/DELETE /api/tags/{id}` |
 | 评论 | `GET /api/comments/article/{id}`、`POST /api/comments`、`DELETE /api/comments/{id}`、`PUT /api/comments/{id}/status` |
 | 文件 | `POST /api/files/upload`、`GET /api/files/user/{userId}`、`DELETE /api/files/{id}` |
 | 站点设置 | `GET /api/site-settings`、`GET /api/site-settings/themes`、`PUT /api/admin/site-settings` |
 | 后台管理 | `GET /api/menus`、`/api/admin/users`、`/api/admin/roles`（含 `{id}/menus`）、`/api/admin/menus`（含 `{id}/roles`）、`PUT /api/admin/users/{id}/role` |
+| API Key | `GET/POST /api/admin/api-keys`、`DELETE /api/admin/api-keys/{id}`（仅 admin） |
 | 统计 | `GET /api/admin/stats/trend`、`/article-trend`、`/category-distribution`、`/top-articles` |
 
 响应统一为 `{ code, message, data, timestamp }`，分页数据为 `{ records, total, current, size }`（见 `app/types/index.ts`）。
