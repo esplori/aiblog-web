@@ -207,7 +207,7 @@ useSeoMeta({
           <div class="flex flex-wrap items-center gap-2 text-[11px]">
             <span v-if="current.companyName" class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{{ current.companyName }}</span>
             <span class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{{ positionLabel(current.position) }}</span>
-            <DifficultyBadge :level="current.difficulty" />
+            <InterviewDifficultyBadge :level="current.difficulty" />
             <span class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-500">{{ stageText(current.stage) }}</span>
             <span v-if="current.lapses" class="text-slate-400">卡壳 {{ current.lapses }} 次</span>
           </div>

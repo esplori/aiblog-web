@@ -257,7 +257,7 @@ useSeoMeta({
                 <NuxtLink to="/interview/review" class="text-xs text-slate-500 hover:text-brand-600">去复习 →</NuxtLink>
               </div>
               <div v-if="companyQuestions.length" class="grid gap-3 sm:grid-cols-2">
-                <QuestionCard v-for="item in companyQuestions" :key="item.id" :question="item" />
+                <InterviewQuestionCard v-for="item in companyQuestions" :key="item.id" :question="item" />
               </div>
               <div v-else class="card text-xs text-slate-400">该公司暂无题目</div>
             </section>

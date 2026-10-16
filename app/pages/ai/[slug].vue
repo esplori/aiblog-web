@@ -68,7 +68,7 @@ watch(
 
     <!-- 头部 -->
     <div class="mt-3 mb-4 flex flex-wrap items-center gap-2">
-      <TypeTag :type="item.type" />
+      <AiTypeTag :type="item.type" />
       <span v-if="item.featured" class="text-[11px] font-semibold text-amber-600">编辑精选</span>
       <span v-if="item.status !== 'published'" class="text-[11px] text-slate-400">{{ STATUS_LABEL[item.status] || item.status }}</span>
       <span class="ml-auto text-xs text-slate-400">
@@ -80,7 +80,7 @@ watch(
     <p class="mt-1.5 text-sm text-slate-500">{{ item.tagline }}</p>
 
     <div class="mt-3 flex flex-wrap items-center gap-2">
-      <RiskBadges :risks="item.risks" />
+      <AiRiskBadges :risks="item.risks" />
       <a
         v-if="item.repoUrl"
         :href="item.repoUrl"
@@ -88,7 +88,7 @@ watch(
         rel="noopener noreferrer"
         class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-brand-600"
       >
-        <AppIcon name="external" class="w-[14px] h-[14px]" />仓库
+        <WorkbenchAppIcon name="external" class="w-[14px] h-[14px]" />仓库
       </a>
       <a
         v-if="item.homepageUrl"
@@ -97,12 +97,12 @@ watch(
         rel="noopener noreferrer"
         class="inline-flex items-center gap-1 text-xs text-slate-500 hover:text-brand-600"
       >
-        <AppIcon name="external" class="w-[14px] h-[14px]" />主页
+        <WorkbenchAppIcon name="external" class="w-[14px] h-[14px]" />主页
       </a>
     </div>
 
     <div v-if="hasExec" class="ai-warn mt-4">
-      <AppIcon name="shield" />
+      <WorkbenchAppIcon name="shield" />
       <div>
         <p class="font-semibold">这个条目会执行命令（执行级）</p>
         <p>
@@ -168,7 +168,7 @@ watch(
           <h2 class="text-sm font-semibold text-slate-900 mb-3">同类条目</h2>
           <ul class="space-y-2">
             <li v-for="r in related" :key="r.slug" class="flex items-center gap-2">
-              <TypeTag :type="r.type" />
+              <AiTypeTag :type="r.type" />
               <NuxtLink :to="'/ai/' + r.slug" class="text-sm text-slate-700 hover:text-brand-600 truncate">{{ r.name }}</NuxtLink>
               <span class="ml-auto text-[11px] text-slate-400">★ {{ r.starCount }}</span>
             </li>

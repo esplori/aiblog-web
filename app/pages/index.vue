@@ -108,16 +108,16 @@ useSeoMeta({
         <h2 class="mb-3 text-sm font-semibold text-slate-900">快捷动作</h2>
         <div class="flex flex-wrap gap-2">
           <NuxtLink to="/admin/articles" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
-            <AppIcon name="plus" />写文章
+            <WorkbenchAppIcon name="plus" />写文章
           </NuxtLink>
           <NuxtLink to="/admin/ai-items" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
-            <AppIcon name="upload" />录入 AI 条目
+            <WorkbenchAppIcon name="upload" />录入 AI 条目
           </NuxtLink>
           <NuxtLink to="/admin" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
-            <AppIcon name="chart" />后台
+            <WorkbenchAppIcon name="chart" />后台
           </NuxtLink>
           <NuxtLink to="/admin/site-settings" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
-            <AppIcon name="settings" />站点设置
+            <WorkbenchAppIcon name="settings" />站点设置
           </NuxtLink>
         </div>
       </div>

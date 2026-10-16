@@ -83,7 +83,7 @@ useSeoMeta({
     </div>
 
     <div v-else class="grid gap-3 sm:grid-cols-2">
-      <CompanyCard v-for="company in companies" :key="company.id" :company="company" />
+      <InterviewCompanyCard v-for="company in companies" :key="company.id" :company="company" />
     </div>
   </div>
 </template>

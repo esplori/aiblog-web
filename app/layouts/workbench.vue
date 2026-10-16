@@ -135,7 +135,7 @@ const onLogout = () => {
             :aria-expanded="String(!collapsed)"
             @click="toggleSide"
           >
-            <AppIcon name="menu" />
+            <WorkbenchAppIcon name="menu" />
           </button>
         </div>
 
@@ -150,7 +150,7 @@ const onLogout = () => {
               :class="mod.key === currentModule.key ? 'bg-brand-50 text-brand-700' : 'text-slate-500 hover:bg-slate-50'"
               :aria-label="mod.label"
             >
-              <AppIcon :name="mod.icon || 'doc'" />
+              <WorkbenchAppIcon :name="mod.icon || 'doc'" />
             </NuxtLink>
             <p
               v-else
@@ -176,7 +176,7 @@ const onLogout = () => {
                       :aria-current="item.key === activeKey ? 'page' : undefined"
                       @click="goto(item)"
                     >
-                      <AppIcon :name="item.icon" class="text-slate-400" />
+                      <WorkbenchAppIcon :name="item.icon" class="text-slate-400" />
                       <span class="truncate">{{ item.label }}</span>
                       <span v-if="badgeCount(item.badge)" class="ml-auto text-[11px] text-slate-400">
                         {{ badgeCount(item.badge) }}
@@ -202,7 +202,7 @@ const onLogout = () => {
               <p class="text-[11px] text-slate-400 truncate">{{ authStore.user?.role === 'admin' ? '管理员' : '成员' }}</p>
             </div>
             <button v-if="!collapsed" type="button" class="ml-auto text-slate-400 hover:text-slate-700" aria-label="退出登录" @click="onLogout">
-              <AppIcon name="logout" />
+              <WorkbenchAppIcon name="logout" />
             </button>
           </div>
 
@@ -213,7 +213,7 @@ const onLogout = () => {
               class="flex items-center justify-center text-slate-500 hover:text-brand-600"
               aria-label="登录"
             >
-              <AppIcon name="user" />
+              <WorkbenchAppIcon name="user" />
             </NuxtLink>
             <template v-else>
               <NuxtLink to="/login" class="block rounded-lg bg-brand-600 py-1.5 text-center text-sm text-white transition-colors hover:bg-brand-700">
@@ -229,7 +229,7 @@ const onLogout = () => {
       <div class="flex-1 min-w-0">
         <header class="sticky top-0 z-30 h-14 bg-white/85 backdrop-blur border-b border-slate-200 flex items-center gap-3 px-4 lg:px-6">
           <button type="button" class="lg:hidden text-slate-500" aria-label="打开导航" @click="drawerOpen = true">
-            <AppIcon name="menu" />
+            <WorkbenchAppIcon name="menu" />
           </button>
 
           <nav class="hidden sm:flex items-center gap-1.5 text-sm" aria-label="面包屑">
@@ -250,10 +250,10 @@ const onLogout = () => {
           </form>
 
           <NuxtLink to="/ai" class="text-slate-500 hover:text-brand-600" aria-label="AI 广场">
-            <AppIcon name="spark" />
+            <WorkbenchAppIcon name="spark" />
           </NuxtLink>
           <NuxtLink to="/interview" class="text-slate-500 hover:text-brand-600" aria-label="面试题库">
-            <AppIcon name="notebook" />
+            <WorkbenchAppIcon name="notebook" />
           </NuxtLink>
           <NuxtLink
             v-if="!authStore.isLoggedIn"
@@ -263,7 +263,7 @@ const onLogout = () => {
             登录
           </NuxtLink>
           <NuxtLink v-if="authStore.isLoggedIn" to="/admin" class="text-slate-500 hover:text-brand-600" aria-label="管理后台">
-            <AppIcon name="settings" />
+            <WorkbenchAppIcon name="settings" />
           </NuxtLink>
         </header>
 
@@ -287,7 +287,7 @@ const onLogout = () => {
                 :class="item.key === activeKey ? 'bg-slate-100 text-slate-900 font-medium' : 'text-slate-600'"
                 @click="goto(item)"
               >
-                <AppIcon :name="item.icon" class="text-slate-400" />
+                <WorkbenchAppIcon :name="item.icon" class="text-slate-400" />
                 <span>{{ item.label }}</span>
                 <span v-if="badgeCount(item.badge)" class="ml-auto text-[11px] text-slate-400">{{ badgeCount(item.badge) }}</span>
               </button>

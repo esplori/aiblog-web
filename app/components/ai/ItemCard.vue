@@ -9,7 +9,7 @@ const platforms = computed(() => (props.item.targets || []).map(t => t.platform)
 <template>
   <article class="bg-white rounded-xl border border-slate-200 p-4 flex flex-col gap-2.5 transition-colors hover:border-brand-300">
     <div class="flex items-center gap-2">
-      <TypeTag :type="item.type" />
+      <AiTypeTag :type="item.type" />
       <span v-if="item.featured" class="text-[11px] font-semibold text-amber-600">精选</span>
       <span class="ml-auto text-[11px] text-slate-400">★ {{ item.starCount }}</span>
     </div>
@@ -21,7 +21,7 @@ const platforms = computed(() => (props.item.targets || []).map(t => t.platform)
       <p class="mt-1 text-[13px] leading-relaxed text-slate-500 line-clamp-2">{{ item.tagline }}</p>
     </div>
 
-    <RiskBadges :risks="item.risks" />
+    <AiRiskBadges :risks="item.risks" />
 
     <div class="mt-auto flex items-center gap-2 flex-wrap text-[11px] text-slate-400">
       <span v-for="tag in item.tags.slice(0, 3)" :key="tag" class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-500">{{ tag }}</span>

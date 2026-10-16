@@ -85,7 +85,7 @@ useSeoMeta({
 
     <div class="mt-3 mb-4 flex flex-wrap items-center gap-2 text-[11px]">
       <span class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{{ typeLabel }}</span>
-      <DifficultyBadge :level="question.difficulty" />
+      <InterviewDifficultyBadge :level="question.difficulty" />
       <NuxtLink
         v-if="question.companySlug"
         :to="'/interview/companies/' + question.companySlug"

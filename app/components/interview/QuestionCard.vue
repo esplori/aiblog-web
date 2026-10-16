@@ -1,11 +1,13 @@
 <template>
-  <NuxtLink
-    :to="'/interview/' + question.slug"
-    class="card block transition-colors hover:border-brand-300"
-  >
+  <div class="card relative block transition-colors hover:border-brand-300">
     <div class="flex items-start justify-between gap-3">
-      <h3 class="text-sm font-semibold leading-snug text-slate-900">{{ question.title }}</h3>
-      <DifficultyBadge :level="question.difficulty" class="shrink-0" />
+      <h3 class="text-sm font-semibold leading-snug text-slate-900">
+        <!-- 用「拉伸链接」覆盖整卡，避免把公司链接嵌进题目链接（嵌套 <a> 会被浏览器拆开导致 hydration mismatch） -->
+        <NuxtLink :to="'/interview/' + question.slug" class="after:absolute after:inset-0 after:content-['']">
+          {{ question.title }}
+        </NuxtLink>
+      </h3>
+      <InterviewDifficultyBadge :level="question.difficulty" class="shrink-0" />
     </div>
 
     <p v-if="excerpt" class="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-500">{{ excerpt }}</p>
@@ -14,7 +16,7 @@
       <NuxtLink
         v-if="question.companySlug"
         :to="'/interview/companies/' + question.companySlug"
-        class="text-slate-500 hover:text-brand-600"
+        class="relative z-10 text-slate-500 hover:text-brand-600"
         @click.stop
       >
         {{ question.companyName }}
@@ -32,7 +34,7 @@
         class="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500"
       >{{ tag }}</span>
     </div>
-  </NuxtLink>
+  </div>
 </template>
 
 <script setup lang="ts">

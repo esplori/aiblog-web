@@ -130,7 +130,7 @@ useSeoMeta({
     </div>
 
     <div v-else class="space-y-3">
-      <QuestionCard v-for="item in questions" :key="item.id" :question="item" />
+      <InterviewQuestionCard v-for="item in questions" :key="item.id" :question="item" />
     </div>
 
     <div v-if="totalPages > 1" class="mt-5 flex items-center justify-center gap-3">
