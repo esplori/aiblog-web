@@ -154,8 +154,8 @@ const onLogout = () => {
             </NuxtLink>
             <p
               v-else
-              class="px-2 pb-1 text-[11px] font-semibold uppercase tracking-wide"
-              :class="mod.key === currentModule.key ? 'text-brand-600' : 'text-slate-400'"
+              class="px-2 pb-1 text-[15px] font-semibold"
+              :class="mod.key === currentModule.key ? 'text-brand-600' : 'text-slate-900'"
             >
               {{ mod.label }}
             </p>
@@ -278,7 +278,7 @@ const onLogout = () => {
       <div class="px-1">
         <p class="text-base font-bold text-slate-900 mb-3">{{ site.name }}</p>
         <div v-for="mod in MODULES" :key="mod.key" class="mb-4">
-          <p class="text-sm font-semibold text-slate-800 mb-1">{{ mod.label }}</p>
+          <p class="text-[15px] font-semibold text-slate-900 mb-1">{{ mod.label }}</p>
           <ul>
             <li v-for="item in mod.groups.flatMap(g => g.items).filter(itemVisible)" :key="item.key">
               <button
