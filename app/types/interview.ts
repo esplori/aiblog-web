@@ -173,3 +173,111 @@ export const REVIEW_RESULT_LABEL: Record<ReviewResult, string> = {
 
 /** SRS 固定间隔（天），与后端 stage 0-5 对应，用于空态文案说明 */
 export const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]
+
+/* ==========================================================================
+ * P3 AI 模拟面试（会话 / 答题 / 评分报告）
+ * 接口：/api/interview/sessions/**（均需登录）
+ * ========================================================================== */
+
+/** 会话状态机：created(AI 出题中) → ongoing(作答中) → scoring(评分中) → done / failed */
+export interface MockSessionSummary {
+  id: number
+  companyName?: string | null
+  position?: string | null
+  round?: string | null
+  mode: string
+  status: string
+  questionCount: number
+  answeredCount: number
+  score?: number | null
+  createdAt?: string
+  submittedAt?: string | null
+}
+
+/** 一道模拟题：题库抽题带 questionId/slug，AI 出题只有 generated title/body */
+export interface MockQuestion {
+  seq: number
+  questionId?: number | null
+  slug?: string | null
+  title: string
+  body?: string | null
+}
+
+export interface MockAnswer {
+  seq: number
+  answerText: string
+  score?: number | null
+  feedback?: string | null
+}
+
+/** 四维评分（0-100） */
+export interface MockDimensions {
+  accuracy: number
+  depth: number
+  expression: number
+  structure: number
+}
+
+/** 报告里的逐题条目（题干来自 detail.questions，此处只有评分与反馈） */
+export interface MockReportItem {
+  seq: number
+  title: string
+  answerText: string
+  score: number
+  feedback: string
+}
+
+export interface MockReport {
+  overallScore: number
+  dimensions: MockDimensions
+  /** 后端可能给整段文本，也可能给建议数组，前端统一归一化展示 */
+  suggestions: string | string[]
+  items: MockReportItem[]
+}
+
+export interface MockSessionDetail {
+  id: number
+  companyName?: string | null
+  position?: string | null
+  round?: string | null
+  mode: string
+  status: string
+  questionCount: number
+  score?: number | null
+  createdAt?: string
+  submittedAt?: string | null
+  questions: MockQuestion[]
+  answers: MockAnswer[]
+  report?: MockReport | null
+}
+
+/** 出题方式：题库抽题 / AI 出题 */
+export const MOCK_MODE_LABEL: Record<string, string> = {
+  bank: '题库抽题',
+  ai: 'AI 出题',
+}
+
+export const MOCK_STATUS_LABEL: Record<string, string> = {
+  created: '生成中',
+  ongoing: '进行中',
+  scoring: '评分中',
+  done: '已完成',
+  failed: '已失败',
+}
+
+/** 模拟面试轮次（可与题库 ROUND_OPTIONS 不同，这里只留面试轮） */
+export const MOCK_ROUND_OPTIONS = ['一面', '二面', '三面', 'hr']
+
+/** 题量三档 */
+export const MOCK_QUESTION_COUNTS = [3, 5, 8]
+
+/** 每人每日场次上限（与后端一致，仅用于文案提示） */
+export const MOCK_DAILY_LIMIT = 3
+
+/** 四维雷达图展示顺序与标签 */
+export const MOCK_DIMENSION_ORDER: Array<{ key: keyof MockDimensions; label: string }> = [
+  { key: 'accuracy', label: '准确性' },
+  { key: 'depth', label: '深度' },
+  { key: 'expression', label: '表达' },
+  { key: 'structure', label: '结构' },
+]

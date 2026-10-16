@@ -1,6 +1,6 @@
 # 面试模块（Interview Hub）设计
 
-> 状态：**P1、P2 已上线**（2026-10-16）；P3 待排期
+> 状态：**P1、P2、P3 已上线**（2026-10-16）
 > 目标仓库：前端 `aiblog-web`（`/home/ubuntu/aiblog-web`）+ 后端 `aiblog-java`（`/home/ubuntu/aiblog-java`）
 > 相关：`docs/ai-community-plan.md`（AI 广场，已上线）、`docs/ai-features-proposal.md`
 > 依赖 skill：`aiblog-web-ui`（颜色令牌 / 排版 / 卡片与两栏规范）
@@ -283,3 +283,19 @@ SRS 只做 6 档固定间隔（1d / 2d / 4d / 7d / 15d / 30d），**不引入 SM
 | 遗留 | `interview_applications` 只有表、暂无接口；复习卡只带 title，展开答案需再取详情接口 |
 
 **P2 未做（可下轮）**：投递看板（applications CRUD）、复习卡直接带题干、连续复习天数 / 周报。
+
+---
+
+## 10. 落地记录（P3，2026-10-16）
+
+| 项 | 实际 |
+| --- | --- |
+| 表 | `interview_sessions` / `interview_session_questions` / `interview_answers` / `interview_reports`（迁移 `V20261016_3__interview_session.sql`，三份同步） |
+| 后端 | `InterviewSessionController` + `InterviewSessionService` + 4 实体 / 4 Mapper / 4 请求 + 4 响应 DTO；每人每天 3 场上限；`scoring` 超 10 分钟自动 `failed`（`@EnableScheduling` + 每分钟扫描）；`SecurityConfig` 把 `/api/interview/sessions/**` 收紧为必须登录 |
+| 接口 | `POST /sessions`（bank 抽题 / ai 出题）、列表、详情、`POST /answers`、`POST /submit`、`GET /report`、`POST /evaluate`（回填）、`GET /pending`（worker）、`POST /questions`（worker 回填 AI 题）、`GET /api/admin/interview/sessions`（抽查） |
+| 前台 | `/interview/mock`（配置 + 我的模拟记录）、`/interview/mock/[id]`（出题中 / 答题 / 评分中 / 报告 四态，3s 轮询）；报告 = 总分 + 四维雷达（ECharts）+ 总评 + 逐题反馈 |
+| worker | `/home/ubuntu/scripts/interview-score.mjs`，px-cron `interview-score` 每 5 分钟：AI 出题 + 逐题评分回填；默认 `nvidia/nemotron-3-super-120b-a12b`，降级 `nemotron-3-ultra-550b-a55b` → openrouter `:free` |
+| 门禁 | `mvn compile` ✅ ｜ `npm run build` ✅ ｜ 容器 rebuild 后 `/interview/mock` 200 ｜ 端到端冒烟：AI 出题 32s / 3 题 → 作答交卷 → 评分 33 分 + 四维 + 逐题反馈 ✅ |
+| 决策 | 评分模型用 nemotron；允许 AI 生成新题；每人每天 3 场；评分走 px 侧 secrets（`~/new-api` 未启用） |
+
+**P3 未做**：语音/视频模式、报告历史对比与排行、worker 并发（当前每轮最多 3 场、单线程）。

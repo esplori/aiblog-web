@@ -100,6 +100,7 @@ export const MODULES: NavModule[] = [
         label: '备战',
         items: [
           { key: 'plan', label: '备战台', path: '/interview/plan', icon: 'target', auth: true },
+          { key: 'mock', label: '模拟面试', path: '/interview/mock', icon: 'mic', auth: true },
           { key: 'review', label: '今日复习', path: '/interview/review', icon: 'clock', auth: true },
         ],
       },
@@ -147,6 +148,7 @@ export const resolveActive = (path: string, type?: string): string => {
   if (path === '/ai') return type ? type : 'plaza'
   if (path.startsWith('/admin/ai-items')) return 'ai-admin'
   // ⚠ 必须放在更宽泛的 /interview 判断之前，否则会被题库兜底命中
+  if (path.startsWith('/interview/mock')) return 'mock'
   if (path.startsWith('/interview/plan')) return 'plan'
   if (path.startsWith('/interview/review')) return 'review'
   if (path.startsWith('/interview/companies')) return 'companies'
