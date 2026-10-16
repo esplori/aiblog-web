@@ -279,3 +279,71 @@ a:hover {
   color: #1f2328;
 }
 
+
+/* 面试题难度档位：1-2 绿 / 3 黄 / 4-5 红（固定语义色，不随品牌换肤） */
+.iq-diff {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.7;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.iq-diff--1,
+.iq-diff--2 { color: #047857; background: color-mix(in srgb, #047857 9%, white); border-color: color-mix(in srgb, #047857 20%, white); }
+.iq-diff--3 { color: #b45309; background: color-mix(in srgb, #d97706 12%, white); border-color: color-mix(in srgb, #d97706 24%, white); }
+.iq-diff--4,
+.iq-diff--5 { color: #b91c1c; background: color-mix(in srgb, #b91c1c 8%, white); border-color: color-mix(in srgb, #b91c1c 20%, white); }
+
+/* 面试题库筛选下拉（原生 select，与 Tailwind 输入框同款边框/圆角） */
+.interview-select {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #334155;
+  outline: none;
+}
+.interview-select:focus {
+  border-color: var(--color-brand);
+}
+
+/* 面试题详情：markdown 正文与标记按钮 */
+.interview-md p { margin-bottom: 10px; }
+.interview-md p:last-child { margin-bottom: 0; }
+.interview-md code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  background: #f6f7f9;
+  border: 1px solid #e8eaed;
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+.interview-md pre {
+  background: #f6f7f9;
+  border: 1px solid #e8eaed;
+  border-radius: 10px;
+  padding: 10px 12px;
+  overflow-x: auto;
+}
+.interview-md ul,
+.interview-md ol { padding-left: 18px; margin-bottom: 10px; list-style: disc; }
+.interview-md blockquote {
+  border-left: 3px solid #e2e8f0;
+  padding-left: 10px;
+  color: #64748b;
+}
+.interview-mark {
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #334155;
+}
+.interview-mark:hover { border-color: var(--color-brand); color: var(--color-brand); }
+.interview-mark--on { border-color: var(--color-brand); color: var(--color-brand); background: color-mix(in srgb, var(--color-brand) 8%, white); }

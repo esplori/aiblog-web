@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { PageResult, ArticleItem } from '~/types'
 import type { AiStats } from '~/types/ai'
+import type { InterviewStats } from '~/types/interview'
 import { MODULES, resolveActive, resolveModule } from '~/utils/navModules'
 import type { NavItem } from '~/utils/navModules'
 
@@ -46,12 +47,22 @@ const { data: articleTotal } = await useAsyncData(
   () => get<PageResult<ArticleItem>>('/api/articles', { page: 1, size: 1, status: 'published' }),
   { default: () => null }
 )
+const { data: interviewStats } = await useAsyncData('wb-interview-stats', () => get<InterviewStats>('/api/interview/stats'), {
+  default: () => null,
+})
 
 const badgeCount = (key?: string): number | null => {
   if (!key) return null
   if (key === 'articles') {
     const total = articleTotal.value?.data?.total
     return total ? Number(total) : null
+  }
+  if (key.startsWith('interview.')) {
+    const interview = interviewStats.value?.data
+    if (!interview) return null
+    if (key === 'interview.total') return interview.total || null
+    const count = interview.byPosition?.[key.replace('interview.', '')]
+    return count ? Number(count) : null
   }
   const stats = aiStats.value?.data
   if (!stats) return null
@@ -139,7 +150,7 @@ const onLogout = () => {
               :class="mod.key === currentModule.key ? 'bg-brand-50 text-brand-700' : 'text-slate-500 hover:bg-slate-50'"
               :aria-label="mod.label"
             >
-              <AppIcon :name="mod.key === 'ai' ? 'spark' : 'doc'" />
+              <AppIcon :name="mod.icon || 'doc'" />
             </NuxtLink>
             <p
               v-else
@@ -240,6 +251,9 @@ const onLogout = () => {
 
           <NuxtLink to="/ai" class="text-slate-500 hover:text-brand-600" aria-label="AI 广场">
             <AppIcon name="spark" />
+          </NuxtLink>
+          <NuxtLink to="/interview" class="text-slate-500 hover:text-brand-600" aria-label="面试题库">
+            <AppIcon name="notebook" />
           </NuxtLink>
           <NuxtLink
             v-if="!authStore.isLoggedIn"

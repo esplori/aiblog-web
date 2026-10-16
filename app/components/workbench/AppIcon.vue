@@ -30,6 +30,9 @@ const PATHS: Record<string, string> = {
   close: 'M6 6l12 12M18 6L6 18',
   logout: 'M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 8l-4 4 4 4M6 12h9',
   filter: 'M4 6h16M7 12h10M10 18h4',
+  notebook: 'M8 4h9a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H8M8 4v16M8 4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2M11 8h5M11 12h5',
+  building: 'M4 21V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v15M15 10h4a1 1 0 0 1 1 1v10M3 21h18M8 9h3M8 13h3M8 17h3',
+  target: 'M12 3v3M12 18v3M3 12h3M18 12h3M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
 }
 
 const d = computed(() => PATHS[props.name] || PATHS.grid)

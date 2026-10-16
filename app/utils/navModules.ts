@@ -28,6 +28,8 @@ export interface NavModule {
   label: string
   hint: string
   home: string
+  /** 折叠态模块图标（AppIcon 的 name） */
+  icon?: string
   groups: NavGroup[]
 }
 
@@ -37,6 +39,7 @@ export const MODULES: NavModule[] = [
     label: '博客',
     hint: '内容与文章',
     home: '/',
+    icon: 'doc',
     groups: [
       {
         key: 'content',
@@ -62,6 +65,7 @@ export const MODULES: NavModule[] = [
     label: 'AI 广场',
     hint: 'Skill / MCP / 提示词',
     home: '/ai',
+    icon: 'spark',
     groups: [
       {
         key: 'plaza',
@@ -84,6 +88,31 @@ export const MODULES: NavModule[] = [
       },
     ],
   },
+  {
+    key: 'interview',
+    label: '面试',
+    hint: '题库 / 公司 / 面经',
+    home: '/interview',
+    icon: 'notebook',
+    groups: [
+      {
+        key: 'practice',
+        label: '练习',
+        items: [
+          { key: 'questions', label: '题库', path: '/interview', icon: 'notebook', badge: 'interview.total' },
+          { key: 'companies', label: '公司库', path: '/interview/companies', icon: 'building' },
+        ],
+      },
+      {
+        key: 'manage',
+        label: '管理',
+        items: [
+          { key: 'iq-admin', label: '题目录入', path: '/admin/interview-questions', icon: 'upload', auth: true },
+          { key: 'ic-admin', label: '公司维护', path: '/admin/interview-companies', icon: 'building', auth: true },
+        ],
+      },
+    ],
+  },
 ]
 
 /** 按路径判断当前属于哪个模块（用于高亮模块切换器） */
@@ -94,6 +123,12 @@ export const resolveModule = (path: string): NavModule => {
   if (path.startsWith('/admin/ai-items')) {
     return MODULES.find(m => m.key === 'ai') as NavModule
   }
+  if (path === '/interview' || path.startsWith('/interview/')) {
+    return MODULES.find(m => m.key === 'interview') as NavModule
+  }
+  if (path.startsWith('/admin/interview')) {
+    return MODULES.find(m => m.key === 'interview') as NavModule
+  }
   return MODULES[0]
 }
 
@@ -103,6 +138,10 @@ export const resolveActive = (path: string, type?: string): string => {
   if (path.startsWith('/ai/')) return 'plaza'
   if (path === '/ai') return type ? type : 'plaza'
   if (path.startsWith('/admin/ai-items')) return 'ai-admin'
+  if (path.startsWith('/interview/companies')) return 'companies'
+  if (path.startsWith('/interview')) return 'questions'
+  if (path.startsWith('/admin/interview-questions')) return 'iq-admin'
+  if (path.startsWith('/admin/interview-companies')) return 'ic-admin'
   if (path.startsWith('/articles')) return 'articles'
   if (path.startsWith('/admin/site-settings')) return 'settings'
   if (path.startsWith('/admin/articles')) return 'write'
