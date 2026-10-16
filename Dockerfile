@@ -4,6 +4,9 @@ FROM node:22-alpine AS builder
 # 安装pnpm
 RUN npm install -g pnpm
 
+# 提高 Node 堆上限，避免小内存机器上 nuxt build 触发 OOM
+ENV NODE_OPTIONS=--max-old-space-size=2048
+
 # 设置工作目录
 WORKDIR /app
 
