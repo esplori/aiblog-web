@@ -99,3 +99,77 @@ export const positionLabel = (position?: string | null): string => {
   if (!position) return '通用'
   return POSITION_LABEL[position] || position
 }
+
+/* ==========================================================================
+ * P2 个人备战台（计划 / 进度 / SRS 复习）
+ * 接口：/api/interview/plan、/api/interview/review/**（均需登录）
+ * ========================================================================== */
+
+/** 备战计划（一个用户一份；未设置时后端返回 plan: null） */
+export interface InterviewPlan {
+  id: number
+  targetCompanyId?: number | null
+  targetCompanyName?: string | null
+  targetCompanySlug?: string | null
+  position?: string | null
+  interviewDate?: string | null
+  /** 距面试的天数：>0 还有 N 天；=0 就是今天；<0 已过 N 天 */
+  daysLeft?: number | null
+  note?: string | null
+  updatedAt?: string
+}
+
+/** 个人进度概览 */
+export interface InterviewProgress {
+  markedCount: number
+  masteredCount: number
+  cardTotal: number
+  dueToday: number
+  reviewedToday: number
+}
+
+export interface InterviewPlanResponse {
+  plan: InterviewPlan | null
+  progress: InterviewProgress
+}
+
+/** 一张待复习卡（SRS） */
+export interface ReviewCard {
+  questionId: number
+  slug: string
+  title: string
+  position?: string | null
+  difficulty?: number | null
+  companyName?: string | null
+  /** 间隔档位 0-5，对应 1/2/4/7/15/30 天 */
+  stage: number
+  dueAt?: string | null
+  lastResult?: string | null
+  lapses: number
+}
+
+export interface ReviewDueResponse {
+  dueTotal: number
+  cards: ReviewCard[]
+}
+
+export interface ReviewStats {
+  cardTotal: number
+  dueToday: number
+  dueWeek: number
+  mastered: number
+  byStage: Record<string, number>
+}
+
+/** 三键反馈（与后端 result 取值一致） */
+export const REVIEW_RESULTS = ['unknown', 'fuzzy', 'known'] as const
+export type ReviewResult = (typeof REVIEW_RESULTS)[number]
+
+export const REVIEW_RESULT_LABEL: Record<ReviewResult, string> = {
+  unknown: '不会',
+  fuzzy: '模糊',
+  known: '会',
+}
+
+/** SRS 固定间隔（天），与后端 stage 0-5 对应，用于空态文案说明 */
+export const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]

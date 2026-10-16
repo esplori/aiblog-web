@@ -1,6 +1,6 @@
 # 面试模块（Interview Hub）设计
 
-> 状态：**P1 已上线**（2026-10-16）；P2 / P3 待排期
+> 状态：**P1、P2 已上线**（2026-10-16）；P3 待排期
 > 目标仓库：前端 `aiblog-web`（`/home/ubuntu/aiblog-web`）+ 后端 `aiblog-java`（`/home/ubuntu/aiblog-java`）
 > 相关：`docs/ai-community-plan.md`（AI 广场，已上线）、`docs/ai-features-proposal.md`
 > 依赖 skill：`aiblog-web-ui`（颜色令牌 / 排版 / 卡片与两栏规范）
@@ -267,3 +267,19 @@ SRS 只做 6 档固定间隔（1d / 2d / 4d / 7d / 15d / 30d），**不引入 SM
 1. 栏目名：**「面试」** / 「面试站」 / 「Offer 站」？（走站点配置，后改成本低）
 2. P2 的备战台是否**必须登录**（建议是，涉及个人数据）
 3. UGC 提交题目：P1 是否就开口子（建议否，P2 再开）
+
+---
+
+## 9. 落地记录（P2，2026-10-16）
+
+| 项 | 实际 |
+| --- | --- |
+| 表 | `interview_plans` / `interview_review_cards` / `interview_applications`（迁移 `V20261016_2__interview_plan.sql`，`schema.sql` 与 `docker/initdb/01-schema.sql` 三份同步） |
+| 后端 | `InterviewPlanController` + `InterviewPlanService`/`InterviewReviewService` + 2 实体 / 2 Mapper / 6 DTO；`SecurityConfig` 把 `/api/interview/plan` 与 `/api/interview/review/**` 收紧为必须登录（其余 GET 仍公开） |
+| SRS | 固定 6 档间隔 1/2/4/7/15/30 天：known → stage+1；fuzzy → stage 至少 1 并保持；unknown → 归零且 lapses+1 |
+| 打标联动 | 题目详情「标记掌握」后自动建复习卡（mastered 且无卡 → stage 5 / 30 天），已有卡不回退阶段 |
+| 前台 | `/interview/plan`（倒计时 + 目标设置 + 进度 + 目标公司近题）、`/interview/review`（逐张卡片、三键评级）；导航新增「备战」分组（登录可见） |
+| 门禁 | `mvn -DskipTests compile` ✅ ｜ `npm run build` ✅ ｜ 容器 rebuild 后 `/interview/plan`、`/interview/review` 200 ｜ API 冒烟（打标 → 建卡 → 评级 → 统计）✅ |
+| 遗留 | `interview_applications` 只有表、暂无接口；复习卡只带 title，展开答案需再取详情接口 |
+
+**P2 未做（可下轮）**：投递看板（applications CRUD）、复习卡直接带题干、连续复习天数 / 周报。
