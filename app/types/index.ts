@@ -62,6 +62,8 @@ export interface Article {
   content: string
   excerpt?: string
   aiSummary?: string
+  metaTitle?: string
+  metaDescription?: string
   coverImage?: string
   status: string
   viewCount: number

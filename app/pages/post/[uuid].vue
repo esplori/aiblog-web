@@ -30,9 +30,18 @@ watch(article, (value) => {
 }, { immediate: true })
 
 // 动态设置 SEO 元信息（SSR 时生效，爬虫可见）
+// SEO：优先用后端 AI 生成的 meta_title / meta_description，回退到标题与摘要
 useSeoMeta({
-  title: () => article.value?.title || '文章详情',
-  description: () => article.value?.excerpt || article.value?.content?.slice(0, 200)?.replace(/<[^>]*>/g, ''),
+  title: () => article.value?.metaTitle || article.value?.title || '文章详情',
+  description: () =>
+    article.value?.metaDescription
+    || article.value?.excerpt
+    || article.value?.aiSummary
+    || article.value?.content?.slice(0, 200)?.replace(/<[^>]*>/g, ''),
+  ogTitle: () => article.value?.metaTitle || article.value?.title || '文章详情',
+  ogDescription: () =>
+    article.value?.metaDescription || article.value?.excerpt || article.value?.aiSummary || '',
+  ogType: 'article',
 })
 
 // 相关文章：后端按标题/摘要相似度排序（同分类、热度、新近度只做小加成）
