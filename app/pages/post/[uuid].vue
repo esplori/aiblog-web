@@ -35,6 +35,29 @@ useSeoMeta({
   description: () => article.value?.excerpt || article.value?.content?.slice(0, 200)?.replace(/<[^>]*>/g, ''),
 })
 
+// 相关文章：后端按标题/摘要相似度排序（同分类、热度、新近度只做小加成）
+// ⚠ 生产 SSR 中 useAsyncData handler 里的 await 后 Nuxt 上下文会丢，
+//    导致 useApi.get() 内部的 useRequestHeaders() 抛错/返回空 → 推荐接口不请求。
+//    这里在 setup 阶段把内网 baseURL 解析好，handler 里直接用 $fetch（无 composable 依赖），
+//    兼容 SSR 与客户端；key 统一用 uuid 保证一致性。
+const config = useRuntimeConfig()
+const apiBaseInternal = import.meta.server ? config.apiBaseInternal : ''
+
+const { data: relatedData } = useAsyncData(
+  () => `article-related-${articleUuid.value}`,
+  async () => {
+    let id = article.value?.id
+    if (!id) {
+      const fallback = await $fetch<ApiResponse<Article>>(`${apiBaseInternal}/api/articles/uuid/${articleUuid.value}`)
+      id = fallback?.data?.id
+    }
+    if (!id) return { data: [] as ArticleItem[] } as any
+    return $fetch<ApiResponse<ArticleItem[]>>(`${apiBaseInternal}/api/articles/${id}/recommended`, { query: { size: 4 } })
+  },
+  { default: () => ({ data: [] as ArticleItem[] }) as any, watch: [articleUuid] }
+)
+const related = computed<ArticleItem[]>(() => relatedData.value?.data || [])
+
 // 评论请求依赖文章内部 id，需等文章加载完成后再请求
 const { data: commentsData, pending: commentsPending, refresh: refreshComments } = useAsyncData(
   () => `article-comments-${article.value?.id ?? 'none'}`,
@@ -177,6 +200,15 @@ const submitComment = async () => {
         <!-- 分隔线 -->
         <div class="border-t border-gray-100" />
 
+        <!-- AI 摘要（后端 LLM 生成，articles.ai_summary） -->
+        <div v-if="article.aiSummary" class="mt-8 rounded-xl border border-brand-100 bg-brand-50/60 p-5">
+          <div class="mb-2 flex items-center gap-2">
+            <span class="rounded bg-brand-600 px-1.5 py-0.5 text-[11px] font-medium text-white">AI 摘要</span>
+            <span class="text-xs text-gray-400">模型根据正文自动生成，仅供参考</span>
+          </div>
+          <p class="text-sm leading-relaxed text-gray-700">{{ article.aiSummary }}</p>
+        </div>
+
         <!-- 文章内容 -->
         <article
           class="article-content pt-10"
@@ -197,6 +229,35 @@ const submitComment = async () => {
             {{ isLiked ? '已点赞' : '点赞' }} ({{ article.likeCount }})
           </el-button>
         </div>
+
+        <!-- 分隔线 -->
+        <div class="border-t border-gray-100" />
+
+        <!-- 相关文章（后端 /api/articles/{id}/recommended，按标题/摘要相似度排序） -->
+        <section v-if="related.length" class="pt-10">
+          <h2 class="mb-4 text-lg font-semibold text-slate-900">相关文章</h2>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <NuxtLink
+              v-for="item in related"
+              :key="item.id"
+              :to="`/post/${item.uuid}`"
+              target="_blank"
+              rel="noopener"
+              class="group block rounded-xl border border-slate-200 bg-white p-4 transition-colors hover:border-brand-300"
+            >
+              <div class="mb-1.5 flex items-center gap-2 text-[11px] text-slate-400">
+                <span v-if="item.category" class="font-medium text-brand-600">{{ item.category.name }}</span>
+                <span>{{ (item.createdAt || '').slice(0, 10) }}</span>
+              </div>
+              <h3 class="line-clamp-2 text-[15px] font-semibold leading-snug text-slate-900 group-hover:text-brand-600">
+                {{ item.title }}
+              </h3>
+              <p v-if="item.excerpt" class="mt-1.5 line-clamp-2 text-[13px] leading-relaxed text-slate-500">
+                {{ item.excerpt }}
+              </p>
+            </NuxtLink>
+          </div>
+        </section>
 
         <!-- 分隔线 -->
         <div class="border-t border-gray-100" />
