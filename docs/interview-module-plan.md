@@ -282,7 +282,8 @@ SRS 只做 6 档固定间隔（1d / 2d / 4d / 7d / 15d / 30d），**不引入 SM
 | 门禁 | `mvn -DskipTests compile` ✅ ｜ `npm run build` ✅ ｜ 容器 rebuild 后 `/interview/plan`、`/interview/review` 200 ｜ API 冒烟（打标 → 建卡 → 评级 → 统计）✅ |
 | 遗留 | `interview_applications` 只有表、暂无接口；复习卡只带 title，展开答案需再取详情接口 |
 
-**P2 未做（可下轮）**：投递看板（applications CRUD）、复习卡直接带题干、连续复习天数 / 周报。
+**P2 已完成（2026-10-18）**：投递看板（applications CRUD）—— 后端 `/api/interview/applications`（列表 / 创建 / 更新 / 改阶段 / 软删，阶段白名单五档），前端 `/interview/applications` 五列阶段看板 + 侧边导航入口。
+**P2 未做（后面再完善）**：复习卡直接带题干、连续复习天数 / 周报。
 
 ---
 
@@ -298,4 +299,4 @@ SRS 只做 6 档固定间隔（1d / 2d / 4d / 7d / 15d / 30d），**不引入 SM
 | 门禁 | `mvn compile` ✅ ｜ `npm run build` ✅ ｜ 容器 rebuild 后 `/interview/mock` 200 ｜ 端到端冒烟：AI 出题 32s / 3 题 → 作答交卷 → 评分 33 分 + 四维 + 逐题反馈 ✅ |
 | 决策 | 评分模型用 nemotron；允许 AI 生成新题；每人每天 3 场；评分走 px 侧 secrets（`~/new-api` 未启用） |
 
-**P3 未做**：语音/视频模式、报告历史对比与排行、worker 并发（当前每轮最多 3 场、单线程）。
+**P3 未做（后面再完善）**：语音/视频模式、报告历史对比与排行、worker 并发（当前每轮最多 3 场、单线程）。
