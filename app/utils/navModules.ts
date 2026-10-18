@@ -48,14 +48,7 @@ export const MODULES: NavModule[] = [
           { key: 'home', label: '首页', path: '/', icon: 'grid' },
           { key: 'articles', label: '全部文章', path: '/articles', icon: 'doc', badge: 'articles' },
           { key: 'write', label: '写文章', path: '/admin/articles', icon: 'plus', auth: true },
-        ],
-      },
-      {
-        key: 'system',
-        label: '站点',
-        items: [
           { key: 'admin', label: '后台首页', path: '/admin', icon: 'chart', auth: true },
-          { key: 'settings', label: '站点设置', path: '/admin/site-settings', icon: 'settings', auth: true },
         ],
       },
     ],
@@ -77,12 +70,6 @@ export const MODULES: NavModule[] = [
           { key: 'prompt', label: '提示词', path: '/ai', type: 'prompt', icon: 'chat', badge: 'ai.prompt' },
           { key: 'model', label: '模型', path: '/ai', type: 'model', icon: 'cube', badge: 'ai.model' },
           { key: 'tool', label: '工具', path: '/ai', type: 'tool', icon: 'wrench', badge: 'ai.tool' },
-        ],
-      },
-      {
-        key: 'manage',
-        label: '管理',
-        items: [
           { key: 'ai-admin', label: '条目录入', path: '/admin/ai-items', icon: 'upload', auth: true },
         ],
       },
@@ -111,12 +98,6 @@ export const MODULES: NavModule[] = [
         items: [
           { key: 'questions', label: '题库', path: '/interview', icon: 'notebook', badge: 'interview.total' },
           { key: 'companies', label: '公司库', path: '/interview/companies', icon: 'building' },
-        ],
-      },
-      {
-        key: 'manage',
-        label: '管理',
-        items: [
           { key: 'iq-admin', label: '题目录入', path: '/admin/interview-questions', icon: 'upload', auth: true },
           { key: 'ic-admin', label: '公司维护', path: '/admin/interview-companies', icon: 'building', auth: true },
         ],
