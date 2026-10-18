@@ -34,6 +34,7 @@ const PATHS: Record<string, string> = {
   building: 'M4 21V6a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v15M15 10h4a1 1 0 0 1 1 1v10M3 21h18M8 9h3M8 13h3M8 17h3',
   target: 'M12 3v3M12 18v3M3 12h3M18 12h3M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
   mic: 'M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zM19 11.5a7 7 0 0 1-14 0M12 18.5V21M9 21h6',
+  briefcase: 'M4 8.5h16v10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zM9 8.5V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2.5M4 13.5h16',
 }
 
 const d = computed(() => PATHS[props.name] || PATHS.grid)

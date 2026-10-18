@@ -281,3 +281,28 @@ export const MOCK_DIMENSION_ORDER: Array<{ key: keyof MockDimensions; label: str
   { key: 'expression', label: '表达' },
   { key: 'structure', label: '结构' },
 ]
+
+// 投递看板（P2）：一条投递记录，阶段固定五档
+export interface InterviewApplication {
+  id: number
+  companyId?: number | null
+  companyName?: string | null
+  position: string
+  stage: string
+  appliedAt?: string | null
+  note?: string | null
+  createdAt?: string
+  updatedAt?: string
+}
+
+/** 看板阶段顺序与中文名，前后端共用同一套 key */
+export const APPLICATION_STAGES = [
+  { key: 'applied', label: '已投递', tone: 'text-slate-600 bg-slate-100' },
+  { key: 'screening', label: '筛选中', tone: 'text-amber-700 bg-amber-50' },
+  { key: 'interview', label: '面试中', tone: 'text-brand-700 bg-brand-50' },
+  { key: 'offer', label: 'Offer', tone: 'text-emerald-700 bg-emerald-50' },
+  { key: 'rejected', label: '已结束', tone: 'text-slate-500 bg-slate-100' },
+] as const
+
+export const stageLabel = (stage?: string | null): string =>
+  APPLICATION_STAGES.find((item) => item.key === stage)?.label || '已投递'
