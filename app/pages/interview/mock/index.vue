@@ -32,7 +32,8 @@ const startError = ref('')
 
 const form = reactive({
   companyId: '',
-  position: '',
+  // 岗位是必填项：这里直接给默认值，避免「看着像选中了、其实提交了 null」导致接口 422
+  position: POSITION_OPTIONS[0] as string,
   round: '',
   mode: 'bank',
   questionCount: 5,
@@ -86,6 +87,11 @@ const load = async () => {
 
 const start = async () => {
   if (starting.value) return
+  // 双保险：即使 position 被清空也给出人话提示，而不是把 422 抛给用户
+  if (!form.position) {
+    startError.value = '请先选择目标岗位'
+    return
+  }
   starting.value = true
   startError.value = ''
   try {
