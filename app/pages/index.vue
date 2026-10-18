@@ -51,7 +51,7 @@ onMounted(() => {
 useSeoMeta({
   description: () =>
     (site.description || '') +
-    ` 站内包含 ${articleTotal.value} 篇技术文章与 ${stats.value?.total || 0} 个经过精选的 AI 资源条目（MCP / Skill / 提示词 / 模型 / 工具）。`,
+    ` 站内包含 ${articleTotal.value} 篇技术文章与 ${stats.value?.total || 0} 个经过精选的 AI 资源条目（MCP / Skill / 提示词 / 工具）。`,
 })
 </script>
 
@@ -141,7 +141,7 @@ useSeoMeta({
             <h2 class="text-base font-bold text-slate-900">AI 广场</h2>
             <NuxtLink to="/ai" class="text-sm text-brand-600 hover:underline">全部 {{ stats?.total || 0 }} 个条目 →</NuxtLink>
           </div>
-          <p class="mb-3 text-xs text-slate-400">编辑精选的 MCP 服务、Skill、提示词、模型与工具，标注权限风险与客户端兼容性</p>
+          <p class="mb-3 text-xs text-slate-400">编辑精选的 MCP 服务、Skill、提示词与工具，标注权限风险与客户端兼容性</p>
           <el-skeleton v-if="aiPending && !aiItems.length" :rows="4" animated />
           <div v-else-if="aiItems.length" class="grid gap-4 sm:grid-cols-2">
             <AiItemCard v-for="item in aiItems" :key="item.slug" :item="item" />

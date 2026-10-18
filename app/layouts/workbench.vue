@@ -249,22 +249,6 @@ const onLogout = () => {
             />
           </form>
 
-          <NuxtLink to="/ai" class="text-slate-500 hover:text-brand-600" aria-label="AI 广场">
-            <WorkbenchAppIcon name="spark" />
-          </NuxtLink>
-          <NuxtLink to="/interview" class="text-slate-500 hover:text-brand-600" aria-label="面试题库">
-            <WorkbenchAppIcon name="notebook" />
-          </NuxtLink>
-          <NuxtLink
-            v-if="!authStore.isLoggedIn"
-            to="/login"
-            class="rounded-lg bg-brand-600 px-3 py-1.5 text-sm text-white transition-colors hover:bg-brand-700"
-          >
-            登录
-          </NuxtLink>
-          <NuxtLink v-if="authStore.isLoggedIn" to="/admin" class="text-slate-500 hover:text-brand-600" aria-label="管理后台">
-            <WorkbenchAppIcon name="settings" />
-          </NuxtLink>
         </header>
 
         <main id="wb-main" class="px-4 lg:px-6 py-6 mx-auto max-w-[1240px]">
@@ -293,6 +277,16 @@ const onLogout = () => {
               </button>
             </li>
           </ul>
+        </div>
+        <div v-if="!authStore.isLoggedIn" class="mt-4 border-t border-slate-100 pt-3">
+          <NuxtLink
+            to="/login"
+            class="block rounded-lg bg-brand-600 py-2 text-center text-sm text-white transition-colors hover:bg-brand-700"
+            @click="drawerOpen = false"
+          >
+            登录
+          </NuxtLink>
+          <p class="mt-2 text-center text-[11px] leading-relaxed text-slate-400">登录后可继续上次阅读</p>
         </div>
   </div>
     </el-drawer>

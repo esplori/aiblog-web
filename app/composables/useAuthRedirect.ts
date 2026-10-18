@@ -81,8 +81,10 @@ export const resolveRedirect = (raw: unknown, fallback: string): string => {
 export const useAuthRedirect = () => {
   const route = useRoute()
   return {
-    /** @param isAdmin 登录用户是否为管理员,决定默认落点 */
-    targetAfterLogin: (isAdmin: boolean) =>
-      resolveRedirect(route.query.redirect, isAdmin ? '/admin' : '/'),
+    /**
+     * 登录后落点：有合法 ?redirect 就回跳，否则一律回首页（boss 2026-10-18 要求
+     * 不再按角色把管理员送进后台）。参数保留只为不改调用方签名。
+     */
+    targetAfterLogin: (_isAdmin?: boolean) => resolveRedirect(route.query.redirect, '/'),
   }
 }

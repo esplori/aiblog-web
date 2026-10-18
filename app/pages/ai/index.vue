@@ -61,7 +61,7 @@ const onSearch = () => setQuery({ keyword: keyword.value.trim() })
 
 useSeoMeta({
   title: () => (type.value ? (TYPE_LABEL[type.value] || type.value) + ' · AI 广场' : 'AI 广场'),
-  description: () => '经过编辑精选与实测的 AI 资源目录：MCP 服务、Skill、提示词、模型与工具，标注权限风险与客户端兼容性。' + site.description,
+  description: () => '经过编辑精选与实测的 AI 资源目录：MCP 服务、Skill、提示词与工具，标注权限风险与客户端兼容性。' + site.description,
 })
 </script>
 

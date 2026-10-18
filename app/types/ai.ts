@@ -54,7 +54,7 @@ export const TYPE_LABEL: Record<string, string> = {
   tool: '工具',
 }
 
-export const TYPE_ORDER: AiType[] = ['skill', 'mcp', 'prompt', 'model', 'tool']
+export const TYPE_ORDER: AiType[] = ['skill', 'mcp', 'prompt', 'tool']
 
 export const RISK_LABEL: Record<string, string> = {
   read: '只读',
