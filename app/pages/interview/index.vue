@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { PageResult } from '~/types'
 import type { InterviewCompany, InterviewQuestion, InterviewStats } from '~/types/interview'
-import { DIFFICULTY_LABEL, POSITION_OPTIONS, ROUND_OPTIONS, TYPE_LABEL, TYPE_ORDER, positionLabel } from '~/types/interview'
+import { DIFFICULTY_LABEL, KIND_FILTER_OPTIONS, questionKindLabel } from '~/types/interview'
 
 // 面试题库：公开可读（未登录也能看），沿用工作台外壳
 definePageMeta({ layout: 'workbench' })
@@ -12,10 +12,10 @@ const authStore = useAuthStore()
 const { get } = useApi()
 
 const filters = computed(() => ({
-  position: String(route.query.position || ''),
-  round: String(route.query.round || ''),
+  // 主题化后：主题（topicId）+ 题型（客观/主观）+ 难度 + 排序 + 关键词
+  topic: String(route.query.topic || ''),
+  kind: String(route.query.kind || ''),
   difficulty: String(route.query.difficulty || ''),
-  type: String(route.query.type || ''),
   sort: String(route.query.sort || 'hot'),
   keyword: String(route.query.keyword || ''),
   page: Number(route.query.page || 1) || 1,
@@ -30,7 +30,7 @@ watch(
 )
 
 const hasFilter = computed(
-  () => !!(filters.value.position || filters.value.round || filters.value.difficulty || filters.value.type || filters.value.keyword)
+  () => !!(filters.value.topic || filters.value.kind || filters.value.difficulty || filters.value.keyword)
 )
 
 /** 筛选一律走 query，保证 SSR / 分享链接 / 后退都一致 */
@@ -58,10 +58,9 @@ const { data, pending } = await useAsyncData(
     get<PageResult<InterviewQuestion>>('/api/interview/questions', {
       page: filters.value.page,
       size: pageSize,
-      position: filters.value.position || undefined,
-      round: filters.value.round || undefined,
+      topicId: filters.value.topic || undefined,
+      questionKind: filters.value.kind || undefined,
       difficulty: filters.value.difficulty || undefined,
-      questionType: filters.value.type || undefined,
       keyword: filters.value.keyword || undefined,
       sort: filters.value.sort,
     }),
@@ -85,9 +84,17 @@ const hot = computed(() => hotData.value?.data || [])
 const companies = computed(() => (companyData.value?.data || []).filter((c) => Number(c.questionCount) > 0).slice(0, 8))
 const totalPages = computed(() => Math.max(Math.ceil(total.value / pageSize), 1))
 
-const positionOptions = computed(() => {
-  const merged = new Set([...(stats.value?.positions || []), ...POSITION_OPTIONS])
-  return Array.from(merged)
+/** 主题下拉：11 个主题全量列出（含章节） */
+const { data: topicData } = await useAsyncData('interview-topics-filter', () => get<{ id: number; name: string; children?: { id: number; name: string }[] }[]>('/api/interview/topics'), {
+  default: () => null,
+})
+const topicOptions = computed(() => {
+  const out: { id: number; name: string }[] = []
+  for (const t of topicData.value?.data || []) {
+    out.push({ id: t.id, name: t.name })
+    for (const c of t.children || []) out.push({ id: c.id, name: '　' + c.name })
+  }
+  return out
 })
 
 const difficultyOptions = computed(() =>
@@ -145,13 +152,9 @@ useSeoMeta({
           class="min-w-[200px] flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
           @input="classify"
         />
-        <select class="interview-select" :value="filters.position" @change="onSelect($event, 'position')">
-          <option value="">全部岗位</option>
-          <option v-for="item in positionOptions" :key="item" :value="item">{{ positionLabel(item) }}</option>
-        </select>
-        <select class="interview-select" :value="filters.round" @change="onSelect($event, 'round')">
-          <option value="">全部轮次</option>
-          <option v-for="item in ROUND_OPTIONS" :key="item" :value="item">{{ item }}</option>
+        <select class="interview-select" :value="filters.topic" @change="onSelect($event, 'topic')">
+          <option value="">全部主题</option>
+          <option v-for="item in topicOptions" :key="item.id" :value="String(item.id)">{{ item.name }}</option>
         </select>
         <select class="interview-select" :value="filters.difficulty" @change="onSelect($event, 'difficulty')">
           <option value="">全部难度</option>
@@ -159,9 +162,9 @@ useSeoMeta({
             {{ item.level }}/5 {{ item.label }}
           </option>
         </select>
-        <select class="interview-select" :value="filters.type" @change="onSelect($event, 'type')">
+        <select class="interview-select" :value="filters.kind" @change="onSelect($event, 'kind')">
           <option value="">全部题型</option>
-          <option v-for="item in TYPE_ORDER" :key="item" :value="item">{{ TYPE_LABEL[item] }}</option>
+          <option v-for="item in KIND_FILTER_OPTIONS" :key="item.value" :value="item.value">{{ item.label }}</option>
         </select>
         <select class="interview-select" :value="filters.sort" @change="onSelect($event, 'sort')">
           <option value="hot">按热度</option>
@@ -172,7 +175,7 @@ useSeoMeta({
       </div>
       <div v-if="hasFilter" class="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
         <span>已筛选</span>
-        <button type="button" class="text-brand-600 hover:text-brand-700" @click="setQuery({ position: '', round: '', difficulty: '', type: '', keyword: '', page: 1 })">
+        <button type="button" class="text-brand-600 hover:text-brand-700" @click="setQuery({ topic: '', kind: '', difficulty: '', keyword: '', page: 1 })">
           清空条件
         </button>
       </div>

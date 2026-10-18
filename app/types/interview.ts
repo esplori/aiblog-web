@@ -9,6 +9,12 @@ export interface InterviewQuestion {
   round?: string | null
   difficulty?: number | null
   questionType: string
+  /** 主题（P1 主题化） */
+  topicId?: number | null
+  topicName?: string | null
+  /** subjective / single / multiple / judge / fill */
+  questionKind?: string | null
+  points?: number | null
   title: string
   body: string
   answer?: string | null
@@ -101,81 +107,7 @@ export const positionLabel = (position?: string | null): string => {
 }
 
 /* ==========================================================================
- * P2 个人备战台（计划 / 进度 / SRS 复习）
- * 接口：/api/interview/plan、/api/interview/review/**（均需登录）
- * ========================================================================== */
-
-/** 备战计划（一个用户一份；未设置时后端返回 plan: null） */
-export interface InterviewPlan {
-  id: number
-  targetCompanyId?: number | null
-  targetCompanyName?: string | null
-  targetCompanySlug?: string | null
-  position?: string | null
-  interviewDate?: string | null
-  /** 距面试的天数：>0 还有 N 天；=0 就是今天；<0 已过 N 天 */
-  daysLeft?: number | null
-  note?: string | null
-  updatedAt?: string
-}
-
-/** 个人进度概览 */
-export interface InterviewProgress {
-  markedCount: number
-  masteredCount: number
-  cardTotal: number
-  dueToday: number
-  reviewedToday: number
-}
-
-export interface InterviewPlanResponse {
-  plan: InterviewPlan | null
-  progress: InterviewProgress
-}
-
-/** 一张待复习卡（SRS） */
-export interface ReviewCard {
-  questionId: number
-  slug: string
-  title: string
-  position?: string | null
-  difficulty?: number | null
-  companyName?: string | null
-  /** 间隔档位 0-5，对应 1/2/4/7/15/30 天 */
-  stage: number
-  dueAt?: string | null
-  lastResult?: string | null
-  lapses: number
-}
-
-export interface ReviewDueResponse {
-  dueTotal: number
-  cards: ReviewCard[]
-}
-
-export interface ReviewStats {
-  cardTotal: number
-  dueToday: number
-  dueWeek: number
-  mastered: number
-  byStage: Record<string, number>
-}
-
-/** 三键反馈（与后端 result 取值一致） */
-export const REVIEW_RESULTS = ['unknown', 'fuzzy', 'known'] as const
-export type ReviewResult = (typeof REVIEW_RESULTS)[number]
-
-export const REVIEW_RESULT_LABEL: Record<ReviewResult, string> = {
-  unknown: '不会',
-  fuzzy: '模糊',
-  known: '会',
-}
-
-/** SRS 固定间隔（天），与后端 stage 0-5 对应，用于空态文案说明 */
-export const REVIEW_INTERVALS = [1, 2, 4, 7, 15, 30]
-
-/* ==========================================================================
- * P3 AI 模拟面试（会话 / 答题 / 评分报告）
+ * P3 AI 模拟考试（会话 / 答题 / 评分报告）
  * 接口：/api/interview/sessions/**（均需登录）
  * ========================================================================== */
 
@@ -265,7 +197,7 @@ export const MOCK_STATUS_LABEL: Record<string, string> = {
   failed: '已失败',
 }
 
-/** 模拟面试轮次（可与题库 ROUND_OPTIONS 不同，这里只留面试轮） */
+/** 模拟考试轮次（可与题库 ROUND_OPTIONS 不同，这里只留面试轮） */
 export const MOCK_ROUND_OPTIONS = ['一面', '二面', '三面', 'hr']
 
 /** 题量三档 */
@@ -306,3 +238,130 @@ export const APPLICATION_STAGES = [
 
 export const stageLabel = (stage?: string | null): string =>
   APPLICATION_STAGES.find((item) => item.key === stage)?.label || '已投递'
+
+/* ==========================================================================
+ * P2 模拟考试（客观题组卷）：创建 → 答题 → 交卷 → 成绩单
+ * 接口：/api/interview/exams/**（均需登录）
+ * ========================================================================== */
+
+export interface ExamOption {
+  key: string
+  text: string
+}
+
+export interface ExamQuestionItem {
+  seq: number
+  questionId: number
+  title: string
+  body?: string | null
+  questionKind: string
+  points: number
+  options: ExamOption[]
+}
+
+export interface ExamPaper {
+  id: number
+  title: string
+  topicNames?: string | null
+  questionCount: number
+  durationMinutes: number
+  totalPoints: number
+  status: string
+  startedAt?: string | null
+  remainingSeconds: number
+  questions: ExamQuestionItem[]
+}
+
+export interface ExamTopicScore {
+  name: string
+  total: number
+  correct: number
+}
+
+export interface ExamWrongItem {
+  questionId: number
+  title: string
+  questionKind?: string | null
+  userAnswer?: string | null
+  correctAnswer?: string | null
+  explanation?: string | null
+}
+
+export interface ExamResult {
+  id: number
+  title: string
+  topicNames?: string | null
+  status: string
+  questionCount: number
+  correctCount: number
+  totalPoints: number
+  score: number
+  accuracy: number
+  durationMinutes: number
+  elapsedSeconds?: number
+  startedAt?: string | null
+  submittedAt?: string | null
+  passed: boolean
+  passScore: number
+  byTopic: ExamTopicScore[]
+  wrongItems: ExamWrongItem[]
+}
+
+export interface ExamSummary {
+  id: number
+  title: string
+  topicNames?: string | null
+  questionCount: number
+  status: string
+  score: number
+  totalPoints: number
+  startedAt?: string | null
+  submittedAt?: string | null
+}
+
+export const EXAM_STATUS_LABEL: Record<string, string> = {
+  ongoing: '进行中',
+  submitted: '已交卷',
+}
+
+export const examStatusLabel = (status?: string | null): string =>
+  (status && EXAM_STATUS_LABEL[status]) || '进行中'
+
+
+/** 主题树节点（/api/interview/topics） */
+export interface InterviewTopicNode {
+  id: number
+  slug: string
+  name: string
+  parentId?: number | null
+  kind: string
+  description?: string | null
+  icon?: string | null
+  sortOrder?: number
+  questionCount: number
+  objectiveCount: number
+  children: InterviewTopicNode[]
+}
+
+
+/** 题型（客观/主观）中文名，题库筛选与卡片共用 */
+export const QUESTION_KIND_LABEL: Record<string, string> = {
+  subjective: '主观题',
+  single: '单选题',
+  multiple: '多选题',
+  judge: '判断题',
+  fill: '填空题',
+}
+
+export const questionKindLabel = (kind?: string | null): string =>
+  (kind && QUESTION_KIND_LABEL[kind]) || '主观题'
+
+/** 题库题型筛选项（objective 为后端支持的合并值） */
+export const KIND_FILTER_OPTIONS = [
+  { value: 'objective', label: '客观题（自动判分）' },
+  { value: 'subjective', label: '主观题' },
+  { value: 'single', label: '单选题' },
+  { value: 'multiple', label: '多选题' },
+  { value: 'judge', label: '判断题' },
+  { value: 'fill', label: '填空题' },
+] as const

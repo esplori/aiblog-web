@@ -13,17 +13,8 @@
     <p v-if="excerpt" class="mt-1.5 line-clamp-2 text-xs leading-relaxed text-slate-500">{{ excerpt }}</p>
 
     <div class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-400">
-      <NuxtLink
-        v-if="question.companySlug"
-        :to="'/interview/companies/' + question.companySlug"
-        class="relative z-10 text-slate-500 hover:text-brand-600"
-        @click.stop
-      >
-        {{ question.companyName }}
-      </NuxtLink>
-      <span v-else class="text-slate-500">{{ question.companyName || '通用题' }}</span>
-      <span>· {{ positionLabel(question.position) }}</span>
-      <span v-if="question.round">· {{ question.round }}</span>
+      <span class="text-slate-500">{{ question.topicName || '未分类' }}</span>
+      <span>· {{ questionKindLabel(question.questionKind) }}</span>
       <span class="ml-auto">★ {{ question.starCount }} · 浏览 {{ question.viewCount }}</span>
     </div>
 
@@ -39,7 +30,7 @@
 
 <script setup lang="ts">
 import type { InterviewQuestion } from '~/types/interview'
-import { positionLabel } from '~/types/interview'
+import { questionKindLabel } from '~/types/interview'
 
 const props = defineProps<{ question: InterviewQuestion }>()
 
