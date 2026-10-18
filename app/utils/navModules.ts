@@ -68,7 +68,6 @@ export const MODULES: NavModule[] = [
           { key: 'mcp', label: 'MCP 服务', path: '/ai', type: 'mcp', icon: 'plug', badge: 'ai.mcp' },
           { key: 'skill', label: 'Skill', path: '/ai', type: 'skill', icon: 'check', badge: 'ai.skill' },
           { key: 'prompt', label: '提示词', path: '/ai', type: 'prompt', icon: 'chat', badge: 'ai.prompt' },
-          { key: 'model', label: '模型', path: '/ai', type: 'model', icon: 'cube', badge: 'ai.model' },
           { key: 'tool', label: '工具', path: '/ai', type: 'tool', icon: 'wrench', badge: 'ai.tool' },
           { key: 'ai-admin', label: '条目录入', path: '/admin/ai-items', icon: 'upload', auth: true },
         ],
@@ -77,29 +76,19 @@ export const MODULES: NavModule[] = [
   },
   {
     key: 'interview',
-    label: '面试',
+    label: '刷题',
     hint: '题库 / 公司 / 面经',
     home: '/interview',
     icon: 'notebook',
     groups: [
       {
-        key: 'prepare',
-        label: '备战',
-        items: [
-          { key: 'plan', label: '备战台', path: '/interview/plan', icon: 'target', auth: true },
-          { key: 'mock', label: '模拟面试', path: '/interview/mock', icon: 'mic', auth: true },
-          { key: 'review', label: '今日复习', path: '/interview/review', icon: 'clock', auth: true },
-          { key: 'applications', label: '投递看板', path: '/interview/applications', icon: 'briefcase', auth: true },
-        ],
-      },
-      {
         key: 'practice',
         label: '练习',
         items: [
+          { key: 'topics', label: '主题刷题', path: '/interview/topics', icon: 'target' },
           { key: 'questions', label: '题库', path: '/interview', icon: 'notebook', badge: 'interview.total' },
-          { key: 'companies', label: '公司库', path: '/interview/companies', icon: 'building' },
+          { key: 'mock', label: '模拟考试', path: '/interview/exams', icon: 'mic', auth: true },
           { key: 'iq-admin', label: '题目录入', path: '/admin/interview-questions', icon: 'upload', auth: true },
-          { key: 'ic-admin', label: '公司维护', path: '/admin/interview-companies', icon: 'building', auth: true },
         ],
       },
     ],
@@ -131,10 +120,6 @@ export const resolveActive = (path: string, type?: string): string => {
   if (path.startsWith('/admin/ai-items')) return 'ai-admin'
   // ⚠ 必须放在更宽泛的 /interview 判断之前，否则会被题库兜底命中
   if (path.startsWith('/interview/mock')) return 'mock'
-  if (path.startsWith('/interview/plan')) return 'plan'
-  if (path.startsWith('/interview/review')) return 'review'
-  if (path.startsWith('/interview/applications')) return 'applications'
-  if (path.startsWith('/interview/companies')) return 'companies'
   if (path.startsWith('/interview')) return 'questions'
   if (path.startsWith('/admin/interview-questions')) return 'iq-admin'
   if (path.startsWith('/admin/interview-companies')) return 'ic-admin'

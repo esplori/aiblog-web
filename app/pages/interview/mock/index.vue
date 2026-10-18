@@ -11,7 +11,7 @@ import {
   positionLabel,
 } from '~/types/interview'
 
-// AI 模拟面试入口（P3）：配置一场 → 生成会话 → 进入房间
+// AI 模拟考试入口（P3）：配置一场 → 生成会话 → 进入房间
 definePageMeta({ layout: 'workbench' })
 
 const authStore = useAuthStore()
@@ -135,8 +135,8 @@ onMounted(() => {
 })
 
 useSeoMeta({
-  title: '模拟面试 · 面试',
-  description: '选择目标公司、岗位与轮次，进行一场 AI 模拟面试并获取评分报告。',
+  title: '模拟考试 · 刷题',
+  description: '选择目标公司、岗位与轮次，进行一场 AI 模拟考试并获取评分报告。',
 })
 </script>
 
@@ -144,7 +144,7 @@ useSeoMeta({
   <div>
     <!-- 未登录：不调接口，只显示引导 -->
     <section v-if="!authStore.isLoggedIn" class="card mx-auto max-w-xl py-10 text-center">
-      <h1 class="text-lg font-bold text-slate-900">登录后开始 AI 模拟面试</h1>
+      <h1 class="text-lg font-bold text-slate-900">登录后开始 AI 模拟考试</h1>
       <p class="mx-auto mt-2 max-w-md text-xs leading-relaxed text-slate-500">
         选择目标公司、岗位与轮次，AI 会逐题出题并评分，最后给出准确性与改进建议。
       </p>
@@ -261,7 +261,7 @@ useSeoMeta({
               type="submit"
               class="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700 disabled:opacity-60"
               :disabled="starting"
-            >{{ starting ? '创建中…' : '开始模拟面试' }}</button>
+            >{{ starting ? '创建中…' : '开始模拟考试' }}</button>
           </form>
         </section>
 

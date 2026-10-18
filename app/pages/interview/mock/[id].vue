@@ -13,7 +13,7 @@ import {
 } from '~/types/interview'
 import { renderMarkdown } from '~/utils/markdown'
 
-// 模拟面试房间（P3）：created(出题) / ongoing(作答) / scoring(评分) / done(报告) / failed
+// 模拟考试房间（P3）：created(出题) / ongoing(作答) / scoring(评分) / done(报告) / failed
 definePageMeta({ layout: 'workbench' })
 
 use([CanvasRenderer, RadarChart, TooltipComponent, RadarComponent])
@@ -314,8 +314,8 @@ onMounted(async () => {
 onUnmounted(stopPolling)
 
 useSeoMeta({
-  title: '模拟面试 · 面试',
-  description: 'AI 模拟面试作答与评分报告。',
+  title: '模拟考试 · 刷题',
+  description: 'AI 模拟考试作答与评分报告。',
 })
 </script>
 
@@ -323,8 +323,8 @@ useSeoMeta({
   <div>
     <!-- 未登录 -->
     <section v-if="!authStore.isLoggedIn" class="card mx-auto max-w-xl py-10 text-center">
-      <h1 class="text-lg font-bold text-slate-900">登录后参加模拟面试</h1>
-      <p class="mx-auto mt-2 max-w-md text-xs leading-relaxed text-slate-500">模拟面试需要登录才能保存你的作答与生成评分报告。</p>
+      <h1 class="text-lg font-bold text-slate-900">登录后参加模拟考试</h1>
+      <p class="mx-auto mt-2 max-w-md text-xs leading-relaxed text-slate-500">模拟考试需要登录才能保存你的作答与生成评分报告。</p>
       <NuxtLink :to="loginUrl" class="mt-5 inline-block rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700">去登录</NuxtLink>
     </section>
 
@@ -489,7 +489,7 @@ useSeoMeta({
 
           <div class="flex flex-wrap gap-2">
             <button type="button" class="rounded-lg bg-brand-600 px-4 py-2 text-sm text-white hover:bg-brand-700" @click="restart">再来一场</button>
-            <NuxtLink to="/interview/plan" class="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">去备战台</NuxtLink>
+            <NuxtLink to="/interview/topics" class="rounded-lg border border-slate-200 px-4 py-2 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">去刷题</NuxtLink>
           </div>
         </template>
 
