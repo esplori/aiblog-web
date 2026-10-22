@@ -44,7 +44,11 @@ export const useApi = () => {
     // SSR 时从请求头获取 cookie，客户端时使用 useCookie
     let authToken = token.value
     if (import.meta.server) {
-      const reqHeaders = useRequestHeaders(['cookie'])
+      // 埋点需要真实访客信息：SSR 直接请求后端（绕过 nginx），若只发 Authorization，
+      // 后端 resolveClientIp 拿到的是容器内网 IP、UA 是 ofetch 默认的 node、Referer 为空，
+      // 于是 VisitorHashUtil 每天只有一个值，UV 恒为 1（实测 6629 条里 6587 条 UA=node）。
+      // 这里把 nginx 注入的转发头原样带给后端。
+      const reqHeaders = useRequestHeaders(['cookie', 'x-forwarded-for', 'x-real-ip', 'user-agent', 'referer'])
       const cookieHeader = reqHeaders.cookie
       if (cookieHeader) {
         const match = cookieHeader.match(/token=([^;]+)/)
@@ -52,6 +56,10 @@ export const useApi = () => {
           authToken = match[1]
         }
       }
+      if (reqHeaders['x-forwarded-for']) headers['X-Forwarded-For'] = reqHeaders['x-forwarded-for']
+      if (reqHeaders['x-real-ip']) headers['X-Real-IP'] = reqHeaders['x-real-ip']
+      if (reqHeaders['user-agent']) headers['User-Agent'] = reqHeaders['user-agent']
+      if (reqHeaders.referer) headers['Referer'] = reqHeaders.referer
     }
 
     if (authToken) {
