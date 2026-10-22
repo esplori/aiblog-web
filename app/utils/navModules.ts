@@ -100,6 +100,9 @@ export const resolveModule = (path: string): NavModule => {
   if (path === '/ai' || path.startsWith('/ai/')) {
     return MODULES.find(m => m.key === 'ai') as NavModule
   }
+  if (path === '/finance' || path.startsWith('/finance/')) {
+    return MODULES.find(m => m.key === 'finance') as NavModule
+  }
   if (path.startsWith('/admin/ai-items')) {
     return MODULES.find(m => m.key === 'ai') as NavModule
   }
@@ -118,11 +121,14 @@ export const resolveActive = (path: string, type?: string): string => {
   if (path.startsWith('/ai/')) return 'plaza'
   if (path === '/ai') return type ? type : 'plaza'
   if (path.startsWith('/admin/ai-items')) return 'ai-admin'
-  // ⚠ 必须放在更宽泛的 /interview 判断之前，否则会被题库兜底命中
-  if (path.startsWith('/interview/mock')) return 'mock'
-  if (path.startsWith('/interview')) return 'questions'
   if (path.startsWith('/admin/interview-questions')) return 'iq-admin'
   if (path.startsWith('/admin/interview-companies')) return 'ic-admin'
+  // ⚠ 刷题模块必须「先具体、后兜底」：题库本身的 path 就是 /interview，
+  //    一旦先用 startsWith('/interview') 兜底，/interview/topics、/interview/exams
+  //    等子项会全部被误判成「题库」（历史 bug：点任何子菜单都高亮题库）。
+  if (path === '/interview/topics' || path.startsWith('/interview/topics/')) return 'topics'
+  if (path.startsWith('/interview/exams') || path.startsWith('/interview/mock')) return 'mock'
+  if (path === '/interview' || path.startsWith('/interview/')) return 'questions'
   if (path.startsWith('/articles')) return 'articles'
   if (path.startsWith('/admin/site-settings')) return 'settings'
   if (path.startsWith('/admin/articles')) return 'write'
