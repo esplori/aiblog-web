@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import type { PageResult, ArticleItem } from '~/types'
+import type { User } from '~/types'
 import type { AiStats } from '~/types/ai'
-import type { InterviewStats } from '~/types/interview'
 import { MODULES, resolveActive, resolveModule } from '~/utils/navModules'
 import type { NavItem } from '~/utils/navModules'
 
@@ -38,32 +37,31 @@ watch(() => route.fullPath, () => {
   drawerOpen.value = false
 })
 
+// 当前登录用户：侧栏左下角要显示真实账号。
+// 原先只有 layouts/default.vue 调 authStore.fetchUser()，工作台外壳从不拉，
+// 于是刷新页面后 store 里 user 为 null，模板兜底渲染成「未登录」——
+// 表现成「明明登录了却显示未登录」。这里在 SSR 阶段补一次，首屏就是账号名。
+const { data: meData } = await useAsyncData('wb-me', async () => {
+  if (!authStore.isLoggedIn || authStore.user) return null
+  try {
+    const res = await get<User>('/api/users/me')
+    return res.data ?? null
+  } catch {
+    // 拉不到就按未登录渲染，跳转交给 useApi 的 401 分支，别在 SSR 里去 navigateTo
+    return null
+  }
+}, { default: () => null })
+if (meData.value && !authStore.user) authStore.user = meData.value
+
 // 徽章数据（SSR 预取，两个模块共用）
 const { data: aiStats } = await useAsyncData('wb-ai-stats', () => get<AiStats>('/api/ai/stats'), {
   default: () => null,
 })
-const { data: articleTotal } = await useAsyncData(
-  'wb-article-total',
-  () => get<PageResult<ArticleItem>>('/api/articles', { page: 1, size: 1, status: 'published' }),
-  { default: () => null }
-)
-const { data: interviewStats } = await useAsyncData('wb-interview-stats', () => get<InterviewStats>('/api/interview/stats'), {
-  default: () => null,
-})
-
+// 徽章只用于 AI 广场计数；「全部文章」与题库菜单按需求不显示数量，
+// 对应的 /api/articles、/api/interview/stats 预取也一并去掉，少两次 SSR 请求。
 const badgeCount = (key?: string): number | null => {
   if (!key) return null
-  if (key === 'articles') {
-    const total = articleTotal.value?.data?.total
-    return total ? Number(total) : null
-  }
-  if (key.startsWith('interview.')) {
-    const interview = interviewStats.value?.data
-    if (!interview) return null
-    if (key === 'interview.total') return interview.total || null
-    const count = interview.byPosition?.[key.replace('interview.', '')]
-    return count ? Number(count) : null
-  }
+  if (key === 'articles' || key.startsWith('interview')) return null
   const stats = aiStats.value?.data
   if (!stats) return null
   if (key === 'ai.total') return stats.total || null
