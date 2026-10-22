@@ -13,11 +13,12 @@ const articleUuid = computed(() => String(route.params.uuid))
 // 使用 useAsyncData 支持 SSR
 // 注意：key 必须用函数形式跟随 articleUuid，否则 SPA 路由切换文章（组件复用、仅 params 变化）时，
 // Nuxt 3.21 的 useAsyncData watch 不会触发重新请求，导致标题/内容停留在上一篇文章。
-const { data: articleData, pending: articlePending, error: articleError, refresh: refreshArticle } = useAsyncData(
+const articleAsync = useAsyncData(
   () => `article-detail-${articleUuid.value}`,
   () => get<Article>(`/api/articles/uuid/${articleUuid.value}`),
   { default: () => null, watch: [articleUuid] }
 )
+const { data: articleData, pending: articlePending, error: articleError, refresh: refreshArticle } = articleAsync
 
 const article = computed(() => articleData.value?.data || null)
 
@@ -49,17 +50,18 @@ useSeoMeta({
 //    导致 useApi.get() 内部的 useRequestHeaders() 抛错/返回空 → 推荐接口不请求。
 //    这里在 setup 阶段把内网 baseURL 解析好，handler 里直接用 $fetch（无 composable 依赖），
 //    兼容 SSR 与客户端；key 统一用 uuid 保证一致性。
+//
+// ⚠ 别再「拿不到 id 就再请求一次文章接口」：SSR 时 article 必然还是 null，
+//    那样等于同一篇文章被查两遍（埋点数据里同页两条记录就是这么来的）。
+//    改为 await 主请求的结果，串行拿 id，只发一次。
 const config = useRuntimeConfig()
 const apiBaseInternal = import.meta.server ? config.apiBaseInternal : ''
 
 const { data: relatedData } = useAsyncData(
   () => `article-related-${articleUuid.value}`,
   async () => {
-    let id = article.value?.id
-    if (!id) {
-      const fallback = await $fetch<ApiResponse<Article>>(`${apiBaseInternal}/api/articles/uuid/${articleUuid.value}`)
-      id = fallback?.data?.id
-    }
+    const main = await articleAsync
+    const id = main.data.value?.id ?? article.value?.id
     if (!id) return { data: [] as ArticleItem[] } as any
     return $fetch<ApiResponse<ArticleItem[]>>(`${apiBaseInternal}/api/articles/${id}/recommended`, { query: { size: 4 } })
   },
