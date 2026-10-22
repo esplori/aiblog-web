@@ -75,6 +75,22 @@ export const MODULES: NavModule[] = [
     ],
   },
   {
+    key: 'finance',
+    label: '股票',
+    hint: '持仓 / 盈亏',
+    home: '/finance',
+    icon: 'chart',
+    groups: [
+      {
+        key: 'portfolio',
+        label: '持仓',
+        items: [
+          { key: 'positions', label: '我的持仓', path: '/finance', icon: 'chart', auth: true },
+        ],
+      },
+    ],
+  },
+  {
     key: 'interview',
     label: '刷题',
     hint: '题库 / 公司 / 面经',
