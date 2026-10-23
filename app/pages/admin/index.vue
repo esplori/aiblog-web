@@ -28,6 +28,8 @@ const stats = ref({
   draftCount: 0,
   monthArticleCount: 0,
   pendingCommentCount: 0,
+  weekArticleCount: 0,
+  lastWeekArticleCount: 0,
 })
 
 const loading = ref(true)
@@ -73,7 +75,7 @@ const topArticles = ref<Array<{ id: number; uuid: string; title: string; viewCou
 const loadTopArticles = async () => {
   if (!isAdmin.value) return
   try {
-    const res = await get<any[]>('/api/admin/stats/top-articles', { limit: 5 })
+    const res = await get<any[]>('/api/admin/stats/top-articles', { limit: 5, days: topDays.value })
     topArticles.value = res.data || []
   } catch (e) {
     fail('热门文章', e)
@@ -121,12 +123,12 @@ const changeRange = async (days: number) => {
   if (rangeDays.value === days) return
   rangeDays.value = days
   loadError.value = ''
-  await Promise.all([loadTrend(), loadTypeDist()])
+  await Promise.all([loadTrend(), loadTypeDist(), loadAudience()])
 }
 
 const reloadAll = async () => {
   loadError.value = ''
-  await Promise.all([loadStats(), loadTopArticles(), loadTrend(), loadCategoryDist(), loadArticleTrend(), loadTypeDist()])
+  await Promise.all([loadStats(), loadTopArticles(), loadTrend(), loadCategoryDist(), loadArticleTrend(), loadTypeDist(), loadAudience()])
 }
 
 const trendTotalPv = computed(() => trend.value.reduce((s, p) => s + Number(p.pv), 0))
@@ -242,6 +244,81 @@ const typeDistOption = computed(() => ({
   ],
 }))
 
+// 受众分布：来源与设备（近 rangeDays 天）
+const audience = ref<{ referrers: any[]; devices: any[] }>({ referrers: [], devices: [] })
+
+const loadAudience = async () => {
+  if (!isAdmin.value) return
+  try {
+    const res = await get<any>('/api/admin/stats/audience', { days: rangeDays.value })
+    audience.value = {
+      referrers: res.data?.referrers || [],
+      devices: res.data?.devices || [],
+    }
+  } catch (e) {
+    fail('来源与设备', e)
+  }
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  direct: '直接访问',
+  search: '搜索引擎',
+  referral: '外部链接',
+}
+
+const referrerOption = computed(() => {
+  const rows = [...audience.value.referrers]
+  return {
+    grid: { left: 8, right: 24, top: 8, bottom: 4, containLabel: true },
+    tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+    xAxis: { type: 'value', minInterval: 1 },
+    yAxis: { type: 'category', data: rows.map((r) => SOURCE_LABELS[r.source] || r.source) },
+    series: [{
+      name: 'PV',
+      type: 'bar',
+      barMaxWidth: 16,
+      data: rows.map((r) => Number(r.pv)),
+      itemStyle: { color: '#2563eb', borderRadius: [0, 4, 4, 0] },
+    }],
+  }
+})
+
+const deviceOption = computed(() => {
+  const rows = audience.value.devices
+  const label = (d: string) => (d === 'mobile' ? '移动端' : '桌面端')
+  return {
+    tooltip: { trigger: 'item', formatter: (p: any) => `${p.name}<br/>PV ${p.value}（${p.percent}%）<br/>UV ${p.data.uv}` },
+    legend: { bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { fontSize: 12 } },
+    series: [{
+      type: 'pie',
+      radius: ['44%', '68%'],
+      center: ['50%', '44%'],
+      label: { show: false },
+      itemStyle: { borderColor: '#fff', borderWidth: 2 },
+      data: rows.map((r, i) => ({
+        name: label(r.device),
+        value: Number(r.pv),
+        uv: Number(r.uv),
+        itemStyle: { color: ['#2563eb', '#94a3b8'][i % 2] },
+      })),
+    }],
+  }
+})
+
+// 热门文章时间窗：全时段累计会让老文章永远霸榜
+const topDays = ref(0)
+const TOP_OPTIONS = [
+  { label: '全部', value: 0 },
+  { label: '近 7 天', value: 7 },
+  { label: '近 30 天', value: 30 },
+]
+
+const changeTopDays = async (days: number) => {
+  if (topDays.value === days) return
+  topDays.value = days
+  await loadTopArticles()
+}
+
 // ECharts 折线配置：单点/多点都能正常绘制
 const trendOption = computed(() => ({
   grid: { left: 8, right: 12, top: 30, bottom: 4, containLabel: true },
@@ -278,6 +355,7 @@ onMounted(async () => {
   loadCategoryDist()
   loadArticleTrend()
   loadTypeDist()
+  loadAudience()
 })
 </script>
 
@@ -314,6 +392,9 @@ onMounted(async () => {
         <div class="card text-center">
           <div class="text-3xl font-bold text-cyan-500" v-text="stats.monthArticleCount" />
           <div class="text-gray-500 text-sm mt-1">本月新增</div>
+          <div class="text-xs mt-1" :class="stats.weekArticleCount >= stats.lastWeekArticleCount ? 'text-green-600' : 'text-gray-400'">
+            本周 {{ stats.weekArticleCount }}（上周 {{ stats.lastWeekArticleCount }}）
+          </div>
         </div>
       </template>
       <div class="card text-center">
@@ -414,6 +495,27 @@ onMounted(async () => {
       </ClientOnly>
     </div>
 
+    <div v-if="isAdmin" class="mt-8 grid gap-8 lg:grid-cols-2">
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">访问来源（近 {{ rangeDays }} 天）</h2>
+        </div>
+        <div v-if="audience.referrers.length === 0" class="text-gray-400 text-sm py-10 text-center">暂无数据</div>
+        <ClientOnly v-else>
+          <VChart :option="referrerOption" autoresize style="height: 200px; width: 100%" />
+        </ClientOnly>
+      </div>
+      <div class="card">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-lg font-semibold">访问设备（近 {{ rangeDays }} 天）</h2>
+        </div>
+        <div v-if="audience.devices.length === 0" class="text-gray-400 text-sm py-10 text-center">暂无数据</div>
+        <ClientOnly v-else>
+          <VChart :option="deviceOption" autoresize style="height: 200px; width: 100%" />
+        </ClientOnly>
+      </div>
+    </div>
+
     <div v-if="isAdmin" class="card mt-8">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold">分类文章分布</h2>
@@ -439,7 +541,18 @@ onMounted(async () => {
     <div v-if="isAdmin" class="card mt-8">
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold">热门文章 TOP5</h2>
-        <NuxtLink to="/admin/articles" class="text-sm text-brand-600 hover:underline">全部文章</NuxtLink>
+        <div class="flex items-center gap-3">
+          <div class="flex rounded-lg border border-slate-200 p-0.5">
+            <button
+              v-for="opt in TOP_OPTIONS"
+              :key="opt.value"
+              class="rounded px-2.5 py-1 text-xs transition"
+              :class="topDays === opt.value ? 'bg-brand-600 text-white' : 'text-gray-500 hover:text-brand-600'"
+              @click="changeTopDays(opt.value)"
+            >{{ opt.label }}</button>
+          </div>
+          <NuxtLink to="/admin/articles" class="text-sm text-brand-600 hover:underline">全部文章</NuxtLink>
+        </div>
       </div>
       <div v-if="topArticles.length === 0" class="text-gray-400 text-sm py-6 text-center">暂无数据</div>
       <ul v-else class="divide-y divide-gray-100">
