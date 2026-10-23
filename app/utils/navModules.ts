@@ -30,6 +30,11 @@ export interface NavModule {
   home: string
   /** 折叠态模块图标（AppIcon 的 name） */
   icon?: string
+  /**
+   * 整个模块需要登录才出现（如「股票」：数据按用户隔离，未登录进去也是一片空）。
+   * 与 item.auth 的区别：那只是隐藏单个入口，这里连模块标题/图标一起收起来。
+   */
+  auth?: boolean
   groups: NavGroup[]
 }
 
@@ -80,6 +85,7 @@ export const MODULES: NavModule[] = [
     hint: '持仓 / 盈亏',
     home: '/finance',
     icon: 'chart',
+    auth: true,
     groups: [
       {
         key: 'portfolio',

@@ -2,7 +2,7 @@
 import type { User } from '~/types'
 import type { AiStats } from '~/types/ai'
 import { MODULES, resolveActive, resolveModule } from '~/utils/navModules'
-import type { NavItem } from '~/utils/navModules'
+import type { NavItem, NavModule } from '~/utils/navModules'
 
 // 工作台外壳：左侧模块栏 + 顶栏 + 功能区。
 // 博客与 AI 广场是同级模块，切模块时只有功能区内容变化。
@@ -75,6 +75,28 @@ const activeKey = computed(() => resolveActive(route.path, route.query.type as s
 
 const itemVisible = (item: NavItem) => !item.auth || authStore.isLoggedIn
 
+/**
+ * 模块级可见性：股票这类「数据按用户隔离」的模块，未登录整个收起来。
+ * 只靠 itemVisible 会留下一个空的模块标题，点进去还是 403。
+ */
+const moduleVisible = (mod: NavModule) => !mod.auth || authStore.isLoggedIn
+const visibleModules = computed(() => MODULES.filter(moduleVisible))
+
+/**
+ * 未登录直接输 URL 进受保护模块（如 /finance）：跳登录页，别让用户对着 403 发呆。
+ * 只在客户端做——SSR 期间跳转会打断首屏渲染，而且 SSR 已经按未登录渲染过一遍了。
+ */
+const guardAuthModule = () => {
+  if (import.meta.server) return
+  if (authStore.isLoggedIn) return
+  if (currentModule.value?.auth) {
+    navigateTo(`/login?redirect=${encodeURIComponent(route.fullPath)}`)
+  }
+}
+
+onMounted(guardAuthModule)
+watch(() => currentModule.value?.key, guardAuthModule)
+
 const breadcrumb = computed(() => {
   const mod = currentModule.value
   for (const group of mod.groups) {
@@ -139,7 +161,7 @@ const onLogout = () => {
 
         <!-- 模块切换 + 导航 -->
         <nav class="flex-1 overflow-y-auto px-2 py-3" aria-label="模块导航">
-          <div v-for="mod in MODULES" :key="mod.key" class="mb-4">
+          <div v-for="mod in visibleModules" :key="mod.key" class="mb-4">
             <!-- 折叠态：模块图标即入口；展开态：模块名只作分区标题，不再和「首页 / 全部条目」重复 -->
             <NuxtLink
               v-if="collapsed"
@@ -259,7 +281,7 @@ const onLogout = () => {
     <el-drawer v-model="drawerOpen" direction="ltr" size="272px" :with-header="false">
       <div class="px-1">
         <p class="text-base font-bold text-slate-900 mb-3">{{ site.name }}</p>
-        <div v-for="mod in MODULES" :key="mod.key" class="mb-4">
+        <div v-for="mod in visibleModules" :key="mod.key" class="mb-4">
           <p class="text-[15px] font-semibold text-slate-900 mb-1">{{ mod.label }}</p>
           <ul>
             <li v-for="item in mod.groups.flatMap(g => g.items).filter(itemVisible)" :key="item.key">
