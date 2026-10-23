@@ -4,6 +4,7 @@ import { CanvasRenderer } from 'echarts/renderers'
 import { LineChart, BarChart, PieChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
+import dayjs from 'dayjs'
 
 definePageMeta({
   layout: 'admin',
@@ -31,6 +32,28 @@ const stats = ref({
 
 const loading = ref(true)
 
+/** 趋势/流量分布共用的时间窗；接口本身支持任意 days，前端只暴露三档 */
+const rangeDays = ref(30)
+const RANGE_OPTIONS = [
+  { label: '7 天', value: 7 },
+  { label: '30 天', value: 30 },
+  { label: '90 天', value: 90 },
+]
+
+/**
+ * 拉数失败必须看得见。
+ * 原来每个请求都 catch 完只 console.error，后端一挂页面照样渲染成一片 0 ——
+ * 看的人会当成「今天没人访问」，而不是「接口挂了」。
+ */
+const loadError = ref('')
+
+const fail = (label: string, e: unknown) => {
+  console.error(e)
+  loadError.value = loadError.value
+    ? `${loadError.value}、${label}`
+    : `${label}加载失败`
+}
+
 const loadStats = async () => {
   loading.value = true
   try {
@@ -39,7 +62,7 @@ const loadStats = async () => {
     const res = await get<Record<string, number>>(url)
     stats.value = { ...stats.value, ...res.data }
   } catch (e) {
-    console.error(e)
+    fail('概览统计', e)
   } finally {
     loading.value = false
   }
@@ -53,7 +76,7 @@ const loadTopArticles = async () => {
     const res = await get<any[]>('/api/admin/stats/top-articles', { limit: 5 })
     topArticles.value = res.data || []
   } catch (e) {
-    console.error(e)
+    fail('热门文章', e)
   }
 }
 
@@ -62,11 +85,48 @@ const trend = ref<Array<{ day: string; pv: number; uv: number }>>([])
 const loadTrend = async () => {
   if (!isAdmin.value) return
   try {
-    const res = await get<any[]>('/api/admin/stats/trend', { days: 30 })
+    const res = await get<any[]>('/api/admin/stats/trend', { days: rangeDays.value })
     trend.value = res.data || []
   } catch (e) {
-    console.error(e)
+    fail('访问趋势', e)
   }
+}
+
+// 今日/昨日对照：trend 是按天升序的，取尾部两条即可，不用再加接口
+const todayStr = () => dayjs().format('YYYY-MM-DD')
+const yesterdayStr = () => dayjs().subtract(1, 'day').format('YYYY-MM-DD')
+
+const dayStat = (day: string) => {
+  const row = trend.value.find((p) => String(p.day).slice(0, 10) === day)
+  return { pv: Number(row?.pv ?? 0), uv: Number(row?.uv ?? 0) }
+}
+
+const todayStat = computed(() => dayStat(todayStr()))
+const yesterdayStat = computed(() => dayStat(yesterdayStr()))
+
+/** 环比文案：昨天为 0 时不显示百分比（除以 0 没有意义） */
+const deltaOf = (cur: number, prev: number): { text: string; up: boolean | null } => {
+  if (!prev) return { text: '—', up: null }
+  const diff = cur - prev
+  const pct = Math.round((diff / prev) * 100)
+  if (diff === 0) return { text: '持平', up: null }
+  return { text: `${diff > 0 ? '↑' : '↓'} ${Math.abs(pct)}%`, up: diff > 0 }
+}
+
+const todayPvDelta = computed(() => deltaOf(todayStat.value.pv, yesterdayStat.value.pv))
+const todayUvDelta = computed(() => deltaOf(todayStat.value.uv, yesterdayStat.value.uv))
+
+/** 切换时间窗：只重拉跟天窗相关的两块，别把分类分布也带着重算 */
+const changeRange = async (days: number) => {
+  if (rangeDays.value === days) return
+  rangeDays.value = days
+  loadError.value = ''
+  await Promise.all([loadTrend(), loadTypeDist()])
+}
+
+const reloadAll = async () => {
+  loadError.value = ''
+  await Promise.all([loadStats(), loadTopArticles(), loadTrend(), loadCategoryDist(), loadArticleTrend(), loadTypeDist()])
 }
 
 const trendTotalPv = computed(() => trend.value.reduce((s, p) => s + Number(p.pv), 0))
@@ -81,7 +141,7 @@ const loadCategoryDist = async () => {
     const res = await get<any[]>('/api/admin/stats/category-distribution')
     categoryDist.value = res.data || []
   } catch (e) {
-    console.error(e)
+    fail('分类分布', e)
   }
 }
 
@@ -94,7 +154,7 @@ const loadArticleTrend = async () => {
     const res = await get<any[]>('/api/admin/stats/article-trend', { months: 6 })
     articleTrend.value = res.data || []
   } catch (e) {
-    console.error(e)
+    fail('发文趋势', e)
   }
 }
 
@@ -149,10 +209,10 @@ const typeDist = ref<Array<{ type: string; pv: number; uv: number }>>([])
 const loadTypeDist = async () => {
   if (!isAdmin.value) return
   try {
-    const res = await get<any[]>('/api/admin/stats/type-distribution', { days: 30 })
+    const res = await get<any[]>('/api/admin/stats/type-distribution', { days: rangeDays.value })
     typeDist.value = (res.data || []).filter((r) => Number(r.pv) > 0)
   } catch (e) {
-    console.error(e)
+    fail('流量分布', e)
   }
 }
 
@@ -227,6 +287,16 @@ onMounted(async () => {
       {{ isAdmin ? '仪表盘' : '我的数据' }}
     </h1>
 
+    <div
+      v-if="loadError"
+      class="mb-6 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+    >
+      <span>⚠ {{ loadError }}——下面显示的数字可能不完整。</span>
+      <button class="rounded border border-red-300 px-3 py-1 text-xs hover:bg-red-100" @click="reloadAll">
+        重新加载
+      </button>
+    </div>
+
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
       <div class="card text-center">
         <div class="text-3xl font-bold text-brand-600" v-text="stats.articleCount" />
@@ -280,11 +350,45 @@ onMounted(async () => {
     </div>
 
     <div v-if="isAdmin" class="card mt-8">
-      <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold">访问趋势（近 30 天）</h2>
-        <div class="text-sm text-gray-500">
-          总 PV <span class="font-semibold text-gray-800">{{ trendTotalPv }}</span>
-          · 总 UV <span class="font-semibold text-gray-800">{{ trendTotalUv }}</span>
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+        <h2 class="text-lg font-semibold">访问趋势（近 {{ rangeDays }} 天）</h2>
+        <div class="flex items-center gap-3">
+          <div class="text-sm text-gray-500">
+            总 PV <span class="font-semibold text-gray-800">{{ trendTotalPv }}</span>
+            · 总 UV <span class="font-semibold text-gray-800">{{ trendTotalUv }}</span>
+          </div>
+          <div class="flex rounded-lg border border-slate-200 p-0.5">
+            <button
+              v-for="opt in RANGE_OPTIONS"
+              :key="opt.value"
+              class="rounded px-2.5 py-1 text-xs transition"
+              :class="rangeDays === opt.value ? 'bg-brand-600 text-white' : 'text-gray-500 hover:text-brand-600'"
+              @click="changeRange(opt.value)"
+            >
+              {{ opt.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mb-4 grid grid-cols-2 gap-3 text-sm">
+        <div class="rounded-lg bg-slate-50 px-3 py-2">
+          <span class="text-gray-500">今日</span>
+          <span class="ml-2 font-semibold text-gray-800">{{ todayStat.pv }}</span>
+          <span class="text-gray-400">PV</span>
+          <span
+            class="ml-1 text-xs"
+            :class="todayPvDelta.up === null ? 'text-gray-400' : todayPvDelta.up ? 'text-green-600' : 'text-red-500'"
+          >{{ todayPvDelta.text }}</span>
+          <span class="ml-3 font-semibold text-gray-800">{{ todayStat.uv }}</span>
+          <span class="text-gray-400">UV</span>
+          <span
+            class="ml-1 text-xs"
+            :class="todayUvDelta.up === null ? 'text-gray-400' : todayUvDelta.up ? 'text-green-600' : 'text-red-500'"
+          >{{ todayUvDelta.text }}</span>
+        </div>
+        <div class="rounded-lg bg-slate-50 px-3 py-2 text-gray-500">
+          昨日 {{ yesterdayStat.pv }} PV · {{ yesterdayStat.uv }} UV
         </div>
       </div>
       <div v-if="trend.length === 0" class="text-gray-400 text-sm py-10 text-center">
@@ -297,7 +401,7 @@ onMounted(async () => {
 
     <div v-if="isAdmin" class="card mt-8">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-semibold">流量分布（近 30 天）</h2>
+        <h2 class="text-lg font-semibold">流量分布（近 {{ rangeDays }} 天）</h2>
         <div class="text-sm text-gray-500">
           合计 PV <span class="font-semibold text-gray-800">{{ typeDistTotal }}</span>
         </div>
