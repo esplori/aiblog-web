@@ -35,6 +35,25 @@ export default defineNuxtConfig({
   // SSR 模式
   ssr: true,
 
+  /**
+   * 页面缓存：内容型列表页走 SWR（stale-while-revalidate），
+   * 过期后先返回旧 HTML、后台再生成新的 —— 访客不等，后端压力也小。
+   *
+   * 刻意不加缓存的：
+   *  - /post/** 文章详情：埋点要在每次真实阅读时落库，缓存 HTML 会让后面的访客不触发埋点；
+   *  - /workbench、/admin、/login：渲染带用户态，缓存会串号；
+   *  - 题库详情页（interview 下的 slug 页）：含用户进度等交互态，先不缓存。
+   */
+  routeRules: {
+    '/': { swr: 300 },
+    '/articles': { swr: 300 },
+    '/articles/**': { swr: 300 },
+    '/interview': { swr: 300 },
+    '/interview/companies': { swr: 300 },
+    '/interview/topics': { swr: 300 },
+    '/ai': { swr: 300 },
+  },
+
   // 运行时配置
   runtimeConfig: {
     // 服务器端（SSR）访问后端的内部地址，浏览器不可见
