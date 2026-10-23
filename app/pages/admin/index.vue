@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { use } from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { LineChart, BarChart } from 'echarts/charts'
+import { LineChart, BarChart, PieChart } from 'echarts/charts'
 import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components'
 import VChart from 'vue-echarts'
 
@@ -9,7 +9,7 @@ definePageMeta({
   layout: 'admin',
 })
 
-use([CanvasRenderer, LineChart, BarChart, GridComponent, TooltipComponent, LegendComponent])
+use([CanvasRenderer, LineChart, BarChart, PieChart, GridComponent, TooltipComponent, LegendComponent])
 
 const authStore = useAuthStore()
 const { get } = useApi()
@@ -134,6 +134,54 @@ const articleTrendOption = computed(() => ({
   ],
 }))
 
+// 页面类型流量分布（埋点扩展后才有：以前只有文章详情有数据）
+const TYPE_LABELS: Record<string, string> = {
+  article: '文章详情',
+  home: '首页',
+  list: '文章列表',
+  interview: '题库',
+  ai: 'AI 索引',
+  other: '其它',
+}
+
+const typeDist = ref<Array<{ type: string; pv: number; uv: number }>>([])
+
+const loadTypeDist = async () => {
+  if (!isAdmin.value) return
+  try {
+    const res = await get<any[]>('/api/admin/stats/type-distribution', { days: 30 })
+    typeDist.value = (res.data || []).filter((r) => Number(r.pv) > 0)
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const typeDistTotal = computed(() => typeDist.value.reduce((s, r) => s + Number(r.pv), 0))
+
+const typeDistOption = computed(() => ({
+  tooltip: {
+    trigger: 'item',
+    formatter: (p: any) => `${p.name}<br/>PV ${p.value}（${p.percent}%）<br/>UV ${p.data.uv}`,
+  },
+  legend: { bottom: 0, itemWidth: 10, itemHeight: 10, textStyle: { fontSize: 12 } },
+  series: [
+    {
+      type: 'pie',
+      radius: ['42%', '68%'],
+      center: ['50%', '44%'],
+      avoidLabelOverlap: true,
+      itemStyle: { borderColor: '#fff', borderWidth: 2 },
+      label: { show: false },
+      data: typeDist.value.map((r, i) => ({
+        name: TYPE_LABELS[r.type] || r.type,
+        value: Number(r.pv),
+        uv: Number(r.uv),
+        itemStyle: { color: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#94a3b8'][i % 6] },
+      })),
+    },
+  ],
+}))
+
 // ECharts 折线配置：单点/多点都能正常绘制
 const trendOption = computed(() => ({
   grid: { left: 8, right: 12, top: 30, bottom: 4, containLabel: true },
@@ -169,6 +217,7 @@ onMounted(async () => {
   loadTrend()
   loadCategoryDist()
   loadArticleTrend()
+  loadTypeDist()
 })
 </script>
 
@@ -243,6 +292,21 @@ onMounted(async () => {
       </div>
       <ClientOnly v-else>
         <VChart :option="trendOption" autoresize style="height: 200px; width: 100%" />
+      </ClientOnly>
+    </div>
+
+    <div v-if="isAdmin" class="card mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold">流量分布（近 30 天）</h2>
+        <div class="text-sm text-gray-500">
+          合计 PV <span class="font-semibold text-gray-800">{{ typeDistTotal }}</span>
+        </div>
+      </div>
+      <div v-if="typeDist.length === 0" class="text-gray-400 text-sm py-10 text-center">
+        还没有页面访问数据
+      </div>
+      <ClientOnly v-else>
+        <VChart :option="typeDistOption" autoresize style="height: 240px; width: 100%" />
       </ClientOnly>
     </div>
 
