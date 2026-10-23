@@ -22,6 +22,23 @@ const { data: articleData, pending: articlePending, error: articleError, refresh
 
 const article = computed(() => articleData.value?.data || null)
 
+// 不存在的 uuid：后端仍返回 200 + 空 data，若不主动抛就是「软 404」——
+// 搜索引擎会收录一堆空白页，错误页也永远不触发。
+// SSR 阶段抛出 → Nuxt 渲染 error.vue 并返回真的 404 状态码。
+if (import.meta.server) {
+  const main = await articleAsync
+  if (!main.data.value?.data) {
+    throw createError({ statusCode: 404, statusMessage: '文章不存在', fatal: true })
+  }
+}
+
+// 站内跳到坏链接（客户端导航）：等请求落地仍没内容就切错误页
+watch(articlePending, (pending) => {
+  if (!pending && !article.value) {
+    showError({ statusCode: 404, statusMessage: '文章不存在' })
+  }
+})
+
 // 记录阅读痕迹（工作台首页的「继续阅读」读取本地记录，不落库）
 const recentReading = useRecentReading()
 watch(article, (value) => {
