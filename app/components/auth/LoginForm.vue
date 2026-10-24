@@ -58,7 +58,7 @@ const submit = async () => {
   try {
     const res = await post<LoginData>('/api/auth/login', form)
     authStore.setAuth(res.data)
-    ElMessage.success('登录成功')
+    // 不再弹「登录成功」：跳到目标页本身就是反馈，多一条提示反而挡住首屏
     navigateTo(targetAfterLogin(res.data.userInfo?.role === 'admin'))
   } catch (e) {
     const info = classify(e)

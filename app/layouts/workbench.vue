@@ -73,13 +73,23 @@ const badgeCount = (key?: string): number | null => {
 const currentModule = computed(() => resolveModule(route.path))
 const activeKey = computed(() => resolveActive(route.path, route.query.type as string | undefined))
 
-const itemVisible = (item: NavItem) => !item.auth || authStore.isLoggedIn
+/**
+ * 可见性按**权限**判，不只看登录状态。
+ *
+ * 原来只判 isLoggedIn：任何登录用户都会看到「写文章」「后台首页」这些入口，
+ * 点进去才被 403 挡住。菜单是承诺，给不出就别摆出来。
+ *
+ * 目前只有 admin 一个角色，与 layouts/admin.vue 的判定保持一致；
+ * 将来出现多角色（编辑、只读）时，应改成以后端 /api/menus 返回的菜单为准。
+ */
+const canUseAdmin = computed(() => authStore.user?.role === 'admin')
+const itemVisible = (item: NavItem) => !item.auth || canUseAdmin.value
 
 /**
- * 模块级可见性：股票这类「数据按用户隔离」的模块，未登录整个收起来。
+ * 模块级可见性：股票这类「数据按用户隔离」的模块，没权限时整个收起来。
  * 只靠 itemVisible 会留下一个空的模块标题，点进去还是 403。
  */
-const moduleVisible = (mod: NavModule) => !mod.auth || authStore.isLoggedIn
+const moduleVisible = (mod: NavModule) => !mod.auth || canUseAdmin.value
 const visibleModules = computed(() => MODULES.filter(moduleVisible))
 
 /**

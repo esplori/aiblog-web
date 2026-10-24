@@ -1,5 +1,7 @@
 <script setup lang="ts">
 const authStore = useAuthStore()
+// 后台入口按角色显示，非管理员看不到「管理」
+const isAdmin = computed(() => authStore.user?.role === 'admin')
 const site = useSiteConfig()
 const { name, brandColor, logoUrl, copyright, footerText, icp } = site
 
@@ -47,7 +49,8 @@ onMounted(() => {
           </NuxtLink>
 
           <template v-if="authStore.isLoggedIn">
-            <NuxtLink to="/admin" class="text-gray-600 hover:text-brand-600">
+            <!-- 「管理」只给有权限的人：菜单是承诺，点进去 403 不如不显示 -->
+            <NuxtLink v-if="isAdmin" to="/admin" class="text-gray-600 hover:text-brand-600">
               管理
             </NuxtLink>
             <el-dropdown>
@@ -59,7 +62,7 @@ onMounted(() => {
               </span>
               <template #dropdown>
                 <el-dropdown-menu>
-                  <el-dropdown-item @click="navigateTo('/admin')">
+                  <el-dropdown-item v-if="isAdmin" @click="navigateTo('/admin')">
                     后台管理
                   </el-dropdown-item>
                   <el-dropdown-item @click="navigateTo('/admin/settings')">

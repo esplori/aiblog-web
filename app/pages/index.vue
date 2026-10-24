@@ -9,6 +9,7 @@ definePageMeta({ layout: 'workbench' })
 
 const site = useSiteConfig()
 const authStore = useAuthStore()
+const isAdmin = computed(() => authStore.user?.role === 'admin')
 const { get } = useApi()
 
 const { data: articlesData, pending: articlesPending } = await useAsyncData(
@@ -104,7 +105,8 @@ useSeoMeta({
           <NuxtLink to="/articles" class="text-brand-600 hover:underline">文章列表</NuxtLink>
         </p>
       </div>
-      <div class="rounded-xl border border-slate-200 bg-white p-4">
+      <!-- 快捷动作全是后台入口：没有权限就不整块藏掉，别让人点进 403 -->
+      <div v-if="isAdmin" class="rounded-xl border border-slate-200 bg-white p-4">
         <h2 class="mb-3 text-sm font-semibold text-slate-900">快捷动作</h2>
         <div class="flex flex-wrap gap-2">
           <NuxtLink to="/admin/articles" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600">
