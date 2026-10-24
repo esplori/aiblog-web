@@ -12,7 +12,7 @@ const { get, post } = useApi()
 const auth = useAuthStore()
 
 interface Conv { id: string; title?: string | null; last_active_at?: number }
-interface Msg { entryId?: string; role: string; text: string; at?: number | null; images?: string[] }
+interface Msg { entryId?: string; role: string; text: string; at?: number | null; images?: string[]; tools?: string[] }
 
 const convs = ref<Conv[]>([])
 const msgs = ref<Msg[]>([])
@@ -63,21 +63,58 @@ const send = async () => {
   msgs.value.push({ role: 'user', text })
   input.value = ''
   await scrollDown()
+
+  // 占位消息：delta 一路往里追加，用户能看到字一个个出来
+  const answer = reactive<Msg>({ role: 'assistant', text: '' })
+  msgs.value.push(answer)
+  let gotAny = false
+
   try {
-    const r = await post<any>('/api/agent/chat', { conversationId: currentId.value || undefined, text })
-    if (r.code !== 200) {
-      err.value = r.message || '发送失败'
+    const token = useCookie('token').value
+    const res = await fetch('/api/agent/chat/stream', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', ...(token ? { authorization: `Bearer ${token}` } : {}) },
+      body: JSON.stringify({ conversationId: currentId.value || undefined, text }),
+    })
+    if (!res.ok || !res.body) {
+      err.value = res.status === 403 ? '登录已失效，请重新登录' : `请求失败（${res.status}）`
       return
     }
-    const data = r.data as { conversationId: string; result: { text?: string; status?: string } }
-    currentId.value = data.conversationId
-    const answer = data.result?.text || ''
-    if (answer) msgs.value.push({ role: 'assistant', text: answer })
-    else err.value = data.result?.status === 'error' ? '模型没有返回内容' : '（空回复）'
+    const reader = res.body.getReader()
+    const dec = new TextDecoder()
+    let buf = ''
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buf += dec.decode(value, { stream: true })
+      // SSE 以空行分隔事件；最后一段可能不完整，留到下一轮
+      const chunks = buf.split('\n\n')
+      buf = chunks.pop() ?? ''
+      for (const chunk of chunks) {
+        for (const line of chunk.split('\n')) {
+          if (!line.startsWith('data:')) continue
+          const raw = line.slice(5).trim()
+          if (!raw) continue
+          let ev: any
+          try { ev = JSON.parse(raw) } catch { continue }
+          if (ev.type === 'meta' && ev.conversationId) { currentId.value = ev.conversationId; continue }
+          if (ev.type === 'delta' && ev.text) { answer.text += ev.text; gotAny = true; void scrollDown(); continue }
+          if (ev.type === 'tool' && ev.name) {
+            answer.tools = [...(answer.tools || []), `${ev.name} · ${ev.status}`]
+            continue
+          }
+          if (ev.type === 'turn.end') {
+            if (ev.status === 'error') err.value = ev.error || '模型没有返回内容'
+            else if (!gotAny && !answer.text) err.value = '（空回复）'
+            continue
+          }
+        }
+      }
+    }
     await scrollDown()
     void loadConvsTitle()
   } catch {
-    err.value = '发送失败'
+    err.value = '发送失败，检查网络后重试'
   } finally {
     sending.value = false
   }
@@ -134,7 +171,8 @@ onMounted(() => {
             :class="m.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-800'"
           >
             <img v-for="(src, k) in m.images || []" :key="k" :src="src" alt="附件" class="mb-1.5 max-h-40 rounded">
-            {{ m.text }}
+            <div v-if="m.tools?.length" class="mb-1 text-xs text-slate-400">{{ m.tools.join(' · ') }}</div>
+            {{ m.text }}<span v-if="m.role === 'assistant' && sending && !m.text" class="text-slate-400">…</span>
           </div>
         </div>
         <div v-if="sending" class="text-xs text-slate-400">正在思考…</div>
