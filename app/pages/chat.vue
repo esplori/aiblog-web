@@ -182,18 +182,30 @@ onMounted(() => {
         <p v-if="!msgs.length" class="mt-10 text-center text-sm text-slate-400">
           问点什么吧，比如「帮我总结今天的 AI 新闻」
         </p>
-        <div v-for="(m, i) in msgs" :key="m.entryId || i" class="mb-3 flex" :class="m.role === 'user' ? 'justify-end' : 'justify-start'">
+        <div v-for="(m, i) in msgs" :key="m.entryId || i" class="mb-3">
+          <!-- 工具调用单独一行，放气泡外面：混在气泡里会和正文分不清哪句是回答 -->
           <div
-            class="max-w-[80%] rounded-2xl px-3.5 py-2 text-sm"
-            :class="m.role === 'user'
-              ? 'whitespace-pre-wrap bg-indigo-600 text-white'
-              : 'bg-slate-100 text-slate-800'"
+            v-if="m.tools?.length"
+            class="mb-1 flex flex-wrap gap-1.5"
+            :class="m.role === 'user' ? 'justify-end' : 'justify-start'"
           >
-            <img v-for="(src, k) in m.images || []" :key="k" :src="src" alt="附件" class="mb-1.5 max-h-40 rounded">
-            <div v-if="m.tools?.length" class="mb-1 text-xs text-slate-400">{{ m.tools.join(' · ') }}</div>
-            <div v-if="m.role === 'user'" class="whitespace-pre-wrap">{{ m.text }}</div>
-            <div v-else class="bubble-md" v-html="md(m.text)" />
-            <span v-if="m.role === 'assistant' && sending && !m.text" class="text-slate-400">…</span>
+            <span
+              v-for="(t, k) in m.tools" :key="k"
+              class="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] text-slate-500"
+            >🔧 {{ t }}</span>
+          </div>
+          <div class="flex" :class="m.role === 'user' ? 'justify-end' : 'justify-start'">
+            <div
+              class="max-w-[80%] rounded-2xl px-3.5 py-2 text-sm"
+              :class="m.role === 'user'
+                ? 'whitespace-pre-wrap bg-indigo-600 text-white'
+                : 'bg-slate-100 text-slate-800'"
+            >
+              <img v-for="(src, k) in m.images || []" :key="k" :src="src" alt="附件" class="mb-1.5 max-h-40 rounded">
+              <div v-if="m.role === 'user'" class="whitespace-pre-wrap">{{ m.text }}</div>
+              <div v-else class="bubble-md" v-html="md(m.text)" />
+              <span v-if="m.role === 'assistant' && sending && !m.text" class="text-slate-400">…</span>
+            </div>
           </div>
         </div>
         <div v-if="sending" class="text-xs text-slate-400">正在思考…</div>
