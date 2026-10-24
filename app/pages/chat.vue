@@ -15,6 +15,7 @@ const auth = useAuthStore()
 
 interface Conv { id: string; title?: string | null; last_active_at?: number }
 interface Msg { entryId?: string; role: string; text: string; at?: number | null; images?: string[]; tools?: string[] }
+interface Artifact { path: string; name: string; bytes: number; kind: 'image' | 'file' }
 
 /**
  * 渲染缓存：流式时每个 delta 都会触发重渲染，命中缓存就不用反复解析同一段文本。
@@ -29,6 +30,48 @@ const md = (text: string) => {
     mdCache.set(text, html)
   }
   return html
+}
+
+const artifacts = ref<Artifact[]>([])
+/** 图片的 blob 地址：Java 侧只认 Authorization 头，<img src> 带不了，只能 fetch 出来再显示 */
+const blobUrls = reactive<Record<string, string>>({})
+
+const artifactUrl = (p: string) =>
+  `/api/agent/files/${encodeURIComponent(currentId.value)}/${p.split('/').map(encodeURIComponent).join('/')}`
+
+const token = () => useCookie('token').value
+
+const loadArtifacts = async (id: string) => {
+  if (!id) { artifacts.value = []; return }
+  try {
+    const r = await get<any>(`/api/agent/conversations/${encodeURIComponent(id)}/artifacts`)
+    artifacts.value = r.code === 200 ? (r.data?.items || []) : []
+    // 只预取图片；其余等点击时再取，避免一进页面就拉一堆大文件
+    for (const a of artifacts.value) {
+      if (a.kind !== 'image' || blobUrls[a.path]) continue
+      void fetchBlob(a.path)
+    }
+  } catch { artifacts.value = [] }
+}
+
+const fetchBlob = async (p: string): Promise<string> => {
+  if (blobUrls[p]) return blobUrls[p]!
+  const t = token()
+  const res = await fetch(artifactUrl(p), { headers: t ? { authorization: `Bearer ${t}` } : {} })
+  if (!res.ok) return ''
+  const url = URL.createObjectURL(await res.blob())
+  blobUrls[p] = url
+  return url
+}
+
+/** 非图片：先取 blob 再触发下载，否则 <a href> 打不开（缺认证头） */
+const download = async (a: Artifact) => {
+  const url = await fetchBlob(a.path)
+  if (!url) return
+  const el = document.createElement('a')
+  el.href = url
+  el.download = a.name
+  el.click()
 }
 
 const convs = ref<Conv[]>([])
@@ -64,13 +107,17 @@ const openConv = async (id: string) => {
     const r = await get<any>(`/api/agent/conversations/${encodeURIComponent(id)}/messages`)
     if (r.code !== 200) { err.value = r.message || '历史加载失败'; msgs.value = []; return }
     msgs.value = (r.data?.items || []).filter((m: Msg) => m.role !== 'tool')
+    void loadArtifacts(id)
     await scrollDown()
   } catch {
     err.value = '历史加载失败'
   }
 }
 
-const newConv = () => { currentId.value = ''; msgs.value = []; input.value = ''; err.value = '' }
+const newConv = () => {
+  currentId.value = ''; msgs.value = []; input.value = ''; err.value = ''
+  artifacts.value = []
+}
 
 const send = async () => {
   const text = input.value.trim()
@@ -130,6 +177,7 @@ const send = async () => {
     }
     await scrollDown()
     void loadConvsTitle()
+    void loadArtifacts(currentId.value)
   } catch {
     err.value = '发送失败，检查网络后重试'
   } finally {
@@ -210,6 +258,27 @@ onMounted(() => {
         </div>
         <div v-if="sending" class="text-xs text-slate-400">正在思考…</div>
         <p v-if="err" class="mt-2 rounded bg-rose-50 px-3 py-2 text-xs text-rose-700">{{ err }}</p>
+        <div v-if="artifacts.length" class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-2.5">
+          <div class="mb-1.5 text-[11px] text-slate-400">会话产物 · {{ artifacts.length }} 个文件</div>
+          <div class="flex flex-wrap gap-2">
+            <div
+              v-for="a in artifacts" :key="a.path"
+              class="max-w-[200px] cursor-pointer rounded-lg border border-slate-200 bg-white p-1.5 transition-colors hover:border-slate-300"
+              @click="download(a)"
+            >
+              <img
+                v-if="a.kind === 'image' && blobUrls[a.path]"
+                :src="blobUrls[a.path]" :alt="a.name" class="mb-1 max-h-32 rounded object-cover"
+              />
+              <div v-else class="mb-1 grid h-14 place-items-center rounded bg-slate-100 text-[10px] text-slate-400">
+                {{ (a.name.split('.').pop() || '').toUpperCase() }}
+              </div>
+              <div class="truncate text-[11px] text-slate-600" :title="a.name">{{ a.name }}</div>
+              <div class="text-[10px] text-slate-400">{{ Math.max(1, Math.round(a.bytes / 1024)) }}KB</div>
+            </div>
+          </div>
+        </div>
+
         <div ref="bottom" />
       </div>
 
