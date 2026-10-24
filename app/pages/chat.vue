@@ -8,11 +8,28 @@
  */
 definePageMeta({ layout: 'workbench' })
 
+import { renderChatMarkdown } from '~/utils/markdown'
+
 const { get, post } = useApi()
 const auth = useAuthStore()
 
 interface Conv { id: string; title?: string | null; last_active_at?: number }
 interface Msg { entryId?: string; role: string; text: string; at?: number | null; images?: string[]; tools?: string[] }
+
+/**
+ * 渲染缓存：流式时每个 delta 都会触发重渲染，命中缓存就不用反复解析同一段文本。
+ * 上限 200 条，超了整体清空 —— 对话里活不过这么多条，简单够用。
+ */
+const mdCache = new Map<string, string>()
+const md = (text: string) => {
+  let html = mdCache.get(text)
+  if (html === undefined) {
+    html = renderChatMarkdown(text)
+    if (mdCache.size > 200) mdCache.clear()
+    mdCache.set(text, html)
+  }
+  return html
+}
 
 const convs = ref<Conv[]>([])
 const msgs = ref<Msg[]>([])
@@ -167,12 +184,16 @@ onMounted(() => {
         </p>
         <div v-for="(m, i) in msgs" :key="m.entryId || i" class="mb-3 flex" :class="m.role === 'user' ? 'justify-end' : 'justify-start'">
           <div
-            class="max-w-[80%] whitespace-pre-wrap rounded-2xl px-3.5 py-2 text-sm"
-            :class="m.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-slate-100 text-slate-800'"
+            class="max-w-[80%] rounded-2xl px-3.5 py-2 text-sm"
+            :class="m.role === 'user'
+              ? 'whitespace-pre-wrap bg-indigo-600 text-white'
+              : 'bg-slate-100 text-slate-800'"
           >
             <img v-for="(src, k) in m.images || []" :key="k" :src="src" alt="附件" class="mb-1.5 max-h-40 rounded">
             <div v-if="m.tools?.length" class="mb-1 text-xs text-slate-400">{{ m.tools.join(' · ') }}</div>
-            {{ m.text }}<span v-if="m.role === 'assistant' && sending && !m.text" class="text-slate-400">…</span>
+            <div v-if="m.role === 'user'" class="whitespace-pre-wrap">{{ m.text }}</div>
+            <div v-else class="bubble-md" v-html="md(m.text)" />
+            <span v-if="m.role === 'assistant' && sending && !m.text" class="text-slate-400">…</span>
           </div>
         </div>
         <div v-if="sending" class="text-xs text-slate-400">正在思考…</div>
@@ -196,3 +217,39 @@ onMounted(() => {
     </section>
   </div>
 </template>
+
+<style scoped>
+/* 模型输出是 v-html 插入的，子元素不带 scoped 属性，必须 :deep() 穿透。
+   对话气泡里的排版要紧凑：文章那套 2.5em 段距在这里会把气泡撑得很空。 */
+.bubble-md :deep(p) { margin: 0 0 0.5em; }
+.bubble-md :deep(p:last-child) { margin-bottom: 0; }
+.bubble-md :deep(ul),
+.bubble-md :deep(ol) { margin: 0.25em 0 0.5em; padding-left: 1.25em; }
+.bubble-md :deep(ul) { list-style: disc; }
+.bubble-md :deep(ol) { list-style: decimal; }
+.bubble-md :deep(li) { margin: 0.15em 0; }
+.bubble-md :deep(h1),
+.bubble-md :deep(h2),
+.bubble-md :deep(h3) { margin: 0.6em 0 0.3em; font-weight: 600; line-height: 1.35; }
+.bubble-md :deep(h1) { font-size: 1.05em; }
+.bubble-md :deep(h2) { font-size: 1em; }
+.bubble-md :deep(h3) { font-size: 0.95em; }
+.bubble-md :deep(code) {
+  border-radius: 0.25rem; background: rgb(226 232 240); padding: 0.1em 0.3em;
+  font-size: 0.9em; font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.bubble-md :deep(pre) {
+  margin: 0.4em 0 0.5em; overflow-x: auto; border-radius: 0.375rem;
+  background: rgb(30 41 59); padding: 0.6em 0.75em; color: rgb(226 232 240);
+}
+.bubble-md :deep(pre code) { background: transparent; padding: 0; color: inherit; }
+.bubble-md :deep(blockquote) {
+  margin: 0.4em 0; border-left: 3px solid rgb(203 213 225); padding-left: 0.7em; color: rgb(71 85 105);
+}
+.bubble-md :deep(a) { color: rgb(79 70 229); text-decoration: underline; text-underline-offset: 2px; }
+.bubble-md :deep(table) { margin: 0.4em 0; border-collapse: collapse; font-size: 0.92em; display: block; overflow-x: auto; }
+.bubble-md :deep(th),
+.bubble-md :deep(td) { border: 1px solid rgb(203 213 225); padding: 0.25em 0.5em; }
+.bubble-md :deep(th) { background: rgb(241 245 249); font-weight: 600; }
+.bubble-md :deep(hr) { margin: 0.6em 0; border: 0; border-top: 1px solid rgb(203 213 225); }
+</style>
