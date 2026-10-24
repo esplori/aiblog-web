@@ -80,6 +80,24 @@ export const MODULES: NavModule[] = [
     ],
   },
   {
+    key: 'assistant',
+    label: 'AI 对话',
+    hint: '和工作台助手聊天',
+    home: '/chat',
+    icon: 'chat',
+    // 聊天记录按人隔离，未登录进去也是一片空
+    auth: true,
+    groups: [
+      {
+        key: 'chat',
+        label: '对话',
+        items: [
+          { key: 'chat', label: '开始对话', path: '/chat', icon: 'chat', auth: true },
+        ],
+      },
+    ],
+  },
+  {
     key: 'finance',
     label: '股票',
     hint: '持仓 / 盈亏',
@@ -124,6 +142,9 @@ export const resolveModule = (path: string): NavModule => {
   }
   if (path === '/finance' || path.startsWith('/finance/')) {
     return MODULES.find(m => m.key === 'finance') as NavModule
+  }
+  if (path === '/chat' || path.startsWith('/chat/')) {
+    return MODULES.find(m => m.key === 'assistant') as NavModule
   }
   if (path.startsWith('/admin/ai-items')) {
     return MODULES.find(m => m.key === 'ai') as NavModule
