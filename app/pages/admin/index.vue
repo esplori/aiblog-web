@@ -12,6 +12,15 @@ definePageMeta({
 
 use([CanvasRenderer, LineChart, BarChart, PieChart, GridComponent, TooltipComponent, LegendComponent])
 
+// 浅蓝磨砂主题:只作用于仪表盘,离开本页自动摘掉 body class
+import '~/assets/css/admin-themes/frost-blue.css'
+useHead({ bodyAttrs: { class: 'frost-dash-body' } })
+
+/** 图表统一走浅蓝调色板,避免各图各色 */
+const CHART_BLUE = '#2f6fde'
+const CHART_TEAL = '#5fa8d3'
+const CHART_PALETTE = ['#2f6fde', '#5a8ce8', '#8fb0ec', '#7fb3c9', '#a9bbd8', '#c7d6ef']
+
 const authStore = useAuthStore()
 const { get } = useApi()
 
@@ -172,7 +181,7 @@ const categoryOption = computed(() => {
       {
         name: '文章数', type: 'bar', barMaxWidth: 18,
         data: rows.map(c => Number(c.count)),
-        itemStyle: { color: '#2563eb', borderRadius: [0, 4, 4, 0] },
+        itemStyle: { color: CHART_BLUE, borderRadius: [0, 4, 4, 0] },
       },
     ],
   }
@@ -191,7 +200,7 @@ const articleTrendOption = computed(() => ({
     {
       name: '新增文章', type: 'bar', barMaxWidth: 28,
       data: articleTrend.value.map(p => Number(p.count)),
-      itemStyle: { color: '#10b981', borderRadius: [4, 4, 0, 0] },
+      itemStyle: { color: CHART_TEAL, borderRadius: [4, 4, 0, 0] },
     },
   ],
 }))
@@ -238,7 +247,7 @@ const typeDistOption = computed(() => ({
         name: TYPE_LABELS[r.type] || r.type,
         value: Number(r.pv),
         uv: Number(r.uv),
-        itemStyle: { color: ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#94a3b8'][i % 6] },
+        itemStyle: { color: CHART_PALETTE[i % CHART_PALETTE.length] },
       })),
     },
   ],
@@ -278,7 +287,7 @@ const referrerOption = computed(() => {
       type: 'bar',
       barMaxWidth: 16,
       data: rows.map((r) => Number(r.pv)),
-      itemStyle: { color: '#2563eb', borderRadius: [0, 4, 4, 0] },
+      itemStyle: { color: CHART_BLUE, borderRadius: [0, 4, 4, 0] },
     }],
   }
 })
@@ -299,7 +308,7 @@ const deviceOption = computed(() => {
         name: label(r.device),
         value: Number(r.pv),
         uv: Number(r.uv),
-        itemStyle: { color: ['#2563eb', '#94a3b8'][i % 2] },
+        itemStyle: { color: [CHART_BLUE, '#a9bbd8'][i % 2] },
       })),
     }],
   }
@@ -334,12 +343,12 @@ const trendOption = computed(() => ({
     {
       name: 'PV', type: 'line', smooth: true, symbolSize: 6,
       data: trend.value.map(p => Number(p.pv)),
-      itemStyle: { color: '#2563eb' },
+      itemStyle: { color: CHART_BLUE },
     },
     {
       name: 'UV', type: 'line', smooth: true, symbolSize: 6,
       data: trend.value.map(p => Number(p.uv)),
-      itemStyle: { color: '#10b981' },
+      itemStyle: { color: CHART_TEAL },
     },
   ],
 }))
@@ -367,7 +376,7 @@ onMounted(async () => {
 
     <div
       v-if="loadError"
-      class="mb-6 flex items-center justify-between gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+      class="load-error mb-6 flex items-center justify-between gap-3 px-4 py-3 text-sm"
     >
       <span>⚠ {{ loadError }}——下面显示的数字可能不完整。</span>
       <button class="rounded border border-red-300 px-3 py-1 text-xs hover:bg-red-100" @click="reloadAll">
@@ -376,56 +385,56 @@ onMounted(async () => {
     </div>
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-8">
-      <div class="card text-center">
-        <div class="text-3xl font-bold text-brand-600" v-text="stats.articleCount" />
-        <div class="text-gray-500 text-sm mt-1">文章总数</div>
+      <div class="card kpi-card kpi-card--blue text-center">
+        <div class="text-3xl font-bold kpi-num" v-text="stats.articleCount" />
+        <div class="kpi-lb text-sm mt-1">文章总数</div>
       </div>
       <template v-if="isAdmin">
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-blue-500" v-text="stats.publishedCount" />
-          <div class="text-gray-500 text-sm mt-1">已发布</div>
+        <div class="card kpi-card kpi-card--mint text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.publishedCount" />
+          <div class="kpi-lb text-sm mt-1">已发布</div>
         </div>
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-gray-500" v-text="stats.draftCount" />
-          <div class="text-gray-500 text-sm mt-1">草稿</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.draftCount" />
+          <div class="kpi-lb text-sm mt-1">草稿</div>
         </div>
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-cyan-500" v-text="stats.monthArticleCount" />
-          <div class="text-gray-500 text-sm mt-1">本月新增</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.monthArticleCount" />
+          <div class="kpi-lb text-sm mt-1">本月新增</div>
           <div class="text-xs mt-1" :class="stats.weekArticleCount >= stats.lastWeekArticleCount ? 'text-green-600' : 'text-gray-400'">
             本周 {{ stats.weekArticleCount }}（上周 {{ stats.lastWeekArticleCount }}）
           </div>
         </div>
       </template>
-      <div class="card text-center">
-        <div class="text-3xl font-bold text-red-500" v-text="stats.totalViewCount" />
-        <div class="text-gray-500 text-sm mt-1">总访问量</div>
+      <div class="card kpi-card text-center">
+        <div class="text-3xl font-bold kpi-num" v-text="stats.totalViewCount" />
+        <div class="kpi-lb text-sm mt-1">总访问量</div>
       </div>
       <template v-if="isAdmin">
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-indigo-500" v-text="stats.userCount" />
-          <div class="text-gray-500 text-sm mt-1">用户总数</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.userCount" />
+          <div class="kpi-lb text-sm mt-1">用户总数</div>
         </div>
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-green-500" v-text="stats.commentCount" />
-          <div class="text-gray-500 text-sm mt-1">评论总数</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.commentCount" />
+          <div class="kpi-lb text-sm mt-1">评论总数</div>
         </div>
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-amber-500" v-text="stats.pendingCommentCount" />
-          <div class="text-gray-500 text-sm mt-1">待审评论</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.pendingCommentCount" />
+          <div class="kpi-lb text-sm mt-1">待审评论</div>
           <NuxtLink
             v-if="stats.pendingCommentCount > 0"
             to="/admin/comments"
             class="text-xs text-brand-600 hover:underline"
           >去审核 →</NuxtLink>
         </div>
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-orange-500" v-text="stats.categoryCount" />
-          <div class="text-gray-500 text-sm mt-1">分类数量</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.categoryCount" />
+          <div class="kpi-lb text-sm mt-1">分类数量</div>
         </div>
-        <div class="card text-center">
-          <div class="text-3xl font-bold text-purple-500" v-text="stats.tagCount" />
-          <div class="text-gray-500 text-sm mt-1">标签数量</div>
+        <div class="card kpi-card text-center">
+          <div class="text-3xl font-bold kpi-num" v-text="stats.tagCount" />
+          <div class="kpi-lb text-sm mt-1">标签数量</div>
         </div>
       </template>
     </div>
@@ -438,12 +447,11 @@ onMounted(async () => {
             总 PV <span class="font-semibold text-gray-800">{{ trendTotalPv }}</span>
             · 总 UV <span class="font-semibold text-gray-800">{{ trendTotalUv }}</span>
           </div>
-          <div class="flex rounded-lg border border-slate-200 p-0.5">
+          <div class="range-seg">
             <button
               v-for="opt in RANGE_OPTIONS"
               :key="opt.value"
-              class="rounded px-2.5 py-1 text-xs transition"
-              :class="rangeDays === opt.value ? 'bg-brand-600 text-white' : 'text-gray-500 hover:text-brand-600'"
+              :class="rangeDays === opt.value ? 'is-on' : ''"
               @click="changeRange(opt.value)"
             >
               {{ opt.label }}
@@ -542,7 +550,7 @@ onMounted(async () => {
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-semibold">热门文章 TOP5</h2>
         <div class="flex items-center gap-3">
-          <div class="flex rounded-lg border border-slate-200 p-0.5">
+          <div class="range-seg">
             <button
               v-for="opt in TOP_OPTIONS"
               :key="opt.value"

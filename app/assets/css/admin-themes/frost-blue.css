@@ -1,0 +1,176 @@
+/* 风格 J · 浅蓝磨砂（仪表盘）
+   浅蓝渐变背景 + 玻璃卡（内壁极轻雾面颗粒）+ 浅蓝/浅青两张实心指标卡 + 胶囊控件。
+   作用域:body.frost-dash-body —— 只由 app/pages/admin/index.vue 在挂载时打上,其他后台页不受影响。 */
+
+body.frost-dash-body {
+  --fb-brand: #2f6fde;
+  --fb-brand-600: #2257b8;
+  --fb-ink: #14243d;
+  --fb-ink-2: #4a5a72;
+  --fb-ink-3: #7a8aa3;
+  --fb-line: rgba(255, 255, 255, 0.9);
+  --fb-glass: linear-gradient(157deg, rgba(255, 255, 255, 0.66) 0%, rgba(255, 255, 255, 0.44) 46%, rgba(255, 255, 255, 0.38) 100%);
+  --fb-shadow: 0 16px 38px -24px rgba(30, 60, 120, 0.42), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
+
+  background:
+    radial-gradient(760px 580px at 0% -8%, #b7d2f6 0%, rgba(183, 210, 246, 0) 62%),
+    radial-gradient(700px 540px at 102% 0%, #c3d6f8 0%, rgba(195, 214, 248, 0) 60%),
+    radial-gradient(780px 620px at 78% 106%, #cfd8f7 0%, rgba(207, 216, 247, 0) 62%),
+    radial-gradient(560px 440px at 26% 80%, #c6e5f4 0%, rgba(198, 229, 244, 0) 66%),
+    linear-gradient(165deg, #e8f1fc 0%, #e7effa 46%, #f1effb 100%);
+  background-attachment: fixed;
+}
+
+/* ===== 布局：侧栏 / 顶栏 / 内容区 ===== */
+body.frost-dash-body .admin-sidebar {
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.4));
+  border-right: 1px solid var(--fb-line) !important;
+  backdrop-filter: blur(20px) saturate(1.12);
+  -webkit-backdrop-filter: blur(20px) saturate(1.12);
+  box-shadow: 0 16px 40px -32px rgba(30, 60, 120, 0.5);
+}
+body.frost-dash-body .admin-sidebar > div:first-child {
+  border-bottom-color: rgba(255, 255, 255, 0.75) !important;
+}
+body.frost-dash-body .admin-sidebar .el-menu {
+  background: transparent;
+}
+body.frost-dash-body .admin-sidebar .el-menu-item {
+  color: var(--fb-ink-2);
+  border-radius: 999px;
+}
+body.frost-dash-body .admin-sidebar .el-menu-item:hover {
+  background: rgba(255, 255, 255, 0.6) !important;
+  color: var(--fb-ink);
+}
+body.frost-dash-body .admin-sidebar .el-menu-item.is-active {
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: var(--fb-brand-600) !important;
+  font-weight: 500;
+  box-shadow: 0 6px 16px -12px rgba(30, 60, 120, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.9) inset;
+}
+
+body.frost-dash-body .admin-topbar {
+  background: linear-gradient(180deg, rgba(233, 241, 251, 0.92) 0%, rgba(233, 241, 251, 0.66) 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+body.frost-dash-body .admin-main {
+  background: transparent !important;
+}
+
+/* ===== 卡片：玻璃 + 内壁雾面颗粒 ===== */
+body.frost-dash-body .card {
+  position: relative;
+  isolation: isolate;
+  background: var(--fb-glass);
+  border: 1px solid var(--fb-line);
+  border-radius: 24px;
+  box-shadow: var(--fb-shadow);
+  backdrop-filter: blur(20px) saturate(1.12);
+  -webkit-backdrop-filter: blur(20px) saturate(1.12);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+/* 只做雾面质感:噪点 + soft-light,透明度压到 0.06,近看才有颗粒 */
+body.frost-dash-body .card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.06;
+  mix-blend-mode: soft-light;
+  background-size: 140px 140px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+body.frost-dash-body .card:hover {
+  box-shadow: 0 22px 48px -26px rgba(30, 60, 120, 0.5), 0 1px 0 rgba(255, 255, 255, 0.95) inset;
+}
+
+/* ===== 指标卡 ===== */
+body.frost-dash-body .kpi-card {
+  padding: 18px 16px;
+}
+body.frost-dash-body .kpi-card--blue {
+  background: linear-gradient(142deg, #a9c8f2 0%, #cde0fa 55%, #e3eefc 100%);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 18px 40px -26px rgba(30, 74, 160, 0.55), 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+body.frost-dash-body .kpi-card--mint {
+  background: linear-gradient(142deg, #bfe0ec 0%, #dcf0f5 55%, #edf8fa 100%);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 18px 40px -26px rgba(30, 110, 150, 0.45), 0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+body.frost-dash-body .kpi-num {
+  color: var(--fb-ink);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+body.frost-dash-body .kpi-lb {
+  color: var(--fb-ink-2);
+  font-size: 12.5px;
+}
+
+/* ===== 文本与容器 ===== */
+body.frost-dash-body .admin-main h1,
+body.frost-dash-body .admin-main h2 {
+  color: var(--fb-ink);
+  letter-spacing: -0.01em;
+}
+body.frost-dash-body .card .text-gray-800 {
+  color: var(--fb-ink) !important;
+}
+body.frost-dash-body .card .text-gray-500 {
+  color: var(--fb-ink-3) !important;
+}
+body.frost-dash-body .card .bg-slate-50 {
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 14px;
+}
+
+/* 时间范围:胶囊分段控件 */
+body.frost-dash-body .range-seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--fb-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+body.frost-dash-body .range-seg button {
+  border-radius: 999px;
+  padding: 4px 13px;
+  font-size: 12px;
+  color: var(--fb-ink-2);
+  transition: background 0.14s, color 0.14s;
+}
+body.frost-dash-body .range-seg button:hover {
+  color: var(--fb-brand-600);
+}
+body.frost-dash-body .range-seg button.is-on {
+  background: #fff;
+  color: var(--fb-ink);
+  font-weight: 500;
+  box-shadow: 0 4px 12px -8px rgba(30, 60, 120, 0.65);
+}
+
+/* 加载失败提示:同样走玻璃,但保留语义红 */
+body.frost-dash-body .load-error {
+  border: 1px solid rgba(214, 96, 78, 0.35);
+  background: rgba(255, 245, 243, 0.85);
+  border-radius: 18px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #b5442a;
+}
+
+@media (max-width: 767px) {
+  body.frost-dash-body .card {
+    border-radius: 20px;
+  }
+}

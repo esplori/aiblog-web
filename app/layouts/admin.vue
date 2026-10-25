@@ -133,7 +133,7 @@ watch(menuLoaded, (v) => {
     <!-- 右侧内容区 -->
     <div class="flex-1 flex flex-col min-w-0">
       <!-- 顶部栏 -->
-      <header class="bg-white h-16 flex items-center justify-between px-4 border-b border-gray-100">
+      <header class="admin-topbar bg-white h-16 flex items-center justify-between px-4 border-b border-gray-100">
         <el-button text @click="isCollapse = !isCollapse">
           <el-icon :size="20">
             <Icon :name="isCollapse ? 'ep:expand' : 'ep:fold'" />
@@ -164,7 +164,7 @@ watch(menuLoaded, (v) => {
       </header>
 
       <!-- 内容 -->
-      <main class="flex-1 p-4 md:p-6 bg-gray-50 min-w-0 overflow-x-auto">
+      <main class="admin-main flex-1 p-4 md:p-6 bg-gray-50 min-w-0 overflow-x-auto">
         <div v-if="!menuLoaded" class="h-full flex items-center justify-center text-gray-400 text-sm py-20">
           加载中...
         </div>
