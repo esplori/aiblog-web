@@ -1,0 +1,78 @@
+/* v3 · 全模块版：现有仪表盘 8 个模块全部上图 */
+.ov{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:16px}
+.ov .k{background:var(--surface);border-radius:var(--r-card);box-shadow:var(--shadow);padding:16px 18px}
+.ov .lb{font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.ov .v{font-family:var(--mono);font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1.25;margin-top:3px}
+.ov .k:first-child .v{color:var(--brand)}
+.ov .v small{font-family:var(--font);font-size:12px;color:var(--ink-3);font-weight:400;margin-left:6px}
+.ov .df{font-size:12px;color:var(--ink-2);margin-top:1px}
+.ov .df em{font-family:var(--mono);font-style:normal;font-weight:500}
+.strip{display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border-radius:var(--r-card);
+  box-shadow:var(--shadow);margin-top:16px}
+.strip div{padding:12px 16px;border-right:1px solid var(--line-soft)}
+.strip div:last-child{border-right:0}
+.strip .lb{font-size:11.5px;color:var(--ink-3)}
+.strip .v{font-family:var(--mono);font-size:16px;font-weight:600;margin-top:2px}
+.strip .v em{font-family:var(--font);font-style:normal;font-size:11px;font-weight:400;margin-left:5px}
+.up{color:var(--ok)}.down{color:var(--danger)}
+
+.rc{display:grid;gap:16px;margin-top:16px}
+.rc.a{grid-template-columns:1.6fr 1fr}
+.rc.b{grid-template-columns:1fr 1fr 1fr}
+.rc.c{grid-template-columns:1.6fr 1fr}
+
+/* 横向条形列表（来源 / 分类 / 流量分布共用） */
+.bars{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.bars li .t{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2)}
+.bars li .t b{font-weight:500;color:var(--ink)}
+.bars li .t span{font-family:var(--mono);color:var(--ink-2)}
+.bars .tr{height:6px;border-radius:3px;background:var(--track);margin-top:5px;overflow:hidden}
+.bars .tr i{display:block;height:100%;border-radius:3px;background:var(--brand);transition:width .5s}
+.bars li:first-child .tr i{background:var(--brand)}
+:root{--bar-rest:rgba(37,99,235,.22)}
+.bars .tr i.s2{background:var(--c2)}.bars .tr i.s3{background:var(--c3)}
+.bars .tr i.s4{background:var(--c4)}.bars .tr i.s5{background:var(--c5)}
+
+/* 今日对照 */
+.today{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.today div{background:var(--tint);border-radius:9px;padding:9px 12px;font-size:12px;color:var(--ink-2)}
+.today b{font-family:var(--mono);color:var(--ink);font-weight:600;margin:0 3px}
+
+/* TOP5 排名 */
+.top5{list-style:none;margin:10px 0 0;padding:0}
+.top5 li{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid var(--line-soft);font-size:12.5px}
+.top5 li:last-child{border-bottom:0}
+.top5 .no{width:20px;height:20px;border-radius:var(--r-btn);background:var(--chip);color:var(--ink-2);font-family:var(--mono);
+  font-size:11px;display:grid;place-items:center;flex:none}
+.top5 li:nth-child(-n+3) .no{background:var(--brand);color:#fff}
+.top5 .tt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+.top5 .vv{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+
+/* 分段切换 */
+.segmini{display:inline-flex;background:var(--seg);border-radius:8px;padding:2px;gap:2px}
+.segmini button{border:0;background:transparent;font-size:11px;color:var(--ink-2);padding:3px 9px;border-radius:6px}
+.segmini button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(16,24,40,.06);font-weight:500}
+
+@media (max-width:1320px){
+  .ov{grid-template-columns:1fr 1fr} .strip{grid-template-columns:repeat(3,1fr)}
+  .rc.a,.rc.b,.rc.c{grid-template-columns:1fr}
+}
+@media (max-width:760px){ .ov{grid-template-columns:1fr 1fr} .strip{grid-template-columns:repeat(2,1fr)} }
+
+/* 环形（与 v2 一致的观感） */
+.donut{border-radius:50%;position:relative;flex:none}
+.donut .hole{position:absolute;border-radius:50%;background:var(--surface);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.donut .hole b{font-family:var(--mono);font-weight:600;letter-spacing:-.02em}
+.donut .hole span{font-size:10px;color:var(--ink-3)}
+.dlg{list-style:none;margin:0;padding:0;flex:1;min-width:110px;display:flex;flex-direction:column;gap:8px}
+.dlg li{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2)}
+.dlg i{width:8px;height:8px;border-radius:2px;flex:none}
+.dlg b{margin-left:auto;font-family:var(--mono);font-weight:500;color:var(--ink)}
+
+/* 设备卡：图例不要被拉到卡片最右 */
+.dlg.wide-limit{max-width:150px}
+.dlg li{line-height:1.3}
+
+/* 环形用变量 */
+.donut.dev{background:conic-gradient(var(--c1) 0 62%, var(--c2) 62% 91%, var(--c3) 91% 100%)}

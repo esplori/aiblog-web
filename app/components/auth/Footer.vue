@@ -10,15 +10,9 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="mt-6 space-y-1 text-center text-xs text-gray-500">
+  <footer class="auth-footer">
     <p>{{ copyright || `© ${year} ${name}` }}</p>
     <p v-if="footerText">{{ footerText }}</p>
-    <a
-      v-if="icp"
-      href="https://beian.miit.gov.cn/"
-      target="_blank"
-      rel="noopener"
-      class="transition-colors hover:text-gray-700"
-    >{{ icp }}</a>
+    <a v-if="icp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener">{{ icp }}</a>
   </footer>
 </template>

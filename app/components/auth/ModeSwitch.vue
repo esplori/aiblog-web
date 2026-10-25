@@ -16,10 +16,14 @@ const tabs = [
   { value: 'login' as const, label: '登录' },
   { value: 'register' as const, label: '注册' },
 ]
+
+/** 滑块位移由 data-i 驱动(纯 CSS transform),不在 JS 里算位置 */
+const activeIndex = computed(() => tabs.findIndex(t => t.value === props.modelValue))
 </script>
 
 <template>
-  <div class="auth-mode-switch" role="tablist" aria-label="登录或注册">
+  <div class="auth-mode-switch" role="tablist" aria-label="登录或注册" :data-i="activeIndex">
+    <span class="auth-mode-switch__thumb" aria-hidden="true" />
     <button
       v-for="tab in tabs"
       :key="tab.value"

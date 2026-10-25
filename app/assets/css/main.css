@@ -8,19 +8,34 @@
   --color-brand: #2563eb;
 }
 
-/* ===== 登录页设计令牌(docs/login-redesign-plan.md §4.1) =====
-   ⚠ `--auth-panel-base` 是**固定值**,不参与换肤 —— 这是对比度的保证,见 §4.3:
-   品牌侧承载文字的区域底色一律走它,品牌色只作装饰层 ⇒ 白字对它约 17:1,
-   与品牌色无关,换任何品牌色都不破 WCAG AA。 */
+/* ===== 登录页设计令牌 =====
+   深色玻璃双栏方案。⚠ `--auth-panel-base` 与 `--auth-bg` 仍是**固定值**,不参与换肤 ——
+   这是对比度的保证:承载文字的区域底色一律走它们,品牌色(--color-brand)只进光斑与焦点环,
+   白字对它们约 17:1,换任何品牌色都不破 WCAG AA。 */
 :root {
-  --auth-surface: #ffffff;
-  --auth-text: #1f1f1f;
-  --auth-muted: #6b7280;
-  --auth-border: rgba(15, 23, 42, 0.08);
-  --auth-panel-base: #0b1220;
-  --auth-radius-card: 16px; /* 对齐全站 .card 的 16px(原先登录页用 rounded-lg 的 8px) */
-  --auth-shadow-card: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
-  --auth-motion: 200ms ease;
+  --auth-bg: #0e1013;
+  --auth-ink: #f2f0ed;
+  --auth-ink-2: #a6a29d;
+  --auth-ink-3: #767370;
+  --auth-line: rgba(255, 255, 255, 0.1);
+  --auth-line-2: rgba(255, 255, 255, 0.06);
+  --auth-line-3: rgba(255, 255, 255, 0.2);
+  --auth-glass: rgba(255, 255, 255, 0.042);
+  --auth-radius-card: 24px;
+  --auth-radius-field: 10px;
+  --auth-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --auth-motion: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  --auth-mx: 0px;
+  --auth-my: 0px;
+  /* 兼容旧变量名(其他文件/组件仍可能引用) */
+  --auth-surface: rgba(255, 255, 255, 0.055);
+  --auth-text: #f2f0ed;
+  --auth-muted: #a6a29d;
+  --auth-border: rgba(255, 255, 255, 0.06);
+  --auth-panel-base: #0e1013;
+  --auth-shadow-card:
+    0 1px 2px rgba(0, 0, 0, 0.5), 0 28px 64px -22px rgba(0, 0, 0, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
 body {
@@ -90,8 +105,89 @@ a:hover {
    第一行 100vh 是给不支持 dvh 的老浏览器的兜底。
    ⚠ 两行顺序不能颠倒:后一行在同名属性上生效。 */
 .auth-shell {
+  position: relative;
   min-height: 100vh;
   min-height: 100dvh;
+  background-color: var(--auth-bg);
+  color: var(--auth-ink);
+  overflow-x: hidden;
+}
+
+/* ---- 背景层:深底渐变 + 三处品牌色光斑 + 细噪点(全部 aria-hidden) ---- */
+.auth-bg {
+  position: fixed;
+  inset: -4%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background: linear-gradient(165deg, #14171c 0%, #0f1114 54%, #0b0d0f 100%);
+}
+.auth-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+}
+.auth-bg__g {
+  position: absolute;
+  display: block;
+  border-radius: 9999px;
+}
+/* g1 左栏强光 / g2 右下弱光 / g3 卡片后柔光(玻璃要有「背后有东西」才成立) */
+.auth-bg__g--1 {
+  left: 6%;
+  top: -14%;
+  width: min(58vw, 820px);
+  height: min(46vw, 620px);
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand) 26%, transparent) 0%,
+    transparent 64%
+  );
+  transform: translate3d(calc(var(--auth-mx) * 1.6), calc(var(--auth-my) * 1.6), 0);
+  animation: auth-breathe 14s var(--auth-ease) infinite alternate;
+}
+.auth-bg__g--2 {
+  right: -10%;
+  bottom: -24%;
+  width: min(54vw, 760px);
+  height: min(38vw, 520px);
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand) 12%, transparent) 0%,
+    transparent 66%
+  );
+  transform: translate3d(calc(var(--auth-mx) * -1.1), calc(var(--auth-my) * -1.1), 0);
+  animation: auth-breathe 18s var(--auth-ease) 1.2s infinite alternate-reverse;
+}
+.auth-bg__g--3 {
+  right: 14%;
+  top: 6%;
+  width: min(46vw, 640px);
+  height: min(42vw, 560px);
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand) 14%, transparent) 0%,
+    transparent 68%
+  );
+  animation: auth-breathe 20s var(--auth-ease) 0.6s infinite alternate;
+}
+@keyframes auth-breathe {
+  from {
+    opacity: 0.72;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(2.2%, 1.6%, 0) scale(1.06);
+  }
+}
+
+/* 内容层压过背景 */
+.auth-layer {
+  position: relative;
+  z-index: 1;
 }
 
 /* 滚动容器:保证横屏手机(高度很小)时注册表单 5 个字段 + 按钮仍可滚动到达,
@@ -101,25 +197,240 @@ a:hover {
   padding-bottom: calc(2rem + env(safe-area-inset-bottom, 0px));
 }
 
-/* 表单卡片:圆角/阴影统一到全站 .card 规格(修 V5) */
-.auth-card {
-  background: var(--auth-surface);
-  border-radius: var(--auth-radius-card);
-  box-shadow: var(--auth-shadow-card);
-  padding: 1.5rem;
-  animation: auth-card-in var(--auth-motion) both;
+/* ---- 移动端(<lg)顶部紧凑品牌条:品牌侧折叠时白标信息不能丢 ---- */
+.auth-topbar {
+  display: none;
+  border-bottom: 1px solid var(--auth-line-2);
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
-
-@media (min-width: 640px) {
-  .auth-card {
-    padding: 2rem;
+.auth-topbar__inner {
+  display: flex;
+  height: 3.5rem;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 1rem;
+}
+.auth-topbar__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #dcd9d5;
+}
+@media (max-width: 1023px) {
+  .auth-topbar {
+    display: block;
   }
 }
 
+/* ===== 左:品牌侧(整片低调玻璃层,只比底色亮一点,不做硬分割) ===== */
+.auth-brand-wrap {
+  width: 42%;
+  flex: 0 0 42%;
+}
+.auth-brand {
+  position: relative;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  border-right: 1px solid var(--auth-line-2);
+  background: rgba(255, 255, 255, 0.025);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+/* 装饰光斑:纯装饰 ⇒ aria-hidden + pointer-events:none + 不承载文字 */
+.auth-brand__glow {
+  position: absolute;
+  left: -18%;
+  top: -10%;
+  width: 34rem;
+  height: 34rem;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle at center,
+    color-mix(in srgb, var(--color-brand) 22%, transparent) 0%,
+    transparent 66%
+  );
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.auth-brand__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  padding: 2.875rem 3.75rem;
+}
+
+.auth-brand__top {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  animation: auth-up var(--auth-motion) both;
+}
+.auth-brand__mark {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--auth-line);
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--auth-ink);
+}
+.auth-brand__logo {
+  height: 1.75rem;
+  max-width: 140px;
+  object-fit: contain;
+}
+.auth-brand__name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #dcd9d5;
+}
+
+.auth-brand__mid {
+  margin: auto 0;
+}
+.auth-brand__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.71875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--auth-ink-3);
+  animation: auth-up var(--auth-motion) 80ms both;
+}
+.auth-brand__eyebrow::after {
+  content: '';
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, var(--auth-line-3), transparent);
+}
+.auth-brand__title {
+  margin-top: 1.25rem;
+  font-size: clamp(2.5rem, 3.9vw, 4.125rem);
+  font-weight: 500;
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  color: var(--auth-ink);
+  animation: auth-up var(--auth-motion) 140ms both;
+}
+.auth-brand__rule {
+  margin-top: 1.875rem;
+  height: 1px;
+  background: linear-gradient(90deg, var(--auth-line-3), transparent);
+  transform-origin: left;
+  animation: auth-grow 640ms var(--auth-ease) 280ms both;
+}
+.auth-brand__tagline {
+  margin-top: 1.375rem;
+  max-width: 24em;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--auth-ink-2);
+  animation: auth-up var(--auth-motion) 200ms both;
+}
+.auth-brand__bot {
+  display: flex;
+  gap: 1.125rem;
+  font-size: 0.75rem;
+  color: var(--auth-ink-3);
+  animation: auth-up var(--auth-motion) 260ms both;
+}
+.auth-brand__bot a {
+  color: var(--auth-ink-3);
+}
+.auth-brand__bot a:hover {
+  color: #dcd9d5;
+}
+
+/* ===== 右:表单侧 ===== */
+.auth-main {
+  padding: 2.5rem 3.5rem;
+}
+.auth-col {
+  width: 100%;
+  max-width: 404px;
+}
+
+/* 玻璃卡 */
+.auth-card {
+  position: relative;
+  padding: 2rem 1.875rem 1.625rem;
+  border-radius: var(--auth-radius-card);
+  border: 1px solid var(--auth-line);
+  background: var(--auth-glass);
+  box-shadow: var(--auth-shadow-card);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  animation: auth-card-in 700ms var(--auth-ease) 100ms both;
+  transition:
+    box-shadow 480ms var(--auth-ease),
+    border-color 480ms var(--auth-ease);
+}
+/* 卡内任意焦点控件聚焦时,卡片边缘提亮一档:把焦点状态延伸到容器层 */
+.auth-card:focus-within {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    var(--auth-shadow-card),
+    0 0 0 1px color-mix(in srgb, var(--color-brand) 18%, transparent);
+}
+/* 不支持 backdrop-filter 的浏览器:卡片不能是半透明(会看不清),退回不透明深底 */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .auth-card {
+    background: #16191c;
+  }
+  .auth-brand {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.auth-card__head {
+  margin-bottom: 1.375rem;
+}
+.auth-card__title {
+  font-size: 1.3125rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--auth-ink);
+}
+.auth-card__sub {
+  margin-top: 0.375rem;
+  font-size: 0.78125rem;
+  color: var(--auth-ink-2);
+}
+
+@keyframes auth-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes auth-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
 @keyframes auth-card-in {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(18px) scale(0.985);
   }
   to {
     opacity: 1;
@@ -127,99 +438,254 @@ a:hover {
   }
 }
 
-/* ===== 品牌侧(仅 ≥lg 显示;装饰层绝对定位,不参与布局、不产生横向滚动) ===== */
-.auth-brand {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  background-color: var(--auth-panel-base);
-}
-
-/* 品牌色光斑:纯装饰 ⇒ aria-hidden + pointer-events:none */
-.auth-brand__glow {
-  position: absolute;
-  top: -18%;
-  right: -22%;
-  width: 32rem;
-  height: 32rem;
-  border-radius: 9999px;
-  background: radial-gradient(
-    circle at center,
-    color-mix(in srgb, var(--color-brand) 62%, transparent) 0%,
-    transparent 62%
-  );
-  opacity: 0.85;
-  pointer-events: none;
-}
-
-/* 细网格纹理:同样纯装饰 */
-.auth-brand__grid {
-  position: absolute;
-  inset: 0;
-  background-image:
-    linear-gradient(color-mix(in srgb, white 5%, transparent) 1px, transparent 1px),
-    linear-gradient(90deg, color-mix(in srgb, white 5%, transparent) 1px, transparent 1px);
-  background-size: 44px 44px;
-  pointer-events: none;
-}
-
-/* 文字侧遮罩:把文字所在区域的底色**压回** --auth-panel-base,
-   这样即使光斑在同一行、即使品牌色是亮黄,文字对比度也不受影响(§4.3 的落地) */
-.auth-brand__scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    var(--auth-panel-base) 0%,
-    color-mix(in srgb, var(--auth-panel-base) 78%, transparent) 52%,
-    transparent 100%
-  );
-  pointer-events: none;
-}
-
 /* ===== 登录/注册切换器(替代原先的 el-tabs) ===== */
 .auth-mode-switch {
+  position: relative;
   display: flex;
-  gap: 0.25rem;
-  padding: 0.25rem;
-  margin-bottom: 1.5rem;
+  gap: 0;
+  padding: 3px;
+  margin-bottom: 1.125rem;
   border-radius: 9999px;
-  background-color: color-mix(in srgb, var(--color-brand) 6%, white);
+  border: 1px solid var(--auth-line-2);
+  background: rgba(255, 255, 255, 0.05);
 }
-
+/* 滑块:位移走 transform,避免逐帧重绘背景色 */
+.auth-mode-switch__thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  height: calc(100% - 6px);
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.92);
+  transition: transform 420ms var(--auth-ease);
+  will-change: transform;
+}
+.auth-mode-switch[data-i='1'] .auth-mode-switch__thumb {
+  transform: translateX(100%);
+}
 .auth-mode-switch__item {
+  position: relative;
+  z-index: 1;
   flex: 1 1 0%;
   padding: 0.5rem 1rem;
   border: 0;
   border-radius: 9999px;
   background: transparent;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--auth-muted);
+  color: var(--auth-ink-2);
   cursor: pointer;
-  transition:
-    background-color var(--auth-motion),
-    color var(--auth-motion);
+  transition: color 350ms var(--auth-ease);
 }
-
 .auth-mode-switch__item.is-active {
-  background-color: var(--auth-surface);
-  color: var(--color-brand);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  color: #14171c;
+  font-weight: 600;
 }
-
 /* 焦点环跟随品牌色;⚠ 不用 outline:none 抹掉焦点可见性 */
 .auth-mode-switch__item:focus-visible {
   outline: 2px solid var(--color-brand);
   outline-offset: 2px;
 }
 
+/* ===== 表单(Element Plus 深色化,全部限定在 .auth-shell 作用域内) ===== */
+.auth-shell {
+  --el-color-primary: var(--color-brand);
+  --el-text-color-primary: var(--auth-ink);
+  --el-text-color-regular: var(--auth-ink-2);
+  --el-text-color-placeholder: #6c6965;
+  --el-text-color-secondary: var(--auth-ink-3);
+  --el-bg-color: transparent;
+  --el-bg-color-overlay: #1a1d21;
+  --el-fill-color-blank: transparent;
+  --el-border-color: var(--auth-line-2);
+  --el-border-color-light: var(--auth-line-2);
+  --el-border-color-lighter: var(--auth-line-2);
+  --el-color-error: #e8908a;
+  --el-color-danger: #c9635c; /* 必填星号:压暗一档,别在深底上跳 */
+}
+
+.auth-shell .el-form-item {
+  margin-bottom: 0.9375rem;
+}
+.auth-shell .el-form-item__label {
+  padding: 0 0 0.375rem;
+  font-size: 0.71875rem;
+  line-height: 1.4;
+  color: var(--auth-ink-2);
+  transition: color 250ms var(--auth-ease);
+}
+.auth-shell .el-form-item:focus-within .el-form-item__label {
+  color: #dcd9d5;
+}
+.auth-shell .el-form-item__error {
+  padding-top: 0.25rem;
+  font-size: 0.71875rem;
+  color: #e8908a;
+}
+
+.auth-shell .el-input__wrapper {
+  padding: 2px 0.8125rem;
+  border-radius: var(--auth-radius-field);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 0 0 1px var(--auth-line-2) inset;
+  transition:
+    box-shadow 280ms var(--auth-ease),
+    background-color 280ms var(--auth-ease);
+}
+.auth-shell .el-input--large .el-input__wrapper {
+  height: 2.625rem;
+}
+.auth-shell .el-input__wrapper:hover {
+  box-shadow: 0 0 0 1px var(--auth-line-3) inset;
+}
+.auth-shell .el-input__wrapper.is-focus {
+  background: rgba(255, 255, 255, 0.075);
+  box-shadow:
+    0 0 0 1px var(--auth-line-3) inset,
+    0 0 0 3px color-mix(in srgb, var(--color-brand) 26%, transparent);
+}
+.auth-shell .el-input__inner {
+  height: 2.25rem;
+  font-size: 0.875rem;
+  color: var(--auth-ink);
+}
+.auth-shell .el-input__inner::placeholder {
+  color: #6c6965;
+}
+.auth-shell .el-input__prefix,
+.auth-shell .el-input__suffix {
+  color: var(--auth-ink-3);
+}
+.auth-shell .el-input__password {
+  cursor: pointer;
+}
+
+/* 主按钮:白底深字(不靠品牌色承载文字,换肤也不会掉对比度) */
+.auth-shell .el-button--primary {
+  height: 2.75rem;
+  border: 0;
+  border-radius: 9999px;
+  background: #f2f0ed;
+  color: #14171c;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    transform 300ms var(--auth-ease),
+    background-color 300ms var(--auth-ease),
+    box-shadow 400ms var(--auth-ease);
+}
+.auth-shell .el-button--primary:hover,
+.auth-shell .el-button--primary:focus {
+  background: #fff;
+  color: #14171c;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px -12px rgba(255, 255, 255, 0.5);
+}
+.auth-shell .el-button--primary:active {
+  transform: translateY(0) scale(0.995);
+}
+.auth-shell .el-button--primary:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--color-brand) 60%, #fff);
+  outline-offset: 3px;
+}
+.auth-shell .el-button--primary.is-loading::before {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* 表单级错误:沿用语义红,深底上把底色降饱和、文字提亮(对比度 ≥4.5:1) */
+.auth-shell .el-alert--error {
+  align-items: center;
+  border: 1px solid rgba(196, 74, 64, 0.34);
+  border-radius: var(--auth-radius-field);
+  background: rgba(196, 74, 64, 0.16);
+  padding: 0.5625rem 0.75rem;
+  animation: auth-alert-in 500ms var(--auth-ease) both;
+}
+.auth-shell .el-alert--error .el-alert__title {
+  font-size: 0.75rem;
+  color: #f2b8b3;
+}
+.auth-shell .el-alert--error .el-alert__icon {
+  color: #f2b8b3;
+}
+.auth-shell .el-button--primary.is-link,
+.auth-shell .el-button.is-link {
+  color: #f2b8b3;
+  font-size: 0.75rem;
+}
+@keyframes auth-alert-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.auth-shell .el-form-item__content > .el-button.w-full,
+.auth-shell .el-button.w-full {
+  width: 100%;
+}
+.auth-shell .el-form-item:last-of-type {
+  margin-top: 1.125rem;
+  margin-bottom: 0;
+}
+
+/* 页脚 */
+.auth-card__foot {
+  margin-top: 1.25rem;
+  padding-top: 0.875rem;
+  border-top: 1px solid var(--auth-line-2);
+}
+.auth-shell .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label::before {
+  color: var(--auth-ink-3);
+}
+.auth-footer {
+  text-align: center;
+  font-size: 0.6875rem;
+  line-height: 1.7;
+  color: var(--auth-ink-3);
+}
+.auth-footer a {
+  color: var(--auth-ink-3);
+}
+.auth-footer a:hover {
+  color: #dcd9d5;
+}
+
+@media (max-width: 1023px) {
+  .auth-main {
+    padding: 1.75rem 1.25rem 3rem;
+  }
+  .auth-brand__inner {
+    padding: 1.625rem 1.5rem;
+  }
+  .auth-card {
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+}
+
 /* ===== 动效降级(修 R4):尊重系统「减少动态效果」设置 ===== */
 @media (prefers-reduced-motion: reduce) {
-  .auth-card {
+  .auth-card,
+  .auth-bg__g,
+  .auth-brand__top,
+  .auth-brand__eyebrow,
+  .auth-brand__title,
+  .auth-brand__rule,
+  .auth-brand__tagline,
+  .auth-brand__bot,
+  .auth-shell .el-alert--error {
     animation: none;
   }
-  .auth-mode-switch__item {
+  .auth-mode-switch__thumb,
+  .auth-mode-switch__item,
+  .auth-card,
+  .auth-shell .el-input__wrapper,
+  .auth-shell .el-button--primary {
     transition: none;
   }
 }

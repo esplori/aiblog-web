@@ -51,10 +51,10 @@ const onSwitchToLogin = (username: string) => {
       <!-- 未激活的面板不挂载:首屏只渲染登录表单的 2 个输入框(注册表单 5 个字段惰性渲染) -->
       <AuthLoginForm v-if="activeTab === 'login'" :initial-username="loginPrefill" />
       <AuthRegisterForm v-else @switch-to-login="onSwitchToLogin" />
-    </AuthFormCard>
 
-    <template #footer>
-      <AuthFooter />
-    </template>
+      <template #foot>
+        <AuthFooter />
+      </template>
+    </AuthFormCard>
   </AuthShell>
 </template>
