@@ -42,8 +42,9 @@ http {
         # 静态资源（Nuxt 构建产物）
         location ^~ /_nuxt/ {
             alias /app/.output/public/_nuxt/;
-            expires 1y;
-            add_header Cache-Control "public, immutable";
+            # 只写一条 Cache-Control：expires 会自己再加一条 max-age，
+            # 两个头同时出现语义含糊（浏览器虽能处理，但缓存策略不好排查）。
+            add_header Cache-Control "public, immutable, max-age=31536000";
         }
 
         # 其他静态文件（favicon 等）
