@@ -2,9 +2,6 @@
 export interface InterviewQuestion {
   id: number
   slug: string
-  companyId?: number | null
-  companyName?: string | null
-  companySlug?: string | null
   position?: string | null
   round?: string | null
   difficulty?: number | null
@@ -32,21 +29,8 @@ export interface InterviewQuestion {
   markLevel?: string | null
 }
 
-export interface InterviewCompany {
-  id: number
-  slug: string
-  name: string
-  industry?: string | null
-  scale?: string | null
-  logoUrl?: string | null
-  intro?: string | null
-  questionCount?: number
-  createdAt?: string
-}
-
 export interface InterviewStats {
   total: number
-  companyCount: number
   byPosition: Record<string, number>
   byDifficulty: Record<string, number>
   positions: string[]
@@ -114,7 +98,6 @@ export const positionLabel = (position?: string | null): string => {
 /** 会话状态机：created(AI 出题中) → ongoing(作答中) → scoring(评分中) → done / failed */
 export interface MockSessionSummary {
   id: number
-  companyName?: string | null
   position?: string | null
   round?: string | null
   mode: string
@@ -169,7 +152,6 @@ export interface MockReport {
 
 export interface MockSessionDetail {
   id: number
-  companyName?: string | null
   position?: string | null
   round?: string | null
   mode: string

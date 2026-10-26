@@ -117,7 +117,7 @@ export const MODULES: NavModule[] = [
   {
     key: 'interview',
     label: '刷题',
-    hint: '题库 / 公司 / 面经',
+    hint: '题库 / 面经',
     home: '/interview',
     icon: 'notebook',
     groups: [
@@ -165,7 +165,6 @@ export const resolveActive = (path: string, type?: string): string => {
   if (path === '/ai') return type ? type : 'plaza'
   if (path.startsWith('/admin/ai-items')) return 'ai-admin'
   if (path.startsWith('/admin/interview-questions')) return 'iq-admin'
-  if (path.startsWith('/admin/interview-companies')) return 'ic-admin'
   // ⚠ 刷题模块必须「先具体、后兜底」：题库本身的 path 就是 /interview，
   //    一旦先用 startsWith('/interview') 兜底，/interview/topics、/interview/exams
   //    等子项会全部被误判成「题库」（历史 bug：点任何子菜单都高亮题库）。

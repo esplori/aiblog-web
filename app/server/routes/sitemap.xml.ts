@@ -4,7 +4,6 @@
  * 收录口径：
  *  - 文章   /post/{uuid}
  *  - 题目   /interview/{slug}
- *  - 公司   /interview/companies/{slug}
  *  - 话题   /interview/topics/{slug}
  * 列表页/首页作为固定项写死。
  *
@@ -34,7 +33,6 @@ export default defineEventHandler(async (event) => {
     { loc: '/', priority: '1.0' },
     { loc: '/articles', priority: '0.9' },
     { loc: '/interview', priority: '0.9' },
-    { loc: '/interview/companies', priority: '0.7' },
     { loc: '/interview/topics', priority: '0.7' },
     { loc: '/ai', priority: '0.6' },
   ]
@@ -54,9 +52,6 @@ export default defineEventHandler(async (event) => {
 
   const questions = await get<Page<{ slug: string }>>(`/api/interview/questions?page=1&size=${pageSize}`)
   for (const q of questions?.records ?? []) urls.push({ loc: `/interview/${q.slug}`, priority: '0.7' })
-
-  const companies = await get<Array<{ slug: string }>>('/api/interview/companies')
-  for (const c of companies ?? []) urls.push({ loc: `/interview/companies/${c.slug}`, priority: '0.6' })
 
   type Topic = { slug?: string; name?: string; children?: Topic[] }
   const topics = await get<Topic[]>('/api/interview/topics')

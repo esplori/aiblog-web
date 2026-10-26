@@ -2,7 +2,7 @@
   <div class="card relative block transition-colors hover:border-brand-300">
     <div class="flex items-start justify-between gap-3">
       <h3 class="text-sm font-semibold leading-snug text-slate-900">
-        <!-- 用「拉伸链接」覆盖整卡，避免把公司链接嵌进题目链接（嵌套 <a> 会被浏览器拆开导致 hydration mismatch） -->
+        <!-- 用「拉伸链接」覆盖整卡，避免把其它链接嵌进题目链接（嵌套 <a> 会被浏览器拆开导致 hydration mismatch） -->
         <NuxtLink :to="'/interview/' + question.slug" class="after:absolute after:inset-0 after:content-['']">
           {{ question.title }}
         </NuxtLink>

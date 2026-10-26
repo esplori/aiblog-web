@@ -1,6 +1,7 @@
 # 面试模块（Interview Hub）设计
 
 > 状态：**P1、P2、P3 已上线**（2026-10-16）
+> 变更：**公司库（companies）维度已于 2026-10-26 整体下线**（前台公司页、后台公司维护、题目/模拟考的公司绑定均已移除），本文档中相关章节仅作历史设计记录。
 > 目标仓库：前端 `aiblog-web`（`/home/ubuntu/aiblog-web`）+ 后端 `aiblog-java`（`/home/ubuntu/aiblog-java`）
 > 相关：`docs/ai-community-plan.md`（AI 广场，已上线）、`docs/ai-features-proposal.md`
 > 依赖 skill：`aiblog-web-ui`（颜色令牌 / 排版 / 卡片与两栏规范）

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PageResult } from '~/types'
-import type { InterviewCompany, InterviewQuestion } from '~/types/interview'
+import type { InterviewQuestion } from '~/types/interview'
 import { DIFFICULTY_LABEL, POSITION_OPTIONS, ROUND_OPTIONS, STATUS_LABEL, TYPE_LABEL, TYPE_ORDER, positionLabel } from '~/types/interview'
 
 // 面试题库后台：题目录入与管理（菜单驱动权限，与 AI 条目录入同风格）
@@ -9,7 +9,6 @@ definePageMeta({ layout: 'admin' })
 const { get, post, put, del, request } = useApi()
 
 const items = ref<InterviewQuestion[]>([])
-const companies = ref<InterviewCompany[]>([])
 const loading = ref(true)
 const page = ref(1)
 const pageSize = ref(20)
@@ -37,16 +36,7 @@ const loadItems = async () => {
   }
 }
 
-const loadCompanies = async () => {
-  try {
-    const res = await get<InterviewCompany[]>('/api/admin/interview/companies')
-    companies.value = res.data || []
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-await Promise.all([loadItems(), loadCompanies()])
+await loadItems()
 
 const handlePageChange = (target: number) => {
   page.value = target
@@ -60,7 +50,6 @@ const onFilter = () => {
 
 const blankForm = () => ({
   slug: '',
-  companyId: null as number | null,
   position: 'java',
   round: '一面',
   difficulty: 3,
@@ -93,7 +82,6 @@ const openEdit = (row: InterviewQuestion) => {
   editingId.value = row.id
   form.value = {
     slug: row.slug,
-    companyId: row.companyId ?? null,
     position: row.position || '',
     round: row.round || '',
     difficulty: row.difficulty ?? 3,
@@ -122,7 +110,6 @@ const submitForm = async () => {
   submitting.value = true
   const payload = {
     slug: form.value.slug.trim() || undefined,
-    companyId: form.value.companyId || undefined,
     position: form.value.position || undefined,
     round: form.value.round || undefined,
     difficulty: form.value.difficulty,
@@ -206,9 +193,6 @@ const removeItem = async (row: InterviewQuestion) => {
 
     <el-table v-loading="loading" :data="items" border stripe>
       <el-table-column prop="title" label="标题" min-width="240" show-overflow-tooltip />
-      <el-table-column label="公司" width="140">
-        <template #default="{ row }">{{ row.companyName || '通用题' }}</template>
-      </el-table-column>
       <el-table-column label="岗位" width="110">
         <template #default="{ row }">{{ positionLabel(row.position) }}</template>
       </el-table-column>
@@ -262,11 +246,6 @@ const removeItem = async (row: InterviewQuestion) => {
           <el-input v-model="form.followUpsText" type="textarea" :rows="3" placeholder="一行一条追问，例如：那 JDK8 的扩容为什么是 2 倍？" />
         </el-form-item>
         <div class="grid grid-cols-2 gap-3">
-          <el-form-item label="公司">
-            <el-select v-model="form.companyId" placeholder="留空 = 通用题" clearable filterable style="width: 100%">
-              <el-option v-for="item in companies" :key="item.id" :label="item.name" :value="item.id" />
-            </el-select>
-          </el-form-item>
           <el-form-item label="岗位">
             <el-select v-model="form.position" filterable allow-create default-first-option style="width: 100%">
               <el-option v-for="item in POSITION_OPTIONS" :key="item" :label="positionLabel(item)" :value="item" />

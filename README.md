@@ -178,9 +178,9 @@ Dockerfile                多阶段构建（builder → node:22-alpine + nginx�
 
 ### 路由
 
-**前台**：`/`（博客首页）、`/articles`（文章列表）、`/post/[uuid]`（文章详情，**对外标识用 UUID**）、`/ai`（AI 广场）、`/interview`（面试题库）、`/interview/[slug]`（题目详情）、`/interview/companies`（公司库）、`/interview/companies/[slug]`（公司题目聚合）、`/login`
+**前台**：`/`（博客首页）、`/articles`（文章列表）、`/post/[uuid]`（文章详情，**对外标识用 UUID**）、`/ai`（AI 广场）、`/interview`（面试题库）、`/interview/[slug]`（题目详情）、`/login`
 
-**后台**：`/admin`（看板）、`/admin/articles`（含 `create` / `edit/[id]`）、`categories`、`tags`、`comments`、`files`、`menus`、`roles`、`users`、`settings`（个人设置）、`site-settings`（站点设置，仅管理员）、`ai-items`（AI 条目录入）、`interview-questions` / `interview-companies`（面试题库与公司维护）
+**后台**：`/admin`（看板）、`/admin/articles`（含 `create` / `edit/[id]`）、`categories`、`tags`、`comments`、`files`、`menus`、`roles`、`users`、`settings`（个人设置）、`site-settings`（站点设置，仅管理员）、`ai-items`（AI 条目录入）、`interview-questions`（面试题库维护）
 
 **兜底**：`/403`
 
@@ -202,7 +202,7 @@ Dockerfile                多阶段构建（builder → node:22-alpine + nginx�
 | API Key | `GET/POST /api/admin/api-keys`、`DELETE /api/admin/api-keys/{id}`（仅 admin） |
 | 统计 | `GET /api/admin/stats/trend`、`/article-trend`、`/category-distribution`、`/top-articles` |
 | 面试题库 | `GET /api/interview/questions`（筛选/分页）、`GET /api/interview/questions/{slug}`、`POST /api/interview/questions/{id}/mark`、`GET /api/interview/hot`、`GET /api/interview/stats`、`GET /api/interview/companies`（含 `{slug}`） |
-| 面试题库管理 | `GET/POST /api/admin/interview/questions`、`PUT /api/admin/interview/questions/{id}`、`PATCH /api/admin/interview/questions/{id}/status`、`DELETE /api/admin/interview/questions/{id}`、`GET/POST /api/admin/interview/companies`、`PUT/DELETE /api/admin/interview/companies/{id}` |
+| 面试题库管理 | `GET/POST /api/admin/interview/questions`、`PUT /api/admin/interview/questions/{id}`、`PATCH /api/admin/interview/questions/{id}/status`、`DELETE /api/admin/interview/questions/{id}`、`GET/POST /api/admin/interview/companies`、`PUT/DELETE /api/admin/interview/companies/{id}`（公司库前端已于 2026-10-26 下线，接口仍保留） |
 
 响应统一为 `{ code, message, data, timestamp }`，分页数据为 `{ records, total, current, size }`（见 `app/types/index.ts`）。
 

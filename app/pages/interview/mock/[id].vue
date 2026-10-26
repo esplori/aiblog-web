@@ -354,7 +354,7 @@ useSeoMeta({
         <!-- 会话概要 -->
         <section class="card">
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <h1 class="text-base font-bold text-slate-900">{{ detail.companyName || '不绑定公司' }}</h1>
+            <h1 class="text-base font-bold text-slate-900">模拟面试</h1>
             <span class="text-xs text-slate-500">{{ detail.position ? positionLabel(detail.position) : '不限岗位' }}</span>
             <span v-if="detail.round" class="text-xs text-slate-400">{{ detail.round }}</span>
             <span class="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500">{{ MOCK_MODE_LABEL[detail.mode] || detail.mode }}</span>

@@ -86,12 +86,6 @@ useSeoMeta({
     <div class="mt-3 mb-4 flex flex-wrap items-center gap-2 text-[11px]">
       <span class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">{{ typeLabel }}</span>
       <InterviewDifficultyBadge :level="question.difficulty" />
-      <NuxtLink
-        v-if="question.companySlug"
-        :to="'/interview/companies/' + question.companySlug"
-        class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600 hover:text-brand-600"
-      >{{ question.companyName }}</NuxtLink>
-      <span v-else class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-600">通用题</span>
       <span class="text-slate-400">{{ positionLabel(question.position) }}<template v-if="question.round"> · {{ question.round }}</template></span>
       <span class="ml-auto text-slate-400">
         ★ {{ question.starCount }} · 浏览 {{ question.viewCount }}

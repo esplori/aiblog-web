@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PageResult } from '~/types'
-import type { InterviewCompany, MockSessionSummary } from '~/types/interview'
+import type { MockSessionSummary } from '~/types/interview'
 import {
   MOCK_DAILY_LIMIT,
   MOCK_MODE_LABEL,
@@ -20,7 +20,6 @@ const { get, post } = useApi()
 
 const loginUrl = computed(() => '/login?redirect=' + encodeURIComponent('/interview/mock'))
 
-const companies = ref<InterviewCompany[]>([])
 const sessions = ref<MockSessionSummary[]>([])
 
 const loading = ref(false)
@@ -31,7 +30,6 @@ const listError = ref('')
 const startError = ref('')
 
 const form = reactive({
-  companyId: '',
   // 岗位是必填项：这里直接给默认值，避免「看着像选中了、其实提交了 null」导致接口 422
   position: POSITION_OPTIONS[0] as string,
   round: '',
@@ -46,15 +44,6 @@ const friendlyStartError = (e: any): string => {
     return `今日模拟场次已用完（每人每天最多 ${MOCK_DAILY_LIMIT} 场），明天再来吧。`
   }
   return msg || '创建失败，请稍后重试'
-}
-
-const loadCompanies = async () => {
-  try {
-    const res = await get<InterviewCompany[]>('/api/interview/companies')
-    companies.value = res.data || []
-  } catch {
-    companies.value = []
-  }
 }
 
 const loadSessions = async () => {
@@ -77,7 +66,7 @@ const load = async () => {
   loading.value = true
   errorMessage.value = ''
   try {
-    await Promise.all([loadCompanies(), loadSessions()])
+    await loadSessions()
   } catch (e: any) {
     errorMessage.value = e?.data?.message || e?.message || '数据加载失败，请稍后重试'
   } finally {
@@ -96,7 +85,6 @@ const start = async () => {
   startError.value = ''
   try {
     const res = await post<MockSessionSummary>('/api/interview/sessions', {
-      companyId: form.companyId ? Number(form.companyId) : null,
       position: form.position || null,
       round: form.round || null,
       mode: form.mode,
@@ -136,7 +124,7 @@ onMounted(() => {
 
 useSeoMeta({
   title: '模拟考试 · 刷题',
-  description: '选择目标公司、岗位与轮次，进行一场 AI 模拟考试并获取评分报告。',
+  description: '选择岗位与轮次，进行一场 AI 模拟考试并获取评分报告。',
 })
 </script>
 
@@ -146,7 +134,7 @@ useSeoMeta({
     <section v-if="!authStore.isLoggedIn" class="card mx-auto max-w-xl py-10 text-center">
       <h1 class="text-lg font-bold text-slate-900">登录后开始 AI 模拟考试</h1>
       <p class="mx-auto mt-2 max-w-md text-xs leading-relaxed text-slate-500">
-        选择目标公司、岗位与轮次，AI 会逐题出题并评分，最后给出准确性与改进建议。
+        选择岗位与轮次，AI 会逐题出题并评分，最后给出准确性与改进建议。
       </p>
       <NuxtLink
         :to="loginUrl"
@@ -189,15 +177,7 @@ useSeoMeta({
           </div>
 
           <form class="mt-4 space-y-4" @submit.prevent="start">
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              <label class="block">
-                <span class="text-xs font-medium text-slate-500">目标公司</span>
-                <select v-model="form.companyId" class="interview-select mt-1 w-full">
-                  <option value="">不绑定</option>
-                  <option v-for="c in companies" :key="c.id" :value="String(c.id)">{{ c.name }}</option>
-                </select>
-              </label>
-
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <label class="block">
                 <span class="text-xs font-medium text-slate-500">岗位</span>
                 <select v-model="form.position" class="interview-select mt-1 w-full">
@@ -235,7 +215,7 @@ useSeoMeta({
                   @click="form.mode = 'ai'"
                 >
                   <span class="block text-sm font-semibold" :class="form.mode === 'ai' ? 'text-brand-700' : 'text-slate-900'">AI 出题</span>
-                  <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">按公司 + 岗位定制生成，需要几十秒；期间可离开页面，稍后回来查看。</span>
+                  <span class="mt-1 block text-[11px] leading-relaxed text-slate-500">按岗位 + 轮次定制生成，需要几十秒；期间可离开页面，稍后回来查看。</span>
                 </button>
               </div>
             </div>
@@ -286,7 +266,6 @@ useSeoMeta({
                 class="flex flex-wrap items-center gap-x-3 gap-y-1 py-3 transition-colors hover:text-brand-600"
               >
                 <span class="text-xs text-slate-400">{{ formatTime(s.createdAt) }}</span>
-                <span class="text-sm text-slate-900">{{ s.companyName || '不绑定公司' }}</span>
                 <span class="text-xs text-slate-500">{{ s.position ? positionLabel(s.position) : '不限岗位' }}</span>
                 <span v-if="s.round" class="text-xs text-slate-400">{{ s.round }}</span>
                 <span class="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-500">{{ MOCK_MODE_LABEL[s.mode] || s.mode }}</span>

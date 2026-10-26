@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { PageResult } from '~/types'
-import type { InterviewCompany, InterviewQuestion, InterviewStats } from '~/types/interview'
+import type { InterviewQuestion, InterviewStats } from '~/types/interview'
 import { DIFFICULTY_LABEL, KIND_FILTER_OPTIONS, questionKindLabel } from '~/types/interview'
 
 // 面试题库：公开可读（未登录也能看），沿用工作台外壳
@@ -73,15 +73,11 @@ const { data: statsData } = await useAsyncData('interview-public-stats', () => g
 const { data: hotData } = await useAsyncData('interview-public-hot', () => get<InterviewQuestion[]>('/api/interview/hot', { size: 5 }), {
   default: () => null,
 })
-const { data: companyData } = await useAsyncData('interview-public-companies', () => get<InterviewCompany[]>('/api/interview/companies'), {
-  default: () => null,
-})
 
 const questions = computed(() => data.value?.data?.records || [])
 const total = computed(() => Number(data.value?.data?.total) || 0)
 const stats = computed(() => statsData.value?.data || null)
 const hot = computed(() => hotData.value?.data || [])
-const companies = computed(() => (companyData.value?.data || []).filter((c) => Number(c.questionCount) > 0).slice(0, 8))
 const totalPages = computed(() => Math.max(Math.ceil(total.value / pageSize), 1))
 
 /** 主题下拉：11 个主题全量列出（含章节） */
@@ -116,8 +112,8 @@ const classify = (event: Event) => {
 }
 
 useSeoMeta({
-  title: '面试题库 · 岗位 × 公司双维度',
-  description: '按岗位与公司整理的面试题库：八股概念、系统设计、算法推导、项目深挖，附参考答案与追问链。',
+  title: '面试题库 · 岗位 × 主题双维度',
+  description: '按岗位与主题整理的面试题库：八股概念、系统设计、算法推导、项目深挖，附参考答案与追问链。',
 })
 </script>
 
@@ -127,14 +123,10 @@ useSeoMeta({
       <div>
         <h1 class="text-lg font-bold text-slate-900">面试题库</h1>
         <p class="mt-1 text-xs text-slate-500">
-          共 {{ total }} 道题 · {{ stats?.companyCount || 0 }} 家公司 · 按「岗位 × 公司」双维度整理
+          共 {{ total }} 道题 · 按「岗位 × 主题」双维度整理
         </p>
       </div>
       <div class="flex items-center gap-2">
-        <NuxtLink
-          to="/interview/companies"
-          class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:border-brand-300 hover:text-brand-600"
-        >公司库</NuxtLink>
         <NuxtLink
           v-if="authStore.isLoggedIn"
           to="/admin/interview-questions"
@@ -221,22 +213,6 @@ useSeoMeta({
       </div>
 
       <aside class="space-y-4">
-        <section class="bg-white rounded-xl border border-slate-200 p-4">
-          <h2 class="text-sm font-semibold text-slate-900">热门公司</h2>
-          <ul class="mt-2 space-y-1.5">
-            <li v-for="company in companies" :key="company.id">
-              <NuxtLink
-                :to="'/interview/companies/' + company.slug"
-                class="flex items-center justify-between text-xs text-slate-500 hover:text-brand-600"
-              >
-                <span class="truncate">{{ company.name }}</span>
-                <span class="ml-2 text-slate-400">{{ company.questionCount }} 题</span>
-              </NuxtLink>
-            </li>
-            <li v-if="!companies.length" class="text-xs text-slate-400">暂无公司数据</li>
-          </ul>
-        </section>
-
         <section class="bg-white rounded-xl border border-slate-200 p-4">
           <h2 class="text-sm font-semibold text-slate-900">热门题目</h2>
           <ul class="mt-2 space-y-2">
