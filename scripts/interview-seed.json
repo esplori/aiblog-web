@@ -1,20 +1,7 @@
 {
-  "companies": [
-    { "slug": "bytedance", "name": "字节跳动", "industry": "互联网", "scale": "10000 人以上", "intro": "以推荐算法为核心的内容平台公司,代表产品有抖音、今日头条、飞书。技术栈以 Go/Java 为主,强调高并发与数据驱动。" },
-    { "slug": "alibaba", "name": "阿里巴巴", "industry": "电商/云计算", "scale": "10000 人以上", "intro": "电商与云计算双主业集团,淘宝天猫与阿里云是其核心资产。中台体系与分布式架构实践在国内影响深远。" },
-    { "slug": "tencent", "name": "腾讯", "industry": "社交/游戏", "scale": "10000 人以上", "intro": "以微信、QQ 为核心的社交与游戏公司,同时经营云与金融科技。C++/Go 在后台与游戏服务端占比高。" },
-    { "slug": "meituan", "name": "美团", "industry": "本地生活", "scale": "10000 人以上", "intro": "本地生活服务平台,覆盖外卖、到店、酒旅与即时配送。业务强调实时调度与海量订单下的稳定性。" },
-    { "slug": "huawei", "name": "华为", "industry": "通信/终端", "scale": "10000 人以上", "intro": "通信设备与终端制造企业,业务涵盖运营商网络、企业业务与消费者终端。底层系统、嵌入式与算法岗位占比高。" },
-    { "slug": "baidu", "name": "百度", "industry": "搜索/人工智能", "scale": "10000 人以上", "intro": "以搜索引擎起家的技术公司,近年重点投入大模型与自动驾驶。文心系列模型与飞桨框架是其 AI 主线。" },
-    { "slug": "jd", "name": "京东", "industry": "电商/物流", "scale": "10000 人以上", "intro": "自营电商与物流一体化公司,以供应链和仓配网络见长。后端系统强调库存、订单与履约的一致性。" },
-    { "slug": "kuaishou", "name": "快手", "industry": "短视频/直播", "scale": "10000 人以上", "intro": "短视频与直播平台,以普惠流量分发和电商直播为特色。服务端面临高并发推流与实时互动挑战。" },
-    { "slug": "xiaohongshu", "name": "小红书", "industry": "社区/消费", "scale": "10000 人以上", "intro": "以图文笔记与生活方式内容为核心的社区平台,兼营电商。数据驱动增长与推荐分发是主要技术方向。" },
-    { "slug": "antgroup", "name": "蚂蚁集团", "industry": "金融科技", "scale": "10000 人以上", "intro": "支付宝背后的金融科技公司,业务覆盖支付、信贷与理财。系统对资金一致性、高可用与安全要求极高。" }
-  ],
   "questions": [
     {
       "slug": "jvm-memory-model",
-      "company": "字节跳动",
       "position": "java",
       "round": "一面",
       "difficulty": 3,
@@ -29,7 +16,6 @@
     },
     {
       "slug": "hashmap-resize-concurrency",
-      "company": null,
       "position": "java",
       "round": "一面",
       "difficulty": 3,
@@ -44,7 +30,6 @@
     },
     {
       "slug": "thread-pool-core-params",
-      "company": "阿里巴巴",
       "position": "java",
       "round": "二面",
       "difficulty": 3,
@@ -59,7 +44,6 @@
     },
     {
       "slug": "mysql-index-b-plus-tree",
-      "company": "美团",
       "position": "java",
       "round": "一面",
       "difficulty": 3,
@@ -74,7 +58,6 @@
     },
     {
       "slug": "mysql-transaction-isolation-mvcc",
-      "company": "字节跳动",
       "position": "java",
       "round": "二面",
       "difficulty": 4,
@@ -89,7 +72,6 @@
     },
     {
       "slug": "redis-cache-avalanche-penetration",
-      "company": "京东",
       "position": "java",
       "round": "一面",
       "difficulty": 3,
@@ -104,7 +86,6 @@
     },
     {
       "slug": "spring-transaction-invalidation",
-      "company": null,
       "position": "java",
       "round": "二面",
       "difficulty": 4,
@@ -119,7 +100,6 @@
     },
     {
       "slug": "aqs-reentrantlock",
-      "company": "蚂蚁集团",
       "position": "java",
       "round": "三面",
       "difficulty": 4,
@@ -134,7 +114,6 @@
     },
     {
       "slug": "distributed-lock-redis",
-      "company": "蚂蚁集团",
       "position": "java",
       "round": "二面",
       "difficulty": 4,
@@ -149,7 +128,6 @@
     },
     {
       "slug": "jvm-gc-tuning-fullgc",
-      "company": "阿里巴巴",
       "position": "java",
       "round": "三面",
       "difficulty": 5,
@@ -164,7 +142,6 @@
     },
     {
       "slug": "jmm-volatile-happens-before",
-      "company": "华为",
       "position": "java",
       "round": "一面",
       "difficulty": 4,
@@ -179,7 +156,6 @@
     },
     {
       "slug": "mq-message-idempotent",
-      "company": "快手",
       "position": "java",
       "round": "二面",
       "difficulty": 3,
@@ -194,7 +170,6 @@
     },
     {
       "slug": "js-event-loop-microtask",
-      "company": "字节跳动",
       "position": "frontend",
       "round": "一面",
       "difficulty": 3,
@@ -209,7 +184,6 @@
     },
     {
       "slug": "closure-memory-leak",
-      "company": null,
       "position": "frontend",
       "round": "一面",
       "difficulty": 2,
@@ -224,7 +198,6 @@
     },
     {
       "slug": "vue3-reactivity-proxy",
-      "company": "快手",
       "position": "frontend",
       "round": "一面",
       "difficulty": 3,
@@ -239,7 +212,6 @@
     },
     {
       "slug": "react-fiber-reconciliation",
-      "company": "腾讯",
       "position": "frontend",
       "round": "二面",
       "difficulty": 4,
@@ -254,7 +226,6 @@
     },
     {
       "slug": "frontend-performance-lcp",
-      "company": "小红书",
       "position": "frontend",
       "round": "二面",
       "difficulty": 4,
@@ -269,7 +240,6 @@
     },
     {
       "slug": "http2-multiplexing-cache",
-      "company": "百度",
       "position": "frontend",
       "round": "一面",
       "difficulty": 3,
@@ -284,7 +254,6 @@
     },
     {
       "slug": "cors-preflight",
-      "company": null,
       "position": "frontend",
       "round": "一面",
       "difficulty": 3,
@@ -299,7 +268,6 @@
     },
     {
       "slug": "implement-promise-all",
-      "company": "字节跳动",
       "position": "frontend",
       "round": "笔试",
       "difficulty": 3,
@@ -314,7 +282,6 @@
     },
     {
       "slug": "lru-cache-design",
-      "company": "字节跳动",
       "position": "algo",
       "round": "一面",
       "difficulty": 4,
@@ -329,7 +296,6 @@
     },
     {
       "slug": "reverse-linked-list-k-group",
-      "company": null,
       "position": "algo",
       "round": "一面",
       "difficulty": 3,
@@ -344,7 +310,6 @@
     },
     {
       "slug": "three-sum",
-      "company": "腾讯",
       "position": "algo",
       "round": "一面",
       "difficulty": 3,
@@ -359,7 +324,6 @@
     },
     {
       "slug": "topk-quickselect-heap",
-      "company": "美团",
       "position": "algo",
       "round": "二面",
       "difficulty": 4,
@@ -374,7 +338,6 @@
     },
     {
       "slug": "longest-increasing-subsequence",
-      "company": null,
       "position": "algo",
       "round": "一面",
       "difficulty": 3,
@@ -389,7 +352,6 @@
     },
     {
       "slug": "binary-tree-zigzag-level-order",
-      "company": "百度",
       "position": "algo",
       "round": "一面",
       "difficulty": 2,
@@ -404,7 +366,6 @@
     },
     {
       "slug": "dp-edit-distance",
-      "company": "华为",
       "position": "algo",
       "round": "二面",
       "difficulty": 4,
@@ -419,7 +380,6 @@
     },
     {
       "slug": "sliding-window-maximum",
-      "company": "快手",
       "position": "algo",
       "round": "一面",
       "difficulty": 3,
@@ -434,7 +394,6 @@
     },
     {
       "slug": "merge-k-sorted-lists",
-      "company": "字节跳动",
       "position": "algo",
       "round": "二面",
       "difficulty": 4,
@@ -449,7 +408,6 @@
     },
     {
       "slug": "product-fermi-dau-estimate",
-      "company": "快手",
       "position": "product",
       "round": "一面",
       "difficulty": 4,
@@ -464,7 +422,6 @@
     },
     {
       "slug": "product-feed-prd-design",
-      "company": "小红书",
       "position": "product",
       "round": "二面",
       "difficulty": 4,
@@ -479,7 +436,6 @@
     },
     {
       "slug": "product-retention-drop-analysis",
-      "company": null,
       "position": "product",
       "round": "一面",
       "difficulty": 3,
@@ -494,7 +450,6 @@
     },
     {
       "slug": "product-hr-conflict-prioritization",
-      "company": "腾讯",
       "position": "product",
       "round": "hr",
       "difficulty": 2,
@@ -509,7 +464,6 @@
     },
     {
       "slug": "transformer-self-attention-complexity",
-      "company": "百度",
       "position": "ai",
       "round": "一面",
       "difficulty": 4,
@@ -524,7 +478,6 @@
     },
     {
       "slug": "rag-chunk-recall-optimization",
-      "company": null,
       "position": "ai",
       "round": "二面",
       "difficulty": 4,
@@ -539,7 +492,6 @@
     },
     {
       "slug": "llm-hallucination-evaluation",
-      "company": "字节跳动",
       "position": "ai",
       "round": "二面",
       "difficulty": 4,

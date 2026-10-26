@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 面试题库种子导入（走 admin API，幂等：已存在的公司/题目会跳过）
+ * 面试题库种子导入（走 admin API，幂等：已存在的题目会跳过）
  *
  * 用法：
  *   node scripts/import-interview.mjs
@@ -59,8 +59,8 @@ async function loadAllQuestions() {
 }
 
 const seed = JSON.parse(await readFile(file, 'utf8'))
-if (!Array.isArray(seed.companies) || !Array.isArray(seed.questions)) {
-  throw new Error('种子文件格式不对：需要 { companies: [], questions: [] }')
+if (!Array.isArray(seed.questions)) {
+  throw new Error('种子文件格式不对：需要 { questions: [] }')
 }
 if (!key) key = (await readFile(keyFile, 'utf8')).trim()
 if (!key) throw new Error('缺少 API Key：设置 AIBLOG_API_KEY 或 ' + keyFile)
@@ -68,34 +68,14 @@ if (!key) throw new Error('缺少 API Key：设置 AIBLOG_API_KEY 或 ' + keyFil
 console.log('种子文件 ' + file)
 console.log('目标 ' + api + (dryRun ? '（dry-run，不写库）' : ''))
 
-const existingCompanies = await request('GET', '/api/admin/interview/companies')
-const companyByName = new Map()
-for (const c of existingCompanies || []) companyByName.set(c.name, c.id)
-
-let coCreated = 0
-for (const c of seed.companies) {
-  if (companyByName.has(c.name)) continue
-  if (dryRun) {
-    console.log('  [dry] 新建公司 ' + c.name)
-  } else {
-    const saved = await request('POST', '/api/admin/interview/companies', {
-      slug: c.slug, name: c.name, industry: c.industry, scale: c.scale, intro: c.intro,
-    })
-    companyByName.set(saved.name, saved.id)
-  }
-  coCreated++
-}
-
 const existingSlugs = await loadAllQuestions()
 let qCreated = 0
 let qSkipped = 0
 const failed = []
 for (const q of seed.questions) {
   if (existingSlugs.has(q.slug)) { qSkipped++; continue }
-  const companyId = q.company ? companyByName.get(q.company) : null
-  if (q.company && !companyId) { failed.push(q.slug + '（找不到公司 ' + q.company + '）'); continue }
   const payload = {
-    slug: q.slug, companyId, position: q.position, round: q.round,
+    slug: q.slug, position: q.position, round: q.round,
     difficulty: q.difficulty, questionType: q.questionType, title: q.title,
     body: q.body, answer: q.answer, followUps: q.followUps || [],
     sourceUrl: q.sourceUrl ?? null, askedYear: q.askedYear ?? null,
@@ -111,7 +91,6 @@ for (const q of seed.questions) {
 }
 
 console.log('---')
-console.log('公司：新建 ' + coCreated + ' / 已有跳过 ' + (seed.companies.length - coCreated))
 console.log('题目：新建 ' + qCreated + ' / 已存在跳过 ' + qSkipped + ' / 总计 ' + seed.questions.length)
 if (failed.length) {
   console.log('失败 ' + failed.length + ' 条：')
