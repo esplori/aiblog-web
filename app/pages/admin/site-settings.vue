@@ -23,6 +23,7 @@ interface SiteData {
   footerText: string
   copyright: string
   icp: string
+  stockEnabled: boolean
 }
 
 // 仅管理员可管理站点外观
@@ -44,6 +45,7 @@ const form = reactive<SiteData>({
   footerText: '',
   copyright: '',
   icp: '',
+  stockEnabled: true,
 })
 
 const formRef = ref()
@@ -77,6 +79,8 @@ const load = async () => {
     form.footerText = data.footerText || ''
     form.copyright = data.copyright || ''
     form.icp = data.icp || ''
+    // 后端历史数据可能为 null —— 一律按「开」处理，避免把入口悄悄关掉
+    form.stockEnabled = data.stockEnabled !== false
     themes.value = (themesRes.data || []).filter(
       (t: ThemePreset) => t && t.key,
     )
@@ -103,6 +107,7 @@ const save = async () => {
       footerText: form.footerText,
       copyright: form.copyright,
       icp: form.icp,
+      stockEnabled: form.stockEnabled,
     })
     // 刷新全局配置覆盖层，让前台/后台即时生效
     await refreshSiteSettings()
@@ -262,6 +267,19 @@ onMounted(load)
           maxlength="100"
           show-word-limit
         />
+      </el-form-item>
+
+      <!-- ════ 功能开关 ════ -->
+      <el-form-item label="股票模块">
+        <div class="flex items-center gap-3">
+          <el-switch v-model="form.stockEnabled" />
+          <span class="text-xs text-gray-400">
+            {{ form.stockEnabled ? '已开启：工作台侧边栏显示「股票」入口' : '已关闭：入口收起，直接访问 /finance 会跳回首页' }}
+          </span>
+        </div>
+        <div class="text-xs text-gray-400 mt-1">
+          持仓/盈亏模块的总开关，保存后立即生效（不影响已有数据，随时可再打开）
+        </div>
       </el-form-item>
 
       <el-form-item>

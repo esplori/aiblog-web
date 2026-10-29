@@ -83,6 +83,11 @@ export default defineNuxtConfig({
         // 后端目前**没有**验证码接口 ⇒ 默认关;后端就位后再置 true
         captchaEnabled: process.env.NUXT_PUBLIC_AUTH_CAPTCHA_ENABLED === 'true',
       },
+      // 功能开关(部署级,默认全开;显式置 false 才关闭 → 无需发版即可关模块)
+      features: {
+        // 股票(持仓/盈亏)模块:关掉后侧边栏入口收起、/finance 重定向首页
+        stockEnabled: process.env.NUXT_PUBLIC_STOCK_ENABLED !== 'false',
+      },
     },
   },
 

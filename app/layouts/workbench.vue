@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { User } from '~/types'
 import type { AiStats } from '~/types/ai'
-import { MODULES, resolveActive, resolveModule } from '~/utils/navModules'
+import { MODULES, canSeeModule, resolveActive, resolveModule } from '~/utils/navModules'
 import type { NavItem, NavModule } from '~/utils/navModules'
 
 // 工作台外壳：左侧模块栏 + 顶栏 + 功能区。
@@ -89,7 +89,11 @@ const itemVisible = (item: NavItem) => !item.auth || canUseAdmin.value
  * 模块级可见性：股票这类「数据按用户隔离」的模块，没权限时整个收起来。
  * 只靠 itemVisible 会留下一个空的模块标题，点进去还是 403。
  */
-const moduleVisible = (mod: NavModule) => !mod.auth || canUseAdmin.value
+const { stockEnabled } = useFeatureFlags()
+const moduleVisible = (mod: NavModule) => canSeeModule(mod, {
+  canUseAdmin: canUseAdmin.value,
+  stockEnabled,
+})
 const visibleModules = computed(() => MODULES.filter(moduleVisible))
 
 /**

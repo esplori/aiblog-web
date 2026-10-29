@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FinSummary, FinTrade } from '~/types/finance'
 
-definePageMeta({ layout: 'workbench' })
+definePageMeta({ layout: 'workbench', middleware: 'stock-enabled' })
 
 const authStore = useAuthStore()
 const { get, post, del } = useApi()

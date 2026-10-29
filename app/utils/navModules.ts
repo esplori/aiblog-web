@@ -135,6 +135,20 @@ export const MODULES: NavModule[] = [
   },
 ]
 
+/**
+ * 模块级可见性：权限 + 功能开关（纯逻辑，布局与单测共用同一份判定）。
+ *
+ * 权限：auth 模块只对管理员展示（与 layouts/admin.vue 一致）。
+ * 开关：stockEnabled=false 时「股票」整块收起 —— 只藏单个菜单项会留下空模块标题。
+ */
+export const canSeeModule = (
+  mod: NavModule,
+  opts: { canUseAdmin: boolean; stockEnabled: boolean },
+): boolean => {
+  if (mod.key === 'finance' && !opts.stockEnabled) return false
+  return !mod.auth || opts.canUseAdmin
+}
+
 /** 按路径判断当前属于哪个模块（用于高亮模块切换器） */
 export const resolveModule = (path: string): NavModule => {
   if (path === '/ai' || path.startsWith('/ai/')) {
