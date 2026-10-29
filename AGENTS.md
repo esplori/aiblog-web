@@ -123,6 +123,11 @@ pnpm test:node        # 单测:node:test(tests/article-cover.test.mjs)
   ⚠ 生效优先级为**后端 `site_settings`(DB) > `.env`** —— 后台已配过的项,改 `.env` **不生效**。
 - **登录页开关**:`NUXT_PUBLIC_AUTH_BRAND_PANEL`(默认 `true`)、`NUXT_PUBLIC_AUTH_FORGOT_URL`(默认空=不渲染)、
   `NUXT_PUBLIC_AUTH_CAPTCHA_ENABLED`(默认 `false`)。
+- **股票模块开关**:优先级 **后台「站点设置」页开关(DB `site_settings.stock_enabled`) > `.env` `NUXT_PUBLIC_STOCK_ENABLED` > 默认开**。
+  后台点一下保存即生效(刷新页面),**不需要重建镜像**;`.env` 那条只作后端不可达时的兜底/应急。
+  关掉后:工作台侧边栏「股票」模块整块收起 + `/finance` 302 回首页(中间件 `stock-enabled`)。
+  ⚠ 后端侧该列由 `SiteSettingsServiceImpl` 启动时幂等补列(`ALTER TABLE ... ADD COLUMN IF NOT EXISTS`),
+  历史库也无需手工执行;增量脚本在 `aiblog-java:/src/main/resources/db/migration/V20261029_1__site_stock_enabled.sql`。
 - 该实例**对外可访问**(nginx access.log 有真实外网流量)⇒ 重建期间存在秒级不可用窗口;
   需零停机应上双实例 + 反向代理切换。
 
