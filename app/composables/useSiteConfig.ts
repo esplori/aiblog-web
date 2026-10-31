@@ -62,6 +62,21 @@ const envSite = (): SiteConfig => {
   }
 }
 
+/**
+ * 后端字段名和前端 SiteConfig 有三处不一致：siteName / siteTagline / siteDescription。
+ * 早先这三项没做映射就合并，结果后台改了站名前台毫无反应（一直取 .env 的兜底名）——
+ * 其它字段（brandColor / icp / footerText…）名字正好相同，把这个坑掩住了。
+ */
+export const normalizeDb = (raw: Partial<SiteConfig> & Record<string, any>): Partial<SiteConfig> => {
+  const { siteName, siteTagline, siteDescription, ...rest } = raw
+  return {
+    ...rest,
+    name: siteName ?? (raw as any).name,
+    tagline: siteTagline ?? (raw as any).tagline,
+    description: siteDescription ?? (raw as any).description,
+  }
+}
+
 const fetchDb = async (): Promise<Partial<SiteConfig> | null> => {
   const runtime = useRuntimeConfig()
   const url = import.meta.server
@@ -70,7 +85,7 @@ const fetchDb = async (): Promise<Partial<SiteConfig> | null> => {
   try {
     const res = await $fetch<SiteResponse>(url)
     if (res?.code === 200 && res.data) {
-      return res.data
+      return normalizeDb(res.data as any)
     }
     return null
   } catch (e) {
