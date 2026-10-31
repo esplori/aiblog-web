@@ -7,6 +7,8 @@ import type { NavItem, NavModule } from '~/utils/navModules'
 // 工作台外壳：左侧模块栏 + 顶栏 + 功能区。
 // 博客与 AI 广场是同级模块，切模块时只有功能区内容变化。
 const site = useSiteConfig()
+// 登录入口开关：默认关。关掉后侧栏/抽屉都不再显示登录，/login 直连仍可进
+const { loginEnabled } = useFeatureFlags()
 const authStore = useAuthStore()
 const route = useRoute()
 const { get } = useApi()
@@ -240,7 +242,7 @@ const onLogout = () => {
             </button>
           </div>
 
-          <template v-else>
+          <template v-else-if="loginEnabled">
             <NuxtLink
               v-if="collapsed"
               to="/login"
@@ -312,7 +314,7 @@ const onLogout = () => {
             </li>
           </ul>
         </div>
-        <div v-if="!authStore.isLoggedIn" class="mt-4 border-t border-slate-100 pt-3">
+        <div v-if="!authStore.isLoggedIn && loginEnabled" class="mt-4 border-t border-slate-100 pt-3">
           <NuxtLink
             to="/login"
             class="block rounded-lg bg-brand-600 py-2 text-center text-sm text-white transition-colors hover:bg-brand-700"

@@ -4,6 +4,8 @@ const authStore = useAuthStore()
 const isAdmin = computed(() => authStore.user?.role === 'admin')
 const site = useSiteConfig()
 const { name, brandColor, logoUrl, copyright, footerText, icp } = site
+// 登录入口开关：默认关，关掉后前台不出现「登录」按钮（/login 直连仍可进，避免把管理员锁死）
+const { loginEnabled } = useFeatureFlags()
 
 // SSR 阶段将品牌色写入 html style，避免客户端注入导致首屏闪烁
 useBrandTheme(brandColor)
@@ -76,7 +78,7 @@ onMounted(() => {
             </el-dropdown>
           </template>
 
-          <template v-else>
+          <template v-else-if="loginEnabled">
             <NuxtLink to="/login">
               <el-button type="primary" size="small">登录</el-button>
             </NuxtLink>

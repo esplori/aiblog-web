@@ -86,12 +86,15 @@ const { data: relatedData } = useAsyncData(
 )
 const related = computed<ArticleItem[]>(() => relatedData.value?.data || [])
 
+// 评论开关：默认关。关掉时整个评论区不渲染，也就不该再去请求评论接口
+const { commentEnabled } = useFeatureFlags()
+
 // 评论请求依赖文章内部 id，需等文章加载完成后再请求
 const { data: commentsData, pending: commentsPending, refresh: refreshComments } = useAsyncData(
   () => `article-comments-${article.value?.id ?? 'none'}`,
   () => {
     const id = article.value?.id
-    if (!id) return Promise.resolve({ data: [] } as any)
+    if (!id || !commentEnabled.value) return Promise.resolve({ data: [] } as any)
     return get<Comment[]>(`/api/comments/article/${id}`)
   },
   { default: () => [], watch: [() => article.value?.id] }
@@ -290,8 +293,8 @@ const submitComment = async () => {
         <!-- 分隔线 -->
         <div class="border-t border-gray-100" />
 
-        <!-- 评论区 -->
-        <section class="pt-10">
+        <!-- 评论区（后台「站点设置」可关，默认关） -->
+        <section v-if="commentEnabled" class="pt-10">
           <h2 class="text-lg font-semibold text-gray-900 mb-8">
             评论 <span class="text-gray-400 font-normal">({{ comments.length }})</span>
           </h2>

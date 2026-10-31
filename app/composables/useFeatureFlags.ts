@@ -5,6 +5,10 @@
  * 于是后台改完刷新生效，不需要重新构建镜像；.env 只作后端不可达时的兜底。
  */
 export const useFeatureFlags = (): FeatureFlags => {
-  const { stockEnabled } = useSiteConfig()
-  return { stockEnabled: resolveStockEnabled(stockEnabled) }
+  const { stockEnabled, loginEnabled, commentEnabled } = useSiteConfig()
+  return {
+    stockEnabled: resolveStockEnabled(stockEnabled),
+    loginEnabled: resolveOffByDefault(loginEnabled),
+    commentEnabled: resolveOffByDefault(commentEnabled),
+  }
 }

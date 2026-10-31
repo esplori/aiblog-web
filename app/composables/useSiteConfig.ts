@@ -6,7 +6,7 @@
  * 供 app.vue / 布局 / 页面同步读取生效值。后端不可达时回退 .env 兜底。
  */
 
-import { resolveStockEnabled } from '~/utils/featureFlags'
+import { resolveOffByDefault, resolveStockEnabled } from '~/utils/featureFlags'
 
 export interface SiteConfig {
   name: string
@@ -21,6 +21,10 @@ export interface SiteConfig {
   icp: string
   /** 股票模块开关：后台设置页可切换，false 收起侧边栏入口并拦 /finance */
   stockEnabled: boolean
+  /** 登录入口开关：默认关，关闭后前台不显示登录入口（/login 直连仍可用，避免把自己锁死） */
+  loginEnabled: boolean
+  /** 评论功能开关：默认关，关闭后文章页不显示评论区 */
+  commentEnabled: boolean
 }
 
 interface SiteResponse {
@@ -47,6 +51,13 @@ const envSite = (): SiteConfig => {
     // 环境变量兜底：DB 里没配过时按 .env 的 NUXT_PUBLIC_STOCK_ENABLED 决定（默认开）
     stockEnabled: resolveStockEnabled(
       config.public.features?.stockEnabled as boolean | string | undefined,
+    ),
+    // 这两个默认关：.env 兜底同样只认明确的 true
+    loginEnabled: resolveOffByDefault(
+      config.public.features?.loginEnabled as boolean | string | undefined,
+    ),
+    commentEnabled: resolveOffByDefault(
+      config.public.features?.commentEnabled as boolean | string | undefined,
     ),
   }
 }

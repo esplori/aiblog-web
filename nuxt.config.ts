@@ -87,6 +87,9 @@ export default defineNuxtConfig({
       features: {
         // 股票(持仓/盈亏)模块:关掉后侧边栏入口收起、/finance 重定向首页
         stockEnabled: process.env.NUXT_PUBLIC_STOCK_ENABLED !== 'false',
+        // 登录入口 / 评论功能:默认关,后台「站点设置」可开;.env 只作后端不可达时的兜底
+        loginEnabled: process.env.NUXT_PUBLIC_LOGIN_ENABLED === 'true',
+        commentEnabled: process.env.NUXT_PUBLIC_COMMENT_ENABLED === 'true',
       },
     },
   },

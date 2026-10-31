@@ -24,6 +24,8 @@ interface SiteData {
   copyright: string
   icp: string
   stockEnabled: boolean
+  loginEnabled: boolean
+  commentEnabled: boolean
 }
 
 // 仅管理员可管理站点外观
@@ -46,6 +48,9 @@ const form = reactive<SiteData>({
   copyright: '',
   icp: '',
   stockEnabled: true,
+  // 这两个默认关，与后端 site_settings.login_enabled / comment_enabled 的默认值一致
+  loginEnabled: false,
+  commentEnabled: false,
 })
 
 const formRef = ref()
@@ -81,6 +86,9 @@ const load = async () => {
     form.icp = data.icp || ''
     // 后端历史数据可能为 null —— 一律按「开」处理，避免把入口悄悄关掉
     form.stockEnabled = data.stockEnabled !== false
+    // 这两个反过来：只有明确 true 才算开，null / 缺列一律按「关」
+    form.loginEnabled = data.loginEnabled === true
+    form.commentEnabled = data.commentEnabled === true
     themes.value = (themesRes.data || []).filter(
       (t: ThemePreset) => t && t.key,
     )
@@ -108,6 +116,8 @@ const save = async () => {
       copyright: form.copyright,
       icp: form.icp,
       stockEnabled: form.stockEnabled,
+      loginEnabled: form.loginEnabled,
+      commentEnabled: form.commentEnabled,
     })
     // 刷新全局配置覆盖层，让前台/后台即时生效
     await refreshSiteSettings()
@@ -279,6 +289,30 @@ onMounted(load)
         </div>
         <div class="text-xs text-gray-400 mt-1">
           持仓/盈亏模块的总开关，保存后立即生效（不影响已有数据，随时可再打开）
+        </div>
+      </el-form-item>
+
+      <el-form-item label="登录入口">
+        <div class="flex items-center gap-3">
+          <el-switch v-model="form.loginEnabled" />
+          <span class="text-xs text-gray-400">
+            {{ form.loginEnabled ? '已开启：前台导航显示「登录」入口' : '已关闭：前台不显示登录入口（默认）' }}
+          </span>
+        </div>
+        <div class="text-xs text-gray-400 mt-1">
+          关闭只是收起入口，直连 <code>/login</code> 仍可登录——否则关掉之后管理员自己就进不来后台了
+        </div>
+      </el-form-item>
+
+      <el-form-item label="评论功能">
+        <div class="flex items-center gap-3">
+          <el-switch v-model="form.commentEnabled" />
+          <span class="text-xs text-gray-400">
+            {{ form.commentEnabled ? '已开启：文章页显示评论区' : '已关闭：文章页不显示评论区（默认）' }}
+          </span>
+        </div>
+        <div class="text-xs text-gray-400 mt-1">
+          关闭后评论组件整块不渲染，也不再请求评论接口；已有评论数据保留，随时可再打开
         </div>
       </el-form-item>
 
