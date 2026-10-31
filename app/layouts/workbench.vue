@@ -290,6 +290,22 @@ const onLogout = () => {
         <main id="wb-main" class="px-4 lg:px-6 py-6 mx-auto max-w-[1240px]">
           <slot />
         </main>
+
+        <!-- 页脚：ICP 备案号要求全站可见，而工作台首页就是主入口，
+             只在博客版布局放页脚等于首页没有备案号 -->
+        <footer
+          v-if="site.icp || site.footerText"
+          class="mx-auto max-w-[1240px] px-4 pb-6 text-center text-[11px] leading-relaxed text-slate-400 lg:px-6"
+        >
+          <p v-if="site.footerText">{{ site.footerText }}</p>
+          <a
+            v-if="site.icp"
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener"
+            class="transition-colors hover:text-slate-600 hover:underline"
+          >{{ site.icp }}</a>
+        </footer>
       </div>
     </div>
 
