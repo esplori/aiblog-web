@@ -93,16 +93,20 @@ onMounted(() => {
     </main>
 
     <!-- 底部：博客版 -->
-    <footer class="bg-gray-800 text-gray-400 py-8">
-      <div class="container text-center text-sm space-y-2">
-        <p>{{ copyright || `© ${year} ${name}` }}</p>
-        <p v-if="footerText">{{ footerText }}</p>
+    <footer class="border-t border-white/10 bg-gray-800 text-gray-400">
+      <div
+        class="container flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 py-7 text-[12.5px] tracking-[.01em]"
+      >
+        <span>{{ copyright || `© ${year} ${name}` }}</span>
+        <span v-if="footerText" class="text-gray-600">·</span>
+        <span v-if="footerText">{{ footerText }}</span>
+        <span v-if="icp && (footerText || copyright)" class="text-gray-600">·</span>
         <a
           v-if="icp"
           href="https://beian.miit.gov.cn/"
           target="_blank"
           rel="noopener"
-          class="hover:text-white transition-colors"
+          class="underline-offset-2 transition-colors hover:text-white hover:underline hover:decoration-gray-500"
         >{{ icp }}</a>
       </div>
     </footer>

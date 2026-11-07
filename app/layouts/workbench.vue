@@ -295,16 +295,22 @@ const onLogout = () => {
              只在博客版布局放页脚等于首页没有备案号 -->
         <footer
           v-if="site.icp || site.footerText"
-          class="mx-auto max-w-[1240px] px-4 pb-6 text-center text-[11px] leading-relaxed text-slate-400 lg:px-6"
+          class="mx-auto max-w-[1240px] px-4 lg:px-6"
         >
-          <p v-if="site.footerText">{{ site.footerText }}</p>
-          <a
-            v-if="site.icp"
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noopener"
-            class="transition-colors hover:text-slate-600 hover:underline"
-          >{{ site.icp }}</a>
+          <!-- 页脚只做“收口”：一条极细分割线 + 一行居中细字，不抢内容区的注意力 -->
+          <div
+            class="mt-6 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-slate-200/70 pt-5 pb-7 text-[11.5px] tracking-[.01em] leading-relaxed text-slate-400"
+          >
+            <span v-if="site.footerText">{{ site.footerText }}</span>
+            <span v-if="site.footerText && site.icp" class="text-slate-300">·</span>
+            <a
+              v-if="site.icp"
+              href="https://beian.miit.gov.cn/"
+              target="_blank"
+              rel="noopener"
+              class="underline-offset-2 transition-colors hover:text-slate-600 hover:underline hover:decoration-slate-300"
+            >{{ site.icp }}</a>
+          </div>
         </footer>
       </div>
     </div>
