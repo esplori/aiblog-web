@@ -28,6 +28,10 @@ export interface FinPosition {
   dayPnl: number
   dayPnlPct: number
   weight: number
+  /** 是否手工编辑过（覆盖流水推导） */
+  manual?: boolean
+  /** 手工编辑备注 */
+  note?: string
 }
 
 export interface FinWatchItem {

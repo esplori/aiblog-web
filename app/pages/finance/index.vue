@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { FinSummary, FinTrade } from '~/types/finance'
+import type { FinPosition, FinSummary, FinTrade } from '~/types/finance'
 
 definePageMeta({ layout: 'workbench', middleware: 'stock-enabled' })
 
 const authStore = useAuthStore()
-const { get, post, del } = useApi()
+const { get, post, put, del } = useApi()
 
 const loginUrl = computed(() => '/login?redirect=' + encodeURIComponent('/finance'))
 
@@ -12,9 +12,13 @@ const summary = ref<FinSummary | null>(null)
 const trades = ref<FinTrade[]>([])
 const loading = ref(false)
 const message = ref('')
+const notice = ref('')
 
 const tradeOpen = ref(false)
 const watchOpen = ref(false)
+const posOpen = ref(false)
+const posManual = ref(false)
+const posForm = reactive({ symbol: '', name: '', shares: '', avgCost: '', note: '' })
 const saving = ref(false)
 const tradeForm = reactive({ symbol: '', side: 'BUY', price: '', shares: '', fee: '', occurredOn: '', note: '' })
 const watchForm = reactive({ symbol: '', targetPrice: '', note: '' })
@@ -73,8 +77,10 @@ async function submitTrade() {
       note: tradeForm.note || undefined,
     })
     if (res.code !== 200) throw new Error(res.message || '保存失败')
+    const cleared = (res.data as { overrideCleared?: boolean } | undefined)?.overrideCleared
     tradeOpen.value = false
     await load()
+    notice.value = cleared ? '已按新交易重置该股的手工持仓' : ''
   } catch (e) {
     message.value = e instanceof Error ? e.message : '保存失败'
   } finally {
@@ -118,6 +124,63 @@ async function removeTrade(id: number) {
   await del('/api/finance/trades/' + id)
   await load()
 }
+
+/* ---------------------------- 持仓手工编辑 ---------------------------- */
+
+function openPositionEdit(p: FinPosition) {
+  posForm.symbol = p.symbol
+  posForm.name = p.name || p.symbol
+  posForm.shares = String(p.shares)
+  posForm.avgCost = String(p.avgCost)
+  posForm.note = p.note || ''
+  posManual.value = !!p.manual
+  posOpen.value = true
+}
+
+async function submitPosition() {
+  const shares = Number(posForm.shares)
+  if (!Number.isInteger(shares) || shares < 0 || shares > 100000000) {
+    message.value = '股数需在 0 ~ 100000000 之间'
+    return
+  }
+  const avgCost = Number(posForm.avgCost)
+  if (!Number.isFinite(avgCost) || avgCost <= 0 || avgCost > 100000) {
+    message.value = '成本价需在 0 ~ 100000 之间'
+    return
+  }
+  saving.value = true
+  message.value = ''
+  try {
+    const res = await put('/api/finance/positions/' + posForm.symbol, {
+      shares,
+      avgCost,
+      note: posForm.note || undefined,
+    })
+    if (res.code !== 200) throw new Error(res.message || '保存失败')
+    posOpen.value = false
+    await load()
+  } catch (e) {
+    message.value = e instanceof Error ? e.message : '保存失败'
+  } finally {
+    saving.value = false
+  }
+}
+
+async function resetPosition() {
+  if (!confirm('恢复按流水计算？手工填的股数和成本会被撤销')) return
+  saving.value = true
+  message.value = ''
+  try {
+    const res = await del('/api/finance/positions/' + posForm.symbol)
+    if (res.code !== 200) throw new Error(res.message || '恢复失败')
+    posOpen.value = false
+    await load()
+  } catch (e) {
+    message.value = e instanceof Error ? e.message : '恢复失败'
+  } finally {
+    saving.value = false
+  }
+}
 </script>
 
 <template>
@@ -146,6 +209,7 @@ async function removeTrade(id: number) {
 
     <template v-else>
       <p v-if="message" class="mb-3 rounded-lg bg-rose-50 px-3 py-2 text-xs text-rose-600">{{ message }}</p>
+      <p v-else-if="notice" class="mb-3 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-600">{{ notice }}</p>
 
       <section class="grid gap-3 sm:grid-cols-4">
         <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -197,12 +261,16 @@ async function removeTrade(id: number) {
                 <th class="px-4 py-2 text-right font-medium">浮盈</th>
                 <th class="px-4 py-2 text-right font-medium">今日</th>
                 <th class="px-4 py-2 text-right font-medium">仓位</th>
+                <th class="px-4 py-2 text-right font-medium"></th>
               </tr>
             </thead>
             <tbody>
               <tr v-for="p in summary.positions" :key="p.symbol" class="border-t border-slate-100">
                 <td class="px-4 py-2">
-                  <p class="font-medium text-slate-800">{{ p.name || p.symbol }}</p>
+                  <p class="font-medium text-slate-800">
+                    {{ p.name || p.symbol }}
+                    <span v-if="p.manual" class="ml-1 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] text-amber-600" :title="p.note || '手工填写'">手工</span>
+                  </p>
                   <p class="text-[11px] text-slate-400">{{ p.symbol }}</p>
                 </td>
                 <td class="px-4 py-2 text-right text-slate-600">{{ p.shares }}</td>
@@ -215,6 +283,9 @@ async function removeTrade(id: number) {
                 </td>
                 <td class="px-4 py-2 text-right" :class="signClass(p.dayPnl)">{{ signText(p.dayPnl) }}</td>
                 <td class="px-4 py-2 text-right text-slate-500">{{ fmt(p.weight, 1) }}%</td>
+                <td class="px-4 py-2 text-right">
+                  <button class="text-xs text-slate-400 hover:text-brand-600" @click="openPositionEdit(p)">编辑</button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -334,6 +405,41 @@ async function removeTrade(id: number) {
       <template #footer>
         <button class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600" @click="tradeOpen = false">取消</button>
         <button class="ml-2 rounded-lg bg-brand-600 px-3 py-1.5 text-sm text-white disabled:opacity-60" :disabled="saving" @click="submitTrade">
+          保存
+        </button>
+      </template>
+    </el-dialog>
+
+    <el-dialog v-model="posOpen" title="编辑持仓" width="400px">
+      <div class="space-y-3">
+        <div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
+          {{ posForm.name }}
+          <span class="ml-1 text-slate-400">{{ posForm.symbol }}</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <p class="text-xs text-slate-400">持股数量</p>
+            <el-input v-model="posForm.shares" type="number" class="mt-1" placeholder="600" />
+          </div>
+          <div>
+            <p class="text-xs text-slate-400">成本价</p>
+            <el-input v-model="posForm.avgCost" type="number" class="mt-1" placeholder="33.500" />
+          </div>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400">备注（可选）</p>
+          <el-input v-model="posForm.note" class="mt-1" placeholder="如：券商口径" />
+        </div>
+        <p class="text-[11px] leading-relaxed text-slate-400">
+          改股数与成本只影响当前及之后的盈亏计算，已生成的每日快照不会重算；新增一笔买卖会自动取消这里的手工值。
+        </p>
+      </div>
+      <template #footer>
+        <button v-if="posManual" class="mr-auto rounded-lg border border-rose-200 px-3 py-1.5 text-sm text-rose-500" @click="resetPosition">
+          恢复按流水计算
+        </button>
+        <button class="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-600" @click="posOpen = false">取消</button>
+        <button class="ml-2 rounded-lg bg-brand-600 px-3 py-1.5 text-sm text-white disabled:opacity-60" :disabled="saving" @click="submitPosition">
           保存
         </button>
       </template>
