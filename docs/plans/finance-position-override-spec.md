@@ -158,3 +158,22 @@ CREATE UNIQUE INDEX IF NOT EXISTS uk_fin_pos_override
 | 9 前端单测 | `pnpm test` | 通过 48 / 失败 0（基线 48） |
 | 9 前端构建 | `pnpm build` | 通过（Nuxt Build complete，.output 生成） |
 | 2-7、10 | 需部署后实测 | 未验证（服务未重启） |
+
+## 部署后实测（2026-11-17，生产环境）
+
+环境：aiblog-java/ubuntu-aiblog-java:latest 重建并重启，两容器 healthy；`fin_position_override` 已在生产库建好（唯一索引 `uk_fin_pos_override` 存在）。
+
+| 项 | 操作 | 实测结果 |
+|---|---|---|
+| 2 表结构 | `\d fin_position_override` | 通过：字段与索引符合第 2 节 |
+| 3 PUT 生效 | `PUT /positions/600036 {"shares":600,"avgCost":33.5}` | 通过：`shares=600 avgCost=33.5 cost=20100.0 manual=true` |
+| 4 summary 一致 | `GET /summary` | 通过：`marketValue=137688.0` = 各持仓市值求和；`cost=122173.48` |
+| 5 撤销回落 | `DELETE /positions/600036` 后 GET | 通过：回到 `500 / 34.132 / manual=false` |
+| 6 边界 | shares=-1 / avgCost=0 / symbol=999999 | 通过：前两条 HTTP 422 + 中文文案，未知标的 `body.code=404` |
+| 7 流水联动 | 用户 18：先 PUT 300 股，再买入 100 股 | 通过：`overrideCleared=true`，持仓变 `100 股 / 43.0 / manual=false`（测试数据已清理，admin 数据未受影响） |
+| 10 页面 | `GET /finance` | 通过：HTTP 200（行内手工标记与弹窗需人工点验） |
+
+补充偏离说明：
+
+4. 参数校验失败由全局异常处理器返回 **HTTP 422**（body.code=422 + 中文 message），不是第 3 节写的 400；业务异常（如 404）走统一 Result 包装，HTTP 200 + `body.code=404`。
+5. 生产容器 `SPRING_SQL_INIT_MODE=never`、`ddl-auto=none`，`schema.sql` 在线上**不会**自动执行；本次建表是手工在生产库执行同一份 DDL，后续同类改动需沿用「手工 DDL + 迁移文件归档」。
